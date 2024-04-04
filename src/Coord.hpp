@@ -362,3 +362,4 @@ operator Coord () const {
     return {R, G, B};
 }
 };
+
