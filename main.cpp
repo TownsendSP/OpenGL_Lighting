@@ -14,11 +14,15 @@
 #include <string>
 #include <functional>
 
-//My Imports
-#include "src/Camera.hpp"
+//My Imports and Defines
 #include "src/Coord.hpp"
+#include "src/Camera.hpp"
 #include "src/LeftVP.h"
 #include "src/things.h"
+#include "src/ColorData.h"
+
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+
 
 //ViewportDefinitions
 int totalHeight = 900;
@@ -63,22 +67,25 @@ float rVPColor[] = {0.2, 0.2, 0.2, 1.0};
 
 
 void setupRight() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     if(showInfoViewport){
         glViewport(lVportW, 0, rVportW, rVportH);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluPerspective(60.0, (float) rVportW / (float) rVportH, 1.0, 500.0);
     } else {
-        glViewport(0, 0, totalWidth, totalHeight);
-        glMatrixMode(GL_PROJECTION);
+        // glViewport(0, 0, totalWidth, totalHeight);
+        // glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(60.0, (float) totalWidth / (float) totalHeight, 1.0, 500.0);
+        // gluPerspective(60.0, (float) totalWidth / (float) totalHeight, 1.0, 500.0);
     }
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     cam.lookAt();
 
-    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
+    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+
 }
 
 void drawLitShapes() {
@@ -90,25 +97,43 @@ void drawLitShapes() {
 void drawUnlitShapes() {
     glDisable(GL_LIGHTING);
 
+    glPushMatrix();
     drawXZxGridlines(20);
+    glPopMatrix();
+
+
+    glPushMatrix();
     for (Debug3Dx debug_x: debugXes) {
         debug_x.draw();
     }
+    glPopMatrix();
+
+
+    //unit cube
+    glPushMatrix();
+    glutSolidDodecahedron();
+    glPopMatrix();
+
+
+
+
         glEnable(GL_LIGHTING);
 }
 
 void drawWindow(){
-    if(showInfoViewport){
-        infoVP.drawViewport();
-    }
+    // if(showInfoViewport){
+    //     infoVP.drawViewport();
+    // }
     setupRight();
+    drawLitShapes();
+    drawUnlitShapes();
 }
 
 
 
 void setupObjects() {
     cam = Camera(Coord(10, 10, 10), Coord(0, 0, 0), Coord(0, 1, 0));
-    debugXes.emplace_back(Debug3Dx(50, 2, Coord(0, 0, 0)));
+    debugXes.emplace_back(Debug3Dx( Coord(0, 0, 0),50, 2));
     windowBlinds = Blinds(1, 2, 0.1, 15, 0);
 
 
@@ -118,7 +143,7 @@ void setup(){
 
 
     // Light property vectors.
-    float lightAmb[] = {0.0, 0.1, 1.0, 1.0};
+    float lightAmb[] = {0.1, 0.1, 1.0, 1.0};
     float lightDifAndSpec[] = {0.0, 0.1, 1.0, 1.0};
     float lightPos[] = {0.0, 7.0, 3.0, 0.0};
     float globAmb[] = {0.2, 0.2, 0.2, 1.0};
@@ -136,7 +161,9 @@ void setup(){
     glEnable(GL_LIGHT0); // Enable particular light source.
     glEnable(GL_DEPTH_TEST); // Enable depth testing.
     glEnable(GL_NORMALIZE); // Enable automatic normalization of normals.
-    glClearColor(0.3, 0.3, 0.3, 1.0);
+
+    setupObjects();
+    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 }
 
 void resize(int w, int h) {
@@ -207,12 +234,14 @@ void keyboard(unsigned char key, int x, int y) {
         break;
         case 'r':
             setup();
-        glClearColor(0.8, 0.8, 1.0, 0.0);
+        glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+
         break;
         case 'R':
             started = false;
         setup();
-        glClearColor(0.8, 0.8, 1.0, 0.0);
+        glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+
         break;
         case 'C':
             cam.relTrans(Coord(0, -1 * speed, 0));
@@ -238,6 +267,7 @@ int main(int argc, char **argv) {
     glutInitWindowPosition(10, 100);
     glutCreateWindow("Scene Display Window");
     setup();
+    // setupObjects();
     glutDisplayFunc(drawWindow);
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyboard);

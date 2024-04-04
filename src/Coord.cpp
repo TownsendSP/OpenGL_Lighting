@@ -109,18 +109,6 @@ bool isColorCloseEnough(Coord color1, Coord color2, float closeness) {
         abs(color1.Y - color2.Y) < closeness &&
         abs(color1.Z - color2.Z) < closeness) {
         return true;
-    }
+        }
     return false;
 }
-
-bool isColorCloseEnough(ColorA color1, ColorA color2, float closeness) {
-    if (abs(color1.R - color2.R) < closeness &&
-        abs(color1.G - color2.G) < closeness &&
-        abs(color1.B - color2.B) < closeness) {
-        return true;
-    }
-    return false;
-}
-
-
-bool isCo

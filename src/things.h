@@ -5,6 +5,7 @@
 #ifndef TGSOUTHAHW4_THINGS_H
 #define TGSOUTHAHW4_THINGS_H
 # include "Coord.hpp"
+# include "ColorData.h"
 
 
 
@@ -17,9 +18,9 @@
 //                       /_/                                                        /____/
 
 
-class things {
-
-};
+// class things {
+//
+// };
 
 class Blinds{
     float width;
@@ -55,6 +56,7 @@ public:
     Coord* position;
 
     Debug3Dx(Coord* position, float size = 1.0, float weight = 1.0);
+    Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
 
     // Debug3Dx(float size = 1.0, float weight = 1.0, Coord position);
 

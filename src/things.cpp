@@ -3,15 +3,23 @@
 //
 
 #include "things.h"
+#ifdef __APPLE__
+# include <GLUT/glut.h>
+#else
+
+# include <GL/glut.h>
+
+#endif
+#define PI 3.14159
 
 
 
 
 //Window Blinds Routines
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
-    matSpecBlinds = ColorA(0.0, 1.0, 1.0, 1.0);
+    matSpecBlinds = ColorData(0.0, 1.0, 1.0, 1.0);
     matShineBlinds[0] = 50.0f;
-    matAmbAndDifBlinds = ColorA(0.8, 0.8, 0.7, 1.0);
+    matAmbAndDifBlinds = ColorData(0.8, 0.8, 0.7, 1.0);
 
     this->width = width;
     this->height = height;
@@ -81,6 +89,12 @@ Debug3Dx::Debug3Dx(Coord *position, float size, float weight) {
     this -> size = size;
     this -> weight = weight;
     this -> position = position;
+}
+
+Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
+    this -> position = &position;
+    this -> size = size;
+    this -> weight = weight;
 }
 
 void Debug3Dx::draw() const {

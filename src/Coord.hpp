@@ -1,4 +1,13 @@
+#ifndef COORD_H
+#define COORD_H
+
+//imports
+#include <algorithm>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <iomanip>
+#include <sstream>
 
 #ifdef __APPLE__
 # include <GLUT/glut.h>
@@ -7,17 +16,9 @@
 # include <GL/glut.h>
 
 #endif
+#define PI 3.14159
 
-#ifndef COORD_H
-#define COORD_H
 
-#include <algorithm>
-
-#include <cmath>
-#include <string>
-#include <vector>
-#include <iomanip>
-#include <sstream>
 
 float srnd(float min, float max);
 
@@ -188,178 +189,7 @@ float dist(Coord point1, Coord point2);
 std::vector<Coord> genRandNonCoLinearCord(int numCoords, float permissibleCloseness, Coord min, Coord max);
 
 Coord genRandNonCoLinearCord(std::vector<Coord> coords, float permissibleCloseness, Coord min, Coord max);
-
+bool isColorCloseEnough(Coord color1, Coord color2, float closeness);
 #endif //COORD_H
 
-bool isColorCloseEnough(Coord color1, Coord color2, float closeness);
-
-
-
-class ColorA {
-public:
-    float R, G, B, A;
-
-    ColorA(float r, float g, float b, float a) {
-        R = r;
-        G = g;
-        B = b;
-        A = a;
-    }
-
-    explicit ColorA(const float in[4]) {
-        R = in[0];
-        G = in[1];
-        B = in[2];
-        A = in[3];
-    }
-
-    //default:
-    ColorA() {
-        R = 0;
-        G = 0;
-        B = 0;
-        A = 0;
-    }
-
-    //<editor-fold desc="Arithmetic">
-    ColorA operator+(const ColorA &other) const {
-        return {R + other.R, G + other.G, B + other.B, A + other.A};
-    }
-
-    ColorA operator+(const float other) const {
-        return {R + other, G + other, B + other, A + other};
-    }
-
-    ColorA operator-(const ColorA &other) const {
-        return {R - other.R, G - other.G, B - other.B, A - other.A};
-    }
-
-    ColorA operator-(const float other) const {
-        return {R - other, G - other, B - other, A - other};
-    }
-
-    ColorA operator*(const ColorA &other) const {
-        return {R * other.R, G * other.G, B * other.B, A * other.A};
-    }
-
-    ColorA operator*(const float other) const {
-        return {R * other, G * other, B * other, A * other};
-    }
-
-    ColorA operator/(const ColorA &other) const {
-        if (other.R != 0 && other.G != 0 && other.B != 0 && other.A != 0) {
-            return {R / other.R, G / other.G, B / other.B, A / other.A};
-        } else {
-            return {};
-        }
-    }
-
-    ColorA operator/(const float other) const {
-        if (other != 0) {
-            return {R / other, G / other, B / other, A / other};
-        } else {
-            return {};
-        }
-    }
-    //</editor-fold>
-
-
-    //<editor-fold desc="Bitwise">
-    ColorA operator&(const int i) const {
-        return ColorA(i & 8 ? R : 0, i & 4 ? G : 0, i & 2 ? B : 0,
-                      i & 1 ? A : 0); // 8 = 1000, 4 = 0100, 2 = 0010, 1 = 0001
-    }
-
-    ColorA operator|(const ColorA i) const {
-        return {R == 0 ? i.R : R, G == 0 ? i.G : G, B == 0 ? i.B : B, A == 0 ? i.A : A};
-    }
-
-    ColorA operator|(const float i) const {
-        return {R == 0 ? i : R, G == 0 ? i : G, B == 0 ? i : B, A == 0 ? i : A};
-    }
-    //</editor-fold>
-
-    //otherMath:
-    ColorA clamp(float min, float max) const {
-        return {clmp(R, min, max),
-                clmp(G, min, max),
-                clmp(B, min, max),
-                clmp(A, min, max)};
-    }
-
-    ColorA clamp(ColorA min, ColorA max) const {
-        return {clmp(R, min.R, max.R),
-                clmp(G, min.G, max.G),
-                clmp(B, min.B, max.B),
-                clmp(A, min.A, max.A)};
-    }
-
-    ColorA scale(float min, float max) const {
-        return {clscl(R, min, max),
-                clscl(G, min, max),
-                clscl(B, min, max),
-                clscl(A, min, max)};
-    }
-
-    ColorA scale(ColorA min, ColorA max) const {
-        return {clscl(R, min.R, max.R),
-                clscl(G, min.G, max.G),
-                clscl(B, min.B, max.B),
-                clscl(A, min.A, max.A)};
-    }
-
-    ColorA pow(const float exponent) const {
-        return {std::pow(R, exponent), std::pow(G, exponent), std::pow(B, exponent), A};
-    }
-
-    ColorA pow(const ColorA &other) const {
-        return {std::pow(R, other.R), std::pow(G, other.G), std::pow(B, other.B), A};
-    }
-
-    float dist(const ColorA &other) const {
-        return std::sqrt(
-                std::abs(R - other.R) * std::abs(R - other.R) +
-                std::abs(G - other.G) * std::abs(G - other.G) +
-                std::abs(B - other.B) * std::abs(B - other.B));
-    }
-
-    std::string toString() const {
-        std::ostringstream oss;
-        oss << std::fixed << std::setprecision(2) << std::showpoint;
-        oss << "(" << R << ", " << G << ", " << B << ", " << A << ")";
-        std::string str = oss.str();
-        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-        str.erase(str.find_last_not_of('.') + 1, std::string::npos);
-        return str;
-    }
-
-
-    bool operator==(const ColorA &other) const {
-        return R == other.R && G == other.G && B == other.B && A == other.A;
-    }
-
-    ColorA scale255() const {
-        return {R * 255, G * 255, B * 255, A};
-    }
-
-    ColorA scale1() const {
-        return {R / 255, G / 255, B / 255, A};
-    }
-
-    Coord toCoord() const {
-        return {R, G, B};
-    }
-
-    //toArray
-    float *toArray() {
-        return new float[4]{R, G, B, A};
-    }
-
-    operator float*() const {
-    return new float[4]{R, G, B, A};
-}
-operator Coord () const {
-    return {R, G, B};
-}
-};
 

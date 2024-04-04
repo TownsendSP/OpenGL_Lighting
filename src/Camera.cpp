@@ -1,11 +1,12 @@
 
 
 #include "Camera.hpp"
-#include "Coord.hpp"
+
 //#include "bee.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <string>
 #include <vector>
 #define PI 3.14159
@@ -124,6 +125,7 @@ void Camera::relRot(Coord deltaAngle) {
 
 void Camera::lookAt() {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
+    // std::cout << "At: " << pos.toString() << " Tgt: " << tgt.toString() << std::endl;
 }
 
 std::vector<std::string> Camera::toString() const {

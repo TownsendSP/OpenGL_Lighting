@@ -20,6 +20,8 @@ add_executable(tgsouthaHW4 main.cpp
         src/LeftVP.h
         src/things.cpp
         src/things.h
+        src/ColorData.cpp
+        src/ColorData.h
 )
 
 target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
