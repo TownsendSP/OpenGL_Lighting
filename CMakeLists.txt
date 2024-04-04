@@ -22,6 +22,10 @@ add_executable(tgsouthaHW4 main.cpp
         src/things.h
         src/ColorData.cpp
         src/ColorData.h
+        src/lighting.cpp
+        src/lighting.h
+        src/lighting.h
+        src/globals.h
 )
 
 target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

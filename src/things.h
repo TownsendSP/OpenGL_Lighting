@@ -6,6 +6,7 @@
 #define TGSOUTHAHW4_THINGS_H
 # include "Coord.hpp"
 # include "ColorData.h"
+# include "globals.h"
 
 
 
@@ -22,32 +23,7 @@
 //
 // };
 
-class Blinds{
-    float width;
-    float height;
-    float depth;
-    float pitchAngle;
 
-    float* matSpecBlinds;
-    float matShineBlinds[1]{};
-    float* matAmbAndDifBlinds;
-
-    int numBlades;
-    float bladeHeight = 0.01;
-
-    float closedFactor;
-    void drawBlade() const;
-    bool opening = false;
-
-public:
-    Blinds(float width, float height, float depth, float pitchAngle, float closedFactor = 1.0);
-    void draw() const;
-    void open(float amt);
-    void close(float amt);
-    void animate(float amt);
-
-    Blinds() = default;
-};
 
 class Debug3Dx {
 public:
@@ -64,6 +40,41 @@ public:
 };
 
 void drawXZxGridlines(float range);
+
+
+
+class Blinds{
+    float width;
+    float height;
+    float depth;
+    float pitchAngle;
+
+
+
+    int numBlades;
+    float bladeHeight = 0.01;
+
+    float closedFactor;
+    void drawBlade() const;
+
+    void drawDbgPoints(DebugLevel dbg = NONE) const;
+
+    bool opening = false;
+    std::vector<Debug3Dx> debugPoints;
+
+public:
+    float* matSpecBlinds;
+    float matShineBlinds[1]{};
+    float* matAmbAndDifBlinds;
+    Blinds(float width, float height, float depth, float pitchAngle, float closedFactor = 1.0);
+    void draw(DebugLevel dbg = NONE) const;
+    void open(float amt);
+    void close(float amt);
+    void animate(float amt);
+
+    Blinds() = default;
+};
+
 
 
 

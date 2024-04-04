@@ -20,9 +20,9 @@
 #include "src/LeftVP.h"
 #include "src/things.h"
 #include "src/ColorData.h"
+#include "src/globals.h"
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
-
 
 //ViewportDefinitions
 int totalHeight = 900;
@@ -32,7 +32,6 @@ int lVportW = 300;
 int lVportH = 900;
 int rVportW = 1600;
 int rVportH = 900;
-
 
 //Global Objects
 Camera cam = Camera();
@@ -54,22 +53,26 @@ int yClick;
 float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
 bool showInfoViewport = false;
 //function pointer to infoVP addDebugString
-std::function<int(int, std::string)> addDebugString = std::bind(&LeftVP::addDebugString, &infoVP, std::placeholders::_1, std::placeholders::_2);
+std::function<int(int, std::string)> addDebugString = std::bind(&LeftVP::addDebugString, &infoVP, std::placeholders::_1,
+                                                                std::placeholders::_2);
 
 std::vector<std::string> instructionVec = {
-        "======Keybinds======",
-        "Scream Internally and resist the urge to throw your computer out the window"
+    "======Keybinds======",
+    "Scream Internally and resist the urge to throw your computer out the window"
 };
 
-//mid-dark grey
+//mid-dark grey, kinda like blender's default background
 float rVPColor[] = {0.2, 0.2, 0.2, 1.0};
 
+DebugLevel defaultDebug = WEAK;
+
+// end global variables
 
 
 void setupRight() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(showInfoViewport){
+    if (showInfoViewport) {
         glViewport(lVportW, 0, rVportW, rVportH);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -84,41 +87,55 @@ void setupRight() {
     glLoadIdentity();
     cam.lookAt();
 
-    // glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
-
+    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 }
 
 void drawLitShapes() {
-    // windowBlinds.draw();
+    glPushMatrix();
+    glTranslatef(-2, 0, -2);
+    windowBlinds.draw(defaultDebug);
+    glPopMatrix();
+
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, windowBlinds.matShineBlinds);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, windowBlinds.matAmbAndDifBlinds);
+    glPushMatrix();
+    glTranslatef(2, 0, 2);
+    glutSolidDodecahedron();
+    glPopMatrix();
 }
 
 void drawUnlitShapes() {
     glDisable(GL_LIGHTING);
 
-    // glPushMatrix();
-    // drawXZxGridlines(20);
-    // glPopMatrix();
-    //
-    //
-    // glPushMatrix();
-    // for (Debug3Dx debug_x: debugXes) {
-    //     debug_x.draw();
-    // }
-    // glPopMatrix();
+    if (defaultDebug != NONE) {
+        glPushMatrix();
+        drawXZxGridlines(20);
+        glPopMatrix();
+
+
+        glPushMatrix();
+        for (Debug3Dx debug_x: debugXes) {
+            debug_x.draw();
+        }
+        glPopMatrix();
+    }
 
 
     //unit cube
     glPushMatrix();
+    glTranslatef(2, 0, 0);
     glutSolidDodecahedron();
     glPopMatrix();
 
 
-
-
-        glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
+    glutSwapBuffers();
 }
 
-void drawWindow(){
+
+void drawWindow() {
     // if(showInfoViewport){
     //     infoVP.drawViewport();
     // }
@@ -128,18 +145,13 @@ void drawWindow(){
 }
 
 
-
 void setupObjects() {
     cam = Camera(Coord(10, 10, 10), Coord(0, 0, 0), Coord(0, 1, 0));
-    debugXes.emplace_back(Debug3Dx( Coord(0, 0, 0),50, 2));
-    windowBlinds = Blinds(1, 2, 0.1, 15, 0);
-
-
+    debugXes.emplace_back(Debug3Dx(Coord(0, 0, 0), 50, 2));
+    windowBlinds = Blinds(1, 2, 0.1, 15);
 }
 
-void setup(){
-
-
+void setup() {
     // Light property vectors.
     float lightAmb[] = {0.1, 0.1, 1.0, 1.0};
     float lightDifAndSpec[] = {0.0, 0.1, 1.0, 1.0};
@@ -161,7 +173,7 @@ void setup(){
     glEnable(GL_NORMALIZE); // Enable automatic normalization of normals.
 
     setupObjects();
-    // glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 }
 
 void resize(int w, int h) {
@@ -172,8 +184,8 @@ void resize(int w, int h) {
     infoVP.lVportW = lVportW = 0.2 * totalWidth; // 20% of total width
     infoVP.lVportH = totalHeight;
 
-        rVportW = totalWidth - lVportW;
-        rVportH = totalHeight;
+    rVportW = totalWidth - lVportW;
+    rVportH = totalHeight;
 
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
@@ -220,37 +232,37 @@ void keyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 'W':
             cam.relTrans(Coord(1 * speed, 0, 0));
-        break;
-        case 'A':
-            cam.relTrans(Coord(-1 * speed, 0, 0));
-        break;
+            break;
         case 'S':
+            cam.relTrans(Coord(-1 * speed, 0, 0));
+            break;
+        case 'A':
             cam.relTrans(Coord(0, 0, -1 * speed));
-        break;
+            break;
         case 'D':
             cam.relTrans(Coord(0, 0, 1 * speed));
-        break;
+            break;
         case 'r':
             setup();
-        glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+            glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 
-        break;
+            break;
         case 'R':
             started = false;
-        setup();
-        glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+            setup();
+            glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 
-        break;
+            break;
         case 'C':
             cam.relTrans(Coord(0, -1 * speed, 0));
-        break;
+            break;
         case 'F':
             cam.relTrans(Coord(0, 1 * speed, 0));
-        break;
+            break;
 
         case ' ': //toggleCamera
             toggleMouse();
-        break;
+            break;
         default:
             break;
     }

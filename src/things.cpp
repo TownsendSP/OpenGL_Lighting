@@ -13,8 +13,6 @@
 #define PI 3.14159
 
 
-
-
 //Window Blinds Routines
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
     matSpecBlinds = ColorData(0.0, 1.0, 1.0, 1.0);
@@ -25,11 +23,13 @@ Blinds::Blinds(float width, float height, float depth, float pitchAngle, float c
     this->height = height;
     this->depth = depth;
     this->pitchAngle = pitchAngle;
-    this->numBlades = height/depth; // NOLINT(*-narrowing-conversions)
+    this->numBlades = height / depth; // NOLINT(*-narrowing-conversions)
     this->closedFactor = 0.0;
 }
 
-void Blinds::drawBlade() const {//scale, rotate about Z, translate
+
+void Blinds::drawBlade() const {
+    //scale, rotate about Z, translate
     glPushMatrix();
     glScalef(depth, height, width);
     glRotatef(pitchAngle, 0.0, 0.0, 1.0);
@@ -37,28 +37,60 @@ void Blinds::drawBlade() const {//scale, rotate about Z, translate
     glPopMatrix();
 }
 
-void Blinds::draw() const {
-    // Set material properties.
+void Blinds::drawDbgPoints(DebugLevel dbg) const {
+    std::vector<Debug3Dx> points;
+    Coord topLeftFront = Coord(-width / 2, height / 2, depth / 2);
+    points.emplace_back(&topLeftFront, 0.5, 1);
+    Coord bottomRightBack = Coord(width / 2, -height / 2, -depth / 2);
+    points.emplace_back(&bottomRightBack, 0.5, 1);
+
+    //if Strong or all, draw a point for each of the blades's centers
+    if (dbg == STRONG || dbg == ALL) {
+        for (int i = 0; i >= numBlades; i++) {
+            Coord bladeCenter = Coord(0.0, closedFactor * numBlades * depth + bladeHeight / 2, 0.0);
+            // NOLINT(*-narrowing-conversions)
+            points.emplace_back(&bladeCenter, 0.2, 0.5);
+        }
+    }
     glPushMatrix();
+    glDisable(GL_LIGHTING);
+    for (auto &point: points) {
+        point.draw();
+    }
+    glEnable(GL_LIGHTING);
+    glPopMatrix();
+}
+
+void Blinds::draw(DebugLevel dbg) const {
+    // Set material properties.
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecBlinds);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShineBlinds);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matAmbAndDifBlinds);
 
     float bladeSpacing = depth * closedFactor + bladeHeight;
+    glPushMatrix();
 
     for (int i = 0; i >= numBlades; i++) {
-        bool isBladeOpened = closedFactor*numBlades < i;  // NOLINT(*-narrowing-conversions)
+        bool isBladeOpened = closedFactor * numBlades < i; // NOLINT(*-narrowing-conversions)
         glPushMatrix();
-        glTranslatef(0.0, isBladeOpened? bladeSpacing : bladeHeight, 0.0);
+        glTranslatef(0.0, isBladeOpened ? bladeSpacing : bladeHeight, 0.0);
         drawBlade();
         glPopMatrix();
     }
     glPopMatrix();
 
+    drawDbgPoints(dbg);
+}
+
+void drawBlinds(Blinds blindIn) {
+    // Set material properties.
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, blindIn.matSpecBlinds);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, blindIn.matShineBlinds);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, blindIn.matAmbAndDifBlinds);
 }
 
 void Blinds::open(float amt) {
-    closedFactor = closedFactor- amt < 0.0 ? 0.0 : closedFactor - amt;
+    closedFactor = closedFactor - amt < 0.0 ? 0.0 : closedFactor - amt;
 }
 
 void Blinds::close(float amt) {
@@ -67,7 +99,7 @@ void Blinds::close(float amt) {
 
 void Blinds::animate(float amt) {
     float current = closedFactor;
-    if(opening) {
+    if (opening) {
         current -= amt;
         opening = current > 0.0;
         closedFactor = current >= 0.0 ? current : 0.0;
@@ -79,22 +111,16 @@ void Blinds::animate(float amt) {
 }
 
 //Drawing a 3D Debug Axis
-// Debug3Dx::Debug3Dx(float size, float weight, Coord position) {
-//     this -> size = size;
-//     this -> weight = weight;
-//     this -> position = &position;
-// }
-
 Debug3Dx::Debug3Dx(Coord *position, float size, float weight) {
-    this -> size = size;
-    this -> weight = weight;
-    this -> position = position;
+    this->size = size;
+    this->weight = weight;
+    this->position = position;
 }
 
 Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
-    this -> position = &position;
-    this -> size = size;
-    this -> weight = weight;
+    this->position = &position;
+    this->size = size;
+    this->weight = weight;
 }
 
 void Debug3Dx::draw() const {
@@ -127,7 +153,6 @@ void Debug3Dx::draw() const {
 
 
     glLineWidth(1);
-
 }
 
 void drawXZxGridlines(float range) {
@@ -147,5 +172,3 @@ void drawXZxGridlines(float range) {
 
     glDisable(GL_LINE_STIPPLE);
 }
-
-
