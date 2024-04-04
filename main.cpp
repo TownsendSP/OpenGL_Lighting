@@ -84,29 +84,27 @@ void setupRight() {
     glLoadIdentity();
     cam.lookAt();
 
-    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+    // glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 
 }
 
 void drawLitShapes() {
-    windowBlinds.draw();
-
-
+    // windowBlinds.draw();
 }
 
 void drawUnlitShapes() {
     glDisable(GL_LIGHTING);
 
-    glPushMatrix();
-    drawXZxGridlines(20);
-    glPopMatrix();
-
-
-    glPushMatrix();
-    for (Debug3Dx debug_x: debugXes) {
-        debug_x.draw();
-    }
-    glPopMatrix();
+    // glPushMatrix();
+    // drawXZxGridlines(20);
+    // glPopMatrix();
+    //
+    //
+    // glPushMatrix();
+    // for (Debug3Dx debug_x: debugXes) {
+    //     debug_x.draw();
+    // }
+    // glPopMatrix();
 
 
     //unit cube
@@ -163,7 +161,7 @@ void setup(){
     glEnable(GL_NORMALIZE); // Enable automatic normalization of normals.
 
     setupObjects();
-    glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
+    // glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 }
 
 void resize(int w, int h) {
