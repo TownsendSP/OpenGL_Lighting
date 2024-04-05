@@ -39,8 +39,15 @@ void LeftVP::drawViewport() {
     glColor3f(textColor.X, textColor.Y, textColor.Z);
     glRasterPos3f(5.0, 5.0, -5.0);
 
+    debug_strings[0] = "======Keybinds======";
+    debug_strings[1] = "Scream Internally and resist the urge to throw your computer out the window";
+    debug_strings[2] = "Press 'q' to quit";
+    debug_strings[3] = "Press 'w' to toggle wireframe";
+    debug_strings[4] = "Press 's' to toggle solid";
+
     for (int i = 0; i < debug_strings->size(); i++) {
-        glRasterPos3f(5.0, lVportH - (i + 1) * 15, -5.0);
+        // glRasterPos3f(5.0, lVportH - (i + 1) * 15, -5.0);
+        glRasterPos3f(5.0, (i + 1) * 15, -5.0);
         std::string inString = std::string(debug_strings[i]);
         char *c;
         for (c = &inString[0]; *c != '\0'; c++) {

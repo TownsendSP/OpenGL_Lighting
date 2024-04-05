@@ -134,11 +134,11 @@ Debug3Dx::Debug3Dx(Coord *position, float size, float weight) {
     this->position = position;
 }
 
-Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
-    this->position = &position;
-    this->size = size;
-    this->weight = weight;
-}
+// Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
+//     this->position = position;
+//     this->size = size;
+//     this->weight = weight;
+// }
 
 void Debug3Dx::draw() const {
     //set line width to weight
@@ -214,3 +214,10 @@ void drawXZxGridlines(float range) {
 //
 //     glDisable(GL_LINE_STIPPLE);
 // }
+
+
+void drawBMPStr(std::string str, void* font) {
+    for (int8_t c: str) {
+        glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c);
+    }
+}

@@ -23,7 +23,7 @@
 //
 // };
 
-
+void drawBMPStr(std::string str, void* font = GLUT_BITMAP_8_BY_13);
 
 class Debug3Dx {
 public:
@@ -31,8 +31,9 @@ public:
     float weight;
     Coord* position;
 
-    Debug3Dx(Coord* position, float size = 1.0, float weight = 1.0);
-    Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
+    explicit Debug3Dx(Coord* position, float size = 1.0, float weight = 1.0);
+
+    // explicit Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
 
     // Debug3Dx(float size = 1.0, float weight = 1.0, Coord position);
 

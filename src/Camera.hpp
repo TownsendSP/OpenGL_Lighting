@@ -6,6 +6,7 @@
 #define CAMERA_H
 
 #include <complex.h>
+#include <map>
 #include <vector>
 
 #include "Coord.hpp"
@@ -13,7 +14,8 @@
 
 class Camera {
     private:
-    std::function<int(int, std::string)> debug_string_add_;
+    std::string* debug_string_add_;
+    std::map<int, std::string>* debug_string_add_map_;
 
 public:
     Coord pos;
@@ -48,17 +50,11 @@ public:
 
     void relRot(float pitch, float yaw);
 
-
-    // debugString functionpointer
-    std::function<int(int, std::string)> getDebugStringAdd() const {
-        return debug_string_add_;
+    void setDebugStringAdd(std::map<int, std::string>* mapPtr) {
+        this->debug_string_add_map_ = mapPtr;
     }
 
-    void setDebugStringAdd(const std::function<int(int, std::string)>& debug_string_add) {
-        debug_string_add_ = debug_string_add;
-    }
-
-    int useDebugStringAdd(int line, std::string message);
+    void useDebugStringAdd(int line, std::string message);
 };
 
 Coord calcPitchYaw(Coord position, Coord target);

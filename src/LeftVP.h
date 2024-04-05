@@ -24,6 +24,12 @@ public:
     int lVportH = 900;
 
     void drawViewport();
+
+    LeftVP() = default;
+
+    std::string* getDbgStrPtr() {
+        return debug_strings;
+    }
 };
 
 

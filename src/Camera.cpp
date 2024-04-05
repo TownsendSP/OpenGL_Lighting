@@ -48,16 +48,6 @@ void Camera::setPitchYaw() {
     ang = Coord(atan2(dirVec.X, dirVec.Z), asin(dirVec.Y), 0);
 }
 
-
-int Camera::useDebugStringAdd(int line, std::string message) {
-    if (debug_string_add_) {
-        return debug_string_add_(line, message);
-    } else {
-        std::cerr << "debug_string_add_ function is not set." << std::endl;
-        return -1;
-    }
-}
-
 Coord calcPitchYaw(Coord position, Coord target) {
     Coord dirVec = (target - position);
     dirVec = dirVec / sqrt(dirVec.pow(2).sum());
@@ -133,12 +123,16 @@ void Camera::relRot(Coord deltaAngle) {
 
 void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
-    if(dbg != NONE) {
+
+
         std::vector<std::string> debugToAdd = toString();
         for (int i = 0; i < debugToAdd.size(); i++) {
-            useDebugStringAdd(i+30, debugToAdd[i]);
+            (*debug_string_add_map_)[i+31] = debugToAdd[i];
         }
-    }
+}
+
+void Camera::useDebugStringAdd(int line, std::string message) {
+    (*debug_string_add_map_)[line] = message;
 }
 
 std::vector<std::string> Camera::toString() const {
