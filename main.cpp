@@ -84,7 +84,9 @@ DebugLevel defaultDebug = WEAK;
 #endif
 
 void drawLeft() {
+    glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
     glDisable( GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
     glPushMatrix();
     //draw background with bkgColor; must be a rectangle, not glclearcolor
     glColor4f(solarizedBG.R, solarizedBG.G, solarizedBG.B, solarizedBG.A);
@@ -100,22 +102,25 @@ void drawLeft() {
     glDrawArrays(GL_QUADS, 0, 4);
     glDisableClientState(GL_VERTEX_ARRAY);
 
+
+    glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
     for (const auto& pair : debugMap) {
-        glRasterPos3f(height - 5.0, (pair.first + 1) * 15, -5.0);
+        std::cout << "Debug String at " << pair.first << ": " << pair.second << std::endl;
+        glRasterPos3f(3.0, (pair.first + 1) * 15, -1.0);
         std::for_each(pair.second.begin(), pair.second.end(), [](int8_t c) { glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c); });
     }
-
-
-
-
-
     glPopMatrix();
 
     //cube at 50, -300
+    glPushMatrix();
     glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(50, 300, 0);
-    glutSolidCube(50);
+    glTranslatef(50, 300, -3);
+    glutSolidCube(10);
+    glPopMatrix();
 
+
+
+            glEnable(GL_DEPTH_TEST);
     glEnable( GL_LIGHTING);
 }
 

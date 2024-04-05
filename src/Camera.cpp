@@ -125,7 +125,7 @@ void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
 
 
-        std::vector<std::string> debugToAdd = toString();
+        std::vector<std::string> debugToAdd = toString(2);
         for (int i = 0; i < debugToAdd.size(); i++) {
             (*debug_string_add_map_)[i+31] = debugToAdd[i];
         }
@@ -135,16 +135,21 @@ void Camera::useDebugStringAdd(int line, std::string message) {
     (*debug_string_add_map_)[line] = message;
 }
 
-std::vector<std::string> Camera::toString() const {
+std::vector<std::string> Camera::toString(int prec) const {
     std::vector<std::string> retVal;
 #include <sstream>
-    Coord dirVec = Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X));
+    std::string* p = pos.toStrings(prec);
+    std::string* t = tgt.toStrings(prec);
+    std::string* u = up.toStrings(prec);
+    std::string* a = ang.toStrings(prec);
+    std::string* d = Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X)).toStrings(prec);
 
-    retVal.emplace_back(std::string("Position X: " + std::to_string(pos.X) + ", Y: " + std::to_string(pos.Y) + ", Z: " + std::to_string(pos.Z)));
-    retVal.emplace_back(std::string("Target X: " + std::to_string(tgt.X) + ", Y: " + std::to_string(tgt.Y) + ", Z: " + std::to_string(tgt.Z)));
-    retVal.emplace_back(std::string("Orientation X: " + std::to_string(up.X) + ", Y: " + std::to_string(up.Y) + ", Z: " + std::to_string(up.Z)));
-    retVal.emplace_back(std::string("Agnle: Pitch " + std::to_string(ang.X) + ", Yaw " + std::to_string(ang.Y) + ", Roll " + std::to_string(ang.Z)));
-    retVal.emplace_back(std::string("Direction Vector: X " + std::to_string(dirVec.X) + ", Y " + std::to_string(dirVec.Y) + ", Z " + std::to_string(dirVec.Z)));
+    retVal.emplace_back(std::string("DirVec: X " + d[0] + ", Y " + d[1] + ", Z " + d[2]));
+    retVal.emplace_back(std::string("Agnle: Pitch " + a[0] + ", Yaw " + a[1] + ", Roll " + a[2]));
+    retVal.emplace_back(std::string("Orientation X: " + u[0] + ", Y: " + u[1] + ", Z: " + u[2]));
+    retVal.emplace_back(std::string("Target X: " + t[0] + ", Y: " + t[1] + ", Z: " + t[2]));
+    retVal.emplace_back(std::string("Pos X: " + p[0] + ", Y: " + p[1] + ", Z: " + p[2]));
+    retVal.emplace_back("          Camera Info");
     return retVal;
 }
 // void Camera::relRot(float pitchChange, float yawChange) {

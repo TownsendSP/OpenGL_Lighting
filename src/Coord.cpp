@@ -21,6 +21,12 @@
 #include <sstream>
 
 
+std::string trunc(float fl, int prec) {
+    char buffer[50];
+    std::snprintf(buffer, sizeof(buffer), "%.*f", prec, fl);
+    return buffer;
+}
+
 float dist(Coord point1, Coord point2) {
     float distX = std::abs(point1.X - point2.X);
     float distY = std::abs(point1.Y - point2.Y);
@@ -72,13 +78,25 @@ std::vector<Coord> genRandNonCoLinearCord(int numCoords, float permissibleClosen
     return coords;
 }
 
-std::string Coord::toString() {
-    std::ostringstream oss;
-    oss << std::fixed << std::setprecision(2) << std::showpoint;
-    oss << "(" << X << ", " << Y << ", " << Z << ")";
-    std::string str = oss.str();
-    str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-    str.erase(str.find_last_not_of('.') + 1, std::string::npos);
+std::string* Coord::toStrings(int precision) const{
+    std::string* ret = new std::string[3];
+    ret[0] = trunc(X, precision);
+    ret[1] = trunc(Y, precision);
+    ret[2] = trunc(Z, precision);
+    return ret;
+}
+
+std::string* Coord::toStrings(int precision) {
+    std::string* ret = new std::string[3];
+    ret[0] = trunc(X, precision);
+    ret[1] = trunc(Y, precision);
+    ret[2] = trunc(Z, precision);
+    return ret;
+}
+
+std::string Coord::toString(int precision) {
+    std::string* things = toStrings(precision);
+    std::string str = "(" + things[0] + ", " + things[1] + ", " + things[2] + ")";
     return str;
 }
 
@@ -112,3 +130,6 @@ bool isColorCloseEnough(Coord color1, Coord color2, float closeness) {
         }
     return false;
 }
+
+
+

@@ -177,7 +177,10 @@ public:
 //     return str;
 // }
 
-    std::string toString();
+    std::string *toStrings(int precision) const;
+
+    std::string toString(int precision = 2);
+    std::string* toStrings(int precision = 2);
 };
 
 inline Coord randCoord(const Coord &min, const Coord &max) {

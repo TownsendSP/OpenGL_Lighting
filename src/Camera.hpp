@@ -44,7 +44,7 @@ public:
 
     void lookAt(DebugLevel dbg = NONE);
 
-    std::vector<std::string> toString() const;
+    std::vector<std::string> toString(int prec) const;
 
     // std::vector<std::string> toString() const;
 
@@ -60,5 +60,5 @@ public:
 Coord calcPitchYaw(Coord position, Coord target);
 Coord calcTarget(Coord position, Coord pitchYaw);
 
-
+std::string trunc(float fl, int prec=3);
 #endif //CAMERA_H
