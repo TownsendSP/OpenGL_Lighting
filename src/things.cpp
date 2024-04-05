@@ -3,6 +3,8 @@
 //
 
 #include "things.h"
+
+#include <iostream>
 #ifdef __APPLE__
 # include <GLUT/glut.h>
 #else
@@ -13,9 +15,11 @@
 #define PI 3.14159
 
 
+
+
 //Window Blinds Routines
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
-    matSpecBlinds = ColorData(0.0, 1.0, 1.0, 1.0);
+    matSpecBlinds = ColorData(0.5, 0.5, 0.5, 1.0);
     matShineBlinds[0] = 50.0f;
     matAmbAndDifBlinds = ColorData(0.8, 0.8, 0.7, 1.0);
 
@@ -31,27 +35,40 @@ Blinds::Blinds(float width, float height, float depth, float pitchAngle, float c
 void Blinds::drawBlade() const {
     //scale, rotate about Z, translate
     glPushMatrix();
-    glScalef(depth, height, width);
+    glScalef(depth, bladeHeight, width);
     glRotatef(pitchAngle, 0.0, 0.0, 1.0);
-    glutSolidCube(7.0);
+    glutSolidCube(1.0);
     glPopMatrix();
 }
 
 void Blinds::drawDbgPoints(DebugLevel dbg) const {
     std::vector<Debug3Dx> points;
-    Coord topLeftFront = Coord(-width / 2, height / 2, depth / 2);
+    Coord topLeftFront = Coord(-depth, height, width);
     points.emplace_back(&topLeftFront, 0.5, 1);
-    Coord bottomRightBack = Coord(width / 2, -height / 2, -depth / 2);
+    Coord bottomRightBack = Coord(depth, -height, -width);
     points.emplace_back(&bottomRightBack, 0.5, 1);
 
     //if Strong or all, draw a point for each of the blades's centers
-    if (dbg == STRONG || dbg == ALL) {
-        for (int i = 0; i >= numBlades; i++) {
-            Coord bladeCenter = Coord(0.0, closedFactor * numBlades * depth + bladeHeight / 2, 0.0);
-            // NOLINT(*-narrowing-conversions)
-            points.emplace_back(&bladeCenter, 0.2, 0.5);
-        }
+
+
+    // if debug == all, draw the bounding box for the bounding box for the blind apparatus
+    if (dbg == ALL) {
+        glDisable(GL_LIGHTING);
+        glColor3f(0.9, 0.9, 0.9);
+        glEnable(GL_LINE_STIPPLE);
+        glLineWidth(2);
+
+        glPushMatrix();
+        glTranslatef(0.0, height / 2, 0.0);
+        glScalef(depth, height, width);
+        glutWireCube(1.0);
+        glPopMatrix();
+
+        glLineWidth(1);
+        glDisable(GL_LINE_STIPPLE);
+        glEnable(GL_LIGHTING);
     }
+
     glPushMatrix();
     glDisable(GL_LIGHTING);
     for (auto &point: points) {
@@ -68,12 +85,12 @@ void Blinds::draw(DebugLevel dbg) const {
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matAmbAndDifBlinds);
 
     float bladeSpacing = depth * closedFactor + bladeHeight;
+    float topBladeHeight = height - bladeSpacing;
     glPushMatrix();
-
-    for (int i = 0; i >= numBlades; i++) {
-        bool isBladeOpened = closedFactor * numBlades < i; // NOLINT(*-narrowing-conversions)
+    for (int i = 0; i <= numBlades; i++) {
+        // bool isBladeOpened = closedFactor * numBlades < i; // NOLINT(*-narrowing-conversions)
         glPushMatrix();
-        glTranslatef(0.0, isBladeOpened ? bladeSpacing : bladeHeight, 0.0);
+        glTranslatef(0.0, topBladeHeight-((i-1)*bladeSpacing), 0.0);
         drawBlade();
         glPopMatrix();
     }
@@ -172,3 +189,28 @@ void drawXZxGridlines(float range) {
 
     glDisable(GL_LINE_STIPPLE);
 }
+//
+//
+// void drawXZxGridlines(float range) {
+//     glColor3f(0.7f, 0.7f, 0.7f); // Set color to light gray
+//     glEnable(GL_LINE_STIPPLE);
+//     glLineStipple(1, 0x0404);
+//
+//     float step = 1.0f; // Initial step size
+//     for (float i = -range; i <= range; i += step) {
+//         if (static_cast<int>(i) % 100 == 0 && i != 0) {
+//             step *= 2; // Double the step size every 100 units
+//         }
+//
+//         glBegin(GL_LINES);
+//         // x-axis
+//         glVertex3f(-range, 0.0f, i);
+//         glVertex3f(range, 0.0f, i);
+//         // z-axis
+//         glVertex3f(i, 0.0f, -range);
+//         glVertex3f(i, 0.0f, range);
+//         glEnd();
+//     }
+//
+//     glDisable(GL_LINE_STIPPLE);
+// }

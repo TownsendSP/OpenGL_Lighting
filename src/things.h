@@ -66,7 +66,7 @@ public:
     float* matSpecBlinds;
     float matShineBlinds[1]{};
     float* matAmbAndDifBlinds;
-    Blinds(float width, float height, float depth, float pitchAngle, float closedFactor = 1.0);
+    Blinds(float width, float height, float depth, float pitchAngle, float closedFactor = 0.0);
     void draw(DebugLevel dbg = NONE) const;
     void open(float amt);
     void close(float amt);

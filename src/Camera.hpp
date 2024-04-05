@@ -9,8 +9,12 @@
 #include <vector>
 
 #include "Coord.hpp"
+#include "globals.h"
 
 class Camera {
+    private:
+    std::function<int(int, std::string)> debug_string_add_;
+
 public:
     Coord pos;
     Coord tgt;
@@ -36,11 +40,25 @@ public:
 
     void relRot(Coord deltaAngle);
 
-    void lookAt();
+    void lookAt(DebugLevel dbg = NONE);
 
     std::vector<std::string> toString() const;
 
+    // std::vector<std::string> toString() const;
+
     void relRot(float pitch, float yaw);
+
+
+    // debugString functionpointer
+    std::function<int(int, std::string)> getDebugStringAdd() const {
+        return debug_string_add_;
+    }
+
+    void setDebugStringAdd(const std::function<int(int, std::string)>& debug_string_add) {
+        debug_string_add_ = debug_string_add;
+    }
+
+    int useDebugStringAdd(int line, std::string message);
 };
 
 Coord calcPitchYaw(Coord position, Coord target);

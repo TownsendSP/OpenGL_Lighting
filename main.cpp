@@ -24,7 +24,8 @@
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
-//ViewportDefinitions
+
+#ifndef FOLDING_REGION_Vport
 int totalHeight = 900;
 int totalWidth = 1900;
 int lVportW = 300;
@@ -32,27 +33,33 @@ int lVportW = 300;
 int lVportH = 900;
 int rVportW = 1600;
 int rVportH = 900;
+#endif
 
-//Global Objects
+
+#ifndef FOLDING_REGION_Global_Objects
+
 Camera cam = Camera();
 LeftVP infoVP = LeftVP(lVportW, lVportH, Coord(0.02745, 0.21176, 0.25882), Coord(0.51373, 0.58039, 0.58824));
 std::vector<Debug3Dx> debugXes;
 Blinds windowBlinds;
 
+#endif
 
-//endGlobalObjs
 
-
+#ifndef FOLDING_REGION_Global_Variables
 //Global Variables
-bool useMouse = true;
+bool useMouse = false;
 bool selecting = false;
 bool started = false;
 int xClick;
 int yClick;
 
 float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
+float blindAnimSpeed = 0.05;
 bool showInfoViewport = false;
 //function pointer to infoVP addDebugString
+
+
 std::function<int(int, std::string)> addDebugString = std::bind(&LeftVP::addDebugString, &infoVP, std::placeholders::_1,
                                                                 std::placeholders::_2);
 
@@ -66,7 +73,7 @@ float rVPColor[] = {0.2, 0.2, 0.2, 1.0};
 
 DebugLevel defaultDebug = WEAK;
 
-// end global variables
+#endif
 
 
 void setupRight() {
@@ -93,7 +100,7 @@ void setupRight() {
 void drawLitShapes() {
     glPushMatrix();
     glTranslatef(-2, 0, -2);
-    windowBlinds.draw(defaultDebug);
+    windowBlinds.draw(ALL);
     glPopMatrix();
 
 
@@ -111,7 +118,7 @@ void drawUnlitShapes() {
 
     if (defaultDebug != NONE) {
         glPushMatrix();
-        drawXZxGridlines(20);
+        drawXZxGridlines(500);
         glPopMatrix();
 
 
@@ -134,11 +141,10 @@ void drawUnlitShapes() {
     glutSwapBuffers();
 }
 
-
 void drawWindow() {
-    // if(showInfoViewport){
-    //     infoVP.drawViewport();
-    // }
+    if(showInfoViewport){
+        infoVP.drawViewport();
+    }
     setupRight();
     drawLitShapes();
     drawUnlitShapes();
@@ -147,16 +153,18 @@ void drawWindow() {
 
 void setupObjects() {
     cam = Camera(Coord(10, 10, 10), Coord(0, 0, 0), Coord(0, 1, 0));
-    debugXes.emplace_back(Debug3Dx(Coord(0, 0, 0), 50, 2));
+    debugXes.emplace_back(Debug3Dx(Coord(0, 0, 0), 500, 2));
     windowBlinds = Blinds(1, 2, 0.1, 15);
+
+    cam.setDebugStringAdd(addDebugString);
 }
 
 void setup() {
     // Light property vectors.
-    float lightAmb[] = {0.1, 0.1, 1.0, 1.0};
-    float lightDifAndSpec[] = {0.0, 0.1, 1.0, 1.0};
-    float lightPos[] = {0.0, 7.0, 3.0, 0.0};
-    float globAmb[] = {0.2, 0.2, 0.2, 1.0};
+float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
+float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
+float lightPos[] = {0.0, 7.0, 0.0, 0.0}; // Position remains the same
+float globAmb[] = {0.2, 0.2, 0.8, 1.0}; // Cool global ambient light
 
     // Light0 properties. //light 0 is a
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
@@ -195,6 +203,8 @@ void resize(int w, int h) {
 }
 
 //control
+#ifndef FOLDING_REGION_Control
+
 void mouse(int x, int y) {
     // debug_strings[0] = ("Cursor: " + std::to_string(x) + ", " + std::to_string(y));
 
@@ -217,7 +227,6 @@ void mouse(int x, int y) {
     glutPostRedisplay();
 }
 
-
 void toggleMouse() {
     useMouse = !useMouse;
     if (useMouse) {
@@ -230,44 +239,69 @@ void toggleMouse() {
 void keyboard(unsigned char key, int x, int y) {
     Coord newFlowerCoord;
     switch (key) {
-        case 'W':
+        case 'W': //CAMERA FORWARD
             cam.relTrans(Coord(1 * speed, 0, 0));
             break;
-        case 'S':
+        case 'S': //CAMERA BACKWARD
             cam.relTrans(Coord(-1 * speed, 0, 0));
             break;
-        case 'A':
+        case 'A': //CAMERA LEFT
             cam.relTrans(Coord(0, 0, -1 * speed));
             break;
-        case 'D':
+        case 'D': //CAMERA RIGHT
             cam.relTrans(Coord(0, 0, 1 * speed));
             break;
-        case 'r':
+        case 'r': //reset all but the camera
             setup();
             glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 
             break;
-        case 'R':
+        case 'R': //reset all
             started = false;
             setup();
             glClearColor(rVPColor[0], rVPColor[1], rVPColor[2], rVPColor[3]);
 
             break;
-        case 'C':
+        case 'C': //CAMERA DOWN
             cam.relTrans(Coord(0, -1 * speed, 0));
             break;
-        case 'F':
+        case 'F': //CAMERA UP
             cam.relTrans(Coord(0, 1 * speed, 0));
             break;
 
-        case ' ': //toggleCamera
+        case ' ': //Toggle Mouse control of Camera
             toggleMouse();
+            break;
+        case 27: //Escape Key: Exit
+            exit(0);
             break;
         default:
             break;
     }
     glutPostRedisplay();
 }
+
+void specialKeyboard(int key, int x, int y) {
+    switch (key) {
+        case GLUT_KEY_F1:
+            showInfoViewport = !showInfoViewport;
+        resize(totalWidth, totalHeight);
+            break;
+
+        case GLUT_KEY_UP: // up arrow does windowBlind.open()
+            windowBlinds.open(blindAnimSpeed);
+            break;
+        case // up arrow does windowBlind.open()
+            GLUT_KEY_DOWN:
+            windowBlinds.close(blindAnimSpeed);
+            break;
+
+        default:
+            break;
+    }
+    glutPostRedisplay();
+}
+#endif
 
 
 int main(int argc, char **argv) {
@@ -281,9 +315,12 @@ int main(int argc, char **argv) {
     glutDisplayFunc(drawWindow);
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyboard);
-    glutPassiveMotionFunc(mouse);
-    // glutSpecialFunc(specialKeyboard);
+    glutPassiveMotionFunc(NULL);
+    glutSpecialFunc(specialKeyboard);
     // glutMouseFunc(mouseControl);
+
+    // glutTimerFunc(5, animate, 1);
+
 
     for (const std::string &i: instructionVec) {
         std::cout << i << std::endl;

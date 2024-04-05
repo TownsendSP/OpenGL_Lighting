@@ -39,7 +39,8 @@ public:
         A = 0;
     }
 
-    //<editor-fold desc="Arithmetic">
+#ifndef ARITHMETIC_OPERATORS
+
     ColorData operator+(const ColorData &other) const {
         return {R + other.R, G + other.G, B + other.B, A + other.A};
     }
@@ -79,7 +80,7 @@ public:
             return {};
         }
     }
-    //</editor-fold>
+#endif
 
 
     //<editor-fold desc="Bitwise">

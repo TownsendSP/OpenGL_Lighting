@@ -4,7 +4,13 @@
 
 #include "LeftVP.h"
 
+#include <iostream>
+
 int LeftVP::addDebugString(int line, std::string inString) {
+    if (line < 0 || line > 59) {
+        return -1;
+    }
+    debug_strings[line] = inString;
     return 0;
 }
 
@@ -31,7 +37,7 @@ void LeftVP::drawViewport() {
     glClearColor(bkgColor.X, bkgColor.Y, bkgColor.Z, 0.0f);
     glPushMatrix();
     glColor3f(textColor.X, textColor.Y, textColor.Z);
-    glRasterPos3f(5.0, 25.0, -5.0);
+    glRasterPos3f(5.0, 5.0, -5.0);
 
     for (int i = 0; i < debug_strings->size(); i++) {
         glRasterPos3f(5.0, lVportH - (i + 1) * 15, -5.0);
@@ -39,6 +45,7 @@ void LeftVP::drawViewport() {
         char *c;
         for (c = &inString[0]; *c != '\0'; c++) {
             glutBitmapCharacter((void *) GLUT_BITMAP_8_BY_13, *c);
+            std::cout << *c;
         }
     }
     glPopMatrix();

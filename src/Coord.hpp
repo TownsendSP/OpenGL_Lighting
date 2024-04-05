@@ -4,6 +4,7 @@
 //imports
 #include <algorithm>
 #include <cmath>
+#include <functional>
 #include <string>
 #include <vector>
 #include <iomanip>
@@ -36,6 +37,7 @@ float srndi(float min, float max);
 
 
 class Coord {
+private:
 public:
     float X, Y, Z;
 

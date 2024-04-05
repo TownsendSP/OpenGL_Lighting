@@ -49,6 +49,14 @@ void Camera::setPitchYaw() {
 }
 
 
+int Camera::useDebugStringAdd(int line, std::string message) {
+    if (debug_string_add_) {
+        return debug_string_add_(line, message);
+    } else {
+        std::cerr << "debug_string_add_ function is not set." << std::endl;
+        return -1;
+    }
+}
 
 Coord calcPitchYaw(Coord position, Coord target) {
     Coord dirVec = (target - position);
@@ -123,47 +131,26 @@ void Camera::relRot(Coord deltaAngle) {
     tgt = pos + dirVec;
 }
 
-void Camera::lookAt() {
+void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
-    // std::cout << "At: " << pos.toString() << " Tgt: " << tgt.toString() << std::endl;
+    if(dbg != NONE) {
+        std::vector<std::string> debugToAdd = toString();
+        for (int i = 0; i < debugToAdd.size(); i++) {
+            useDebugStringAdd(i+30, debugToAdd[i]);
+        }
+    }
 }
 
 std::vector<std::string> Camera::toString() const {
     std::vector<std::string> retVal;
-    char posBuf[100];
-    char tgtBuf[100];
-    char upBuf[100];
-    char angBuf[100];
-    char dirVecBuf[100];
 #include <sstream>
-
-    std::ostringstream posStream;
-    posStream << "Position: X " << pos.X << ", Y " << pos.Y << ", Z " << pos.Z;
-    std::string posStr = posStream.str();
-
-    std::ostringstream tgtStream;
-    tgtStream << "Target: X " << tgt.X << ", Y " << tgt.Y << ", Z " << tgt.Z;
-    std::string tgtStr = tgtStream.str();
-
-    std::ostringstream upStream;
-    upStream << "Orientation: X " << up.X << ", Y " << up.Y << ", Z " << up.Z;
-    std::string upStr = upStream.str();
-
-    std::ostringstream angStream;
-    angStream << "Rotations: Pitch " << ang.X << ", Yaw " << ang.Y << ", Roll " << ang.Z;
-    std::string angStr = angStream.str();
-
     Coord dirVec = Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X));
 
-    std::ostringstream dirVecStream;
-    dirVecStream << "Direction Vector: X " << dirVec.X << ", Y " << dirVec.Y << ", Z " << dirVec.Z;
-    std::string dirVecStr = dirVecStream.str();
-
-    retVal.push_back(std::string(posBuf));
-    retVal.push_back(std::string(tgtBuf));
-    retVal.push_back(std::string(upBuf));
-    retVal.push_back(std::string(angBuf));
-    retVal.push_back(std::string(dirVecBuf));
+    retVal.emplace_back(std::string("Position X: " + std::to_string(pos.X) + ", Y: " + std::to_string(pos.Y) + ", Z: " + std::to_string(pos.Z)));
+    retVal.emplace_back(std::string("Target X: " + std::to_string(tgt.X) + ", Y: " + std::to_string(tgt.Y) + ", Z: " + std::to_string(tgt.Z)));
+    retVal.emplace_back(std::string("Orientation X: " + std::to_string(up.X) + ", Y: " + std::to_string(up.Y) + ", Z: " + std::to_string(up.Z)));
+    retVal.emplace_back(std::string("Agnle: Pitch " + std::to_string(ang.X) + ", Yaw " + std::to_string(ang.Y) + ", Roll " + std::to_string(ang.Z)));
+    retVal.emplace_back(std::string("Direction Vector: X " + std::to_string(dirVec.X) + ", Y " + std::to_string(dirVec.Y) + ", Z " + std::to_string(dirVec.Z)));
     return retVal;
 }
 // void Camera::relRot(float pitchChange, float yawChange) {
