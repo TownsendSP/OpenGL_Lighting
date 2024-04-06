@@ -18,7 +18,6 @@
 //My Imports and Defines
 #include "src/Coord.hpp"
 #include "src/Camera.hpp"
-#include "src/LeftVP.h"
 #include "src/things.h"
 #include "src/ColorData.h"
 #include "src/globals.h"
@@ -38,7 +37,6 @@ int height = 900;
 #ifndef FOLDING_REGION_Global_Objects
 
 Camera cam = Camera();
-LeftVP infoVP;
 std::vector<Debug3Dx> debugXes;
 Blinds windowBlinds;
 
@@ -57,10 +55,6 @@ float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivit
 float blindAnimSpeed = 0.05;
 bool showInfoViewport = true;
 //function pointer to infoVP addDebugString
-
-
-std::function<int(int, std::string)> addDebugString = std::bind(&LeftVP::addDebugString, &infoVP, std::placeholders::_1,
-                                                                std::placeholders::_2);
 
 std::string* debug_strings;
 std::string infoStrings[60];
@@ -105,22 +99,12 @@ void drawLeft() {
 
     glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
     for (const auto& pair : debugMap) {
-        std::cout << "Debug String at " << pair.first << ": " << pair.second << std::endl;
         glRasterPos3f(3.0, (pair.first + 1) * 15, -1.0);
         std::for_each(pair.second.begin(), pair.second.end(), [](int8_t c) { glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c); });
     }
     glPopMatrix();
 
-    //cube at 50, -300
-    glPushMatrix();
-    glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(50, 300, -3);
-    glutSolidCube(10);
-    glPopMatrix();
-
-
-
-            glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable( GL_LIGHTING);
 }
 
@@ -134,28 +118,26 @@ void setupLeft() {
     glOrtho(0, lVportW, 0, height, -10, 10.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
 }
 
 void setupRight() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (showInfoViewport) {
         glViewport(lVportW, 0, rVportW, height);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(60.0, (float) rVportW / (float) height, 1.0, 500.0);
+
     } else {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, totalWidth, height);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(60.0, (float) totalWidth / (float) height, 1.0, 500.0);
+
     }
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, (float) totalWidth / (float) height, 1.0, 500.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     cam.lookAt();
 
-    glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
+    // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 }
 
 void drawLitShapes() {
@@ -165,13 +147,13 @@ void drawLitShapes() {
     glPopMatrix();
 
 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, windowBlinds.matShineBlinds);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, windowBlinds.matAmbAndDifBlinds);
-    glPushMatrix();
-    glTranslatef(2, 0, 2);
-    glutSolidDodecahedron();
-    glPopMatrix();
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, windowBlinds.matShineBlinds);
+    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, windowBlinds.matAmbAndDifBlinds);
+    // glPushMatrix();
+    // glTranslatef(2, 0, 2);
+    // glutSolidDodecahedron();
+    // glPopMatrix();
 }
 
 void drawUnlitShapes() {
@@ -184,6 +166,7 @@ void drawUnlitShapes() {
 
 
         glPushMatrix();
+
         for (Debug3Dx debug_x: debugXes) {
             debug_x.draw();
         }
@@ -193,39 +176,37 @@ void drawUnlitShapes() {
 }
 
 void drawWindow() {
-    // if(showInfoViewport){
-
-    // }
+    if(showInfoViewport){
+        setupLeft();
+        drawLeft();
+    }
     setupRight();
     drawLitShapes();
     drawUnlitShapes();
-
-            setupLeft();
-        drawLeft();
 
     glutSwapBuffers();
 }
 
 void setupObjects() {
-    cam = Camera(Coord(10, 10, 10), Coord(0, 0, 0), Coord(0, 1, 0));
-    debugXes.emplace_back(&Coord(0, 0, 0), 100, 2);
-
+    cam = Camera(Coord(0, 0.000000001, 0), Coord(0, 0.000000001, 0), Coord(0, 1, 0));
+    debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 15);
 
-    // infoVP = LeftVP(lVportW, height, Coord(0.02745, 0.21176, 0.25882), Coord(0.71373, 0.58039, 0.58824));
-    // debug_strings = infoVP.getDbgStrPtr();
+    //giving them access to the debugging info map
     cam.setDebugStringAdd(&debugMap);
+    windowBlinds.setDebugStringAdd(&debugMap);
 
     //setup lvp class:
 
 }
+
 
 void setup() {
     // Light property vectors.
 float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
 float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
 float lightPos[] = {0.0, 7.0, 0.0, 0.0}; // Position remains the same
-float globAmb[] = {0.2, 0.2, 0.8, 1.0}; // Cool global ambient light
+float globAmb[] = {0.2, 0.2, 0.5, 1.0}; // Cool global ambient light
 
     // Light0 properties. //light 0 is a
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
@@ -235,6 +216,7 @@ float globAmb[] = {0.2, 0.2, 0.8, 1.0}; // Cool global ambient light
 
     // Poperties of the ambient light.
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
 
     glEnable(GL_LIGHTING); // Enable lighting calculations.
     glEnable(GL_LIGHT0); // Enable particular light source.
@@ -249,13 +231,8 @@ void resize(int w, int h) {
     totalWidth = w;
     height = h;
 
-
-    infoVP.lVportW = lVportW = 0.2 * totalWidth; // 20% of total width
-    infoVP.lVportH = height;
-
+    lVportW = 0.2 * totalWidth; // 20% of total width
     rVportW = totalWidth - lVportW;
-    height = height;
-
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -346,7 +323,7 @@ void specialKeyboard(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_F1:
             showInfoViewport = !showInfoViewport;
-        resize(totalWidth, height);
+            resize(totalWidth, height);
             break;
 
         case GLUT_KEY_UP: // up arrow does windowBlind.open()

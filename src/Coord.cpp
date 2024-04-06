@@ -18,8 +18,15 @@
 #include <iostream>
 #include <random>
 #include <iomanip>
+#include <map>
 #include <sstream>
 
+void mapInsert(std::map<int, std::string>* mapthing, std::vector<std::string> vec, int indexInsert) {
+    for (int i = 0; i < vec.size(); i++) {
+        mapthing->insert(std::pair<int, std::string>(indexInsert + i, vec[i]));
+    }
+
+}
 
 std::string trunc(float fl, int prec) {
     char buffer[50];

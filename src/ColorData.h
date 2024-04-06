@@ -13,9 +13,15 @@
 #include <sstream>
 #include "Coord.hpp"
 
+
 class ColorData {
 public:
     float R, G, B, A;
+    float *X = &R;
+    float *Y = &G;
+    float *Z = &B;
+    float *W = &A;
+
 
     ColorData(float r, float g, float b, float a) {
         R = r;
@@ -184,4 +190,10 @@ operator Coord () const {
 
 
 bool isColorCloseEnough(ColorData color1, ColorData color2, float closeness);
+
+class QuadPos : public ColorData {
+
+};
+
+
 #endif //COLORDATA_H

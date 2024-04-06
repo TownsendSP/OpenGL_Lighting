@@ -61,4 +61,6 @@ Coord calcPitchYaw(Coord position, Coord target);
 Coord calcTarget(Coord position, Coord pitchYaw);
 
 std::string trunc(float fl, int prec=3);
+
+void mapInsert(std::map<int, std::string>* mapthing, std::vector<std::string>, int indexInsert);
 #endif //CAMERA_H

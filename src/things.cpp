@@ -21,7 +21,7 @@
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
     matSpecBlinds = ColorData(0.5, 0.5, 0.5, 1.0);
     matShineBlinds[0] = 50.0f;
-    matAmbAndDifBlinds = ColorData(0.8, 0.8, 0.7, 1.0);
+    matAmbAndDifBlinds = ColorData(0.9, 0.9, 0.89, 1.0);
 
     this->width = width;
     this->height = height;
@@ -35,10 +35,14 @@ Blinds::Blinds(float width, float height, float depth, float pitchAngle, float c
 void Blinds::drawBlade() const {
     //scale, rotate about Z, translate
     glPushMatrix();
-    glScalef(depth, bladeHeight, width);
     glRotatef(pitchAngle, 0.0, 0.0, 1.0);
+    glPushMatrix();
+    glScalef(depth, bladeHeight, width);
     glutSolidCube(1.0);
     glPopMatrix();
+    glPopMatrix();
+
+
 }
 
 void Blinds::drawDbgPoints(DebugLevel dbg) const {
@@ -84,10 +88,10 @@ void Blinds::draw(DebugLevel dbg) const {
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShineBlinds);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matAmbAndDifBlinds);
 
-    float bladeSpacing = depth * closedFactor + bladeHeight;
+    float bladeSpacing = depth * closedFactor + bladeHeight /2;
     float topBladeHeight = height - bladeSpacing;
     glPushMatrix();
-    for (int i = 0; i <= numBlades; i++) {
+    for (int i = 0; i < numBlades; i++) {
         // bool isBladeOpened = closedFactor * numBlades < i; // NOLINT(*-narrowing-conversions)
         glPushMatrix();
         glTranslatef(0.0, topBladeHeight-((i-1)*bladeSpacing), 0.0);
@@ -97,6 +101,12 @@ void Blinds::draw(DebugLevel dbg) const {
     glPopMatrix();
 
     drawDbgPoints(dbg);
+
+    if(debug_string_add_map_ != nullptr){
+        (*debug_string_add_map_)[27] = "Blinds State: " + std::to_string(closedFactor);
+        (*debug_string_add_map_)[28] = "Blade Spacing: " + std::to_string(bladeSpacing);
+        (*debug_string_add_map_)[29] = "Num Blades: " + std::to_string(numBlades);
+    }
 }
 
 void drawBlinds(Blinds blindIn) {
@@ -131,14 +141,14 @@ void Blinds::animate(float amt) {
 Debug3Dx::Debug3Dx(Coord *position, float size, float weight) {
     this->size = size;
     this->weight = weight;
-    this->position = position;
+    this->position = *position;
 }
 
-// Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
-//     this->position = position;
-//     this->size = size;
-//     this->weight = weight;
-// }
+Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
+    this->position = position;
+    this->size = size;
+    this->weight = weight;
+}
 
 void Debug3Dx::draw() const {
     //set line width to weight
@@ -148,22 +158,22 @@ void Debug3Dx::draw() const {
     // X axis
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_LINES);
-    glVertex3f(position->X - size, position->Y, position->Z);
-    glVertex3f(position->X + size, position->Y, position->Z);
+    glVertex3f(position.X - size, position.Y, position.Z);
+    glVertex3f(position.X + size, position.Y, position.Z);
     glEnd();
 
     //y axis
     glColor3f(0.0f, 0.0f, 1.0f);
     glBegin(GL_LINES);
-    glVertex3f(position->X, position->Y - size, position->Z);
-    glVertex3f(position->X, position->Y + size, position->Z);
+    glVertex3f(position.X, position.Y - size, position.Z);
+    glVertex3f(position.X, position.Y + size, position.Z);
     glEnd();
 
     //z axis
     glColor3f(0.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
-    glVertex3f(position->X, position->Y, position->Z - size);
-    glVertex3f(position->X, position->Y, position->Z + size);
+    glVertex3f(position.X, position.Y, position.Z - size);
+    glVertex3f(position.X, position.Y, position.Z + size);
     glEnd();
 
     glPopMatrix();

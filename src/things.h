@@ -4,6 +4,8 @@
 
 #ifndef TGSOUTHAHW4_THINGS_H
 #define TGSOUTHAHW4_THINGS_H
+#include <map>
+
 # include "Coord.hpp"
 # include "ColorData.h"
 # include "globals.h"
@@ -29,11 +31,11 @@ class Debug3Dx {
 public:
     float size;
     float weight;
-    Coord* position;
+    Coord position;
 
     explicit Debug3Dx(Coord* position, float size = 1.0, float weight = 1.0);
 
-    // explicit Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
+    explicit Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
 
     // Debug3Dx(float size = 1.0, float weight = 1.0, Coord position);
 
@@ -49,6 +51,9 @@ class Blinds{
     float height;
     float depth;
     float pitchAngle;
+    std::map<int, std::string>* debug_string_add_map_ = nullptr;
+
+
 
 
 
@@ -64,11 +69,17 @@ class Blinds{
     std::vector<Debug3Dx> debugPoints;
 
 public:
+    void setDebugStringAdd(std::map<int, std::string>* mapPtr) {
+        this->debug_string_add_map_ = mapPtr;
+    }
     float* matSpecBlinds;
     float matShineBlinds[1]{};
     float* matAmbAndDifBlinds;
     Blinds(float width, float height, float depth, float pitchAngle, float closedFactor = 0.0);
     void draw(DebugLevel dbg = NONE) const;
+
+    std::vector<std::string> toStrings(int prec);
+
     void open(float amt);
     void close(float amt);
     void animate(float amt);
@@ -76,6 +87,19 @@ public:
     Blinds() = default;
 };
 
+
+class Wall {
+    // assuming +x is far , -x is near, +z is right, -z is left
+    Coord nearBottomLeft;
+    Coord farTopRight;
+    float* matSpecWall;
+    float matShineWall[1]{};
+    float* matAmbAndDifWall;
+
+
+
+
+};
 
 
 
