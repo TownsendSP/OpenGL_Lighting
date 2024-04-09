@@ -6,9 +6,10 @@
 #define TGSOUTHAHW4_THINGS_H
 #include <map>
 
-# include "Coord.hpp"
+# include "Coord.h"
 # include "ColorData.h"
 # include "globals.h"
+
 
 
 
@@ -101,6 +102,7 @@ class Wall {
 
 };
 
+void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions);
 
 
 

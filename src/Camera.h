@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 
-#include "Coord.hpp"
+#include "Coord.h"
 #include "globals.h"
 
 class Camera {
@@ -55,6 +55,11 @@ public:
     }
 
     void useDebugStringAdd(int line, std::string message);
+
+    Coord vec() const {
+        return Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X));
+    };
+
 };
 
 Coord calcPitchYaw(Coord position, Coord target);

@@ -8,7 +8,7 @@
 
 #endif
 
-#include "Coord.hpp"
+#include "Coord.h"
 
 #include <cmath>
 
@@ -85,8 +85,77 @@ std::vector<Coord> genRandNonCoLinearCord(int numCoords, float permissibleClosen
     return coords;
 }
 
+Coord Coord::wrap(Coord maxes, Coord mins, Coord add) {
+    Coord result = *this + add;
+
+    if (result.X > maxes.X) {
+        result.X = mins.X + (result.X - maxes.X);
+    } else if (result.X < mins.X) {
+        result.X = maxes.X - (mins.X - result.X);
+    }
+
+    if (result.Y > maxes.Y) {
+        result.Y = mins.Y + (result.Y - maxes.Y);
+    } else if (result.Y < mins.Y) {
+        result.Y = maxes.Y - (mins.Y - result.Y);
+    }
+
+    if (result.Z > maxes.Z) {
+        result.Z = mins.Z + (result.Z - maxes.Z);
+    } else if (result.Z < mins.Z) {
+        result.Z = maxes.Z - (mins.Z - result.Z);
+    }
+
+    return result;
+}
+
+Coord Coord::wrap(float maxe, float min, Coord add) {
+    Coord result = *this + add;
+
+    if (result.X > maxe) {
+        result.X = min + (result.X - maxe);
+    } else if (result.X < min) {
+        result.X = maxe - (min - result.X);
+    }
+
+    if (result.Y > maxe) {
+        result.Y = min + (result.Y - maxe);
+    } else if (result.Y < min) {
+        result.Y = maxe - (min - result.Y);
+    }
+
+    if (result.Z > maxe) {
+        result.Z = min + (result.Z - maxe);
+    } else if (result.Z < min) {
+        result.Z = maxe - (min - result.Z);
+    }
+
+    return result;
+}
+
+Coord Coord::radiansToDegrees() const {
+    float herePi = 3.14159265358979323846;
+        return {(X * 180 / herePi),(Y * 180 / herePi),(Z * 180 / herePi)};
+
+}
+
+Coord Coord::degToRad() {
+    float herePi = 3.14159265358979323846;
+    return {(X * herePi / 180),(Y * herePi / 180),(Z * herePi / 180)};
+
+
+
+}
+
+Coord Coord::dirVecToRad() const {
+        float pitch = atan2(Y, Z);
+        float yaw = atan2(X, Z);
+        return Coord(pitch, yaw, 0);
+}
+
+
 std::string* Coord::toStrings(int precision) const{
-    std::string* ret = new std::string[3];
+      std::string* ret = new std::string[3];
     ret[0] = trunc(X, precision);
     ret[1] = trunc(Y, precision);
     ret[2] = trunc(Z, precision);

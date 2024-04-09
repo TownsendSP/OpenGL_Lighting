@@ -63,6 +63,7 @@ public:
 
 
     //mathy stuff
+#ifndef FOLDING_COORDMATH
     Coord operator+(const Coord &other) const {
         return {X + other.X, Y + other.Y, Z + other.Z};
     }
@@ -147,6 +148,7 @@ public:
         return X == other.X && Y == other.Y && Z == other.Z;
     }
 
+
     [[nodiscard]] Coord pow(const float exponent) const {
         return {std::pow(X, exponent), std::pow(Y, exponent), std::pow(Z, exponent)};
     }
@@ -161,21 +163,25 @@ public:
                 std::abs(Y - other.Y) * std::abs(Y - other.Y) +
                 std::abs(Z - other.Z) * std::abs(Z - other.Z));
     }
+#endif
 
-    // std::string toString () const {
-    //     return "(" + std::to_string(X) + ", " + std::to_string(Y) + ", " + std::to_string(Z) + ")";
-    // }
+    Coord wrap(Coord maxes, Coord mins, Coord add);
 
+    Coord wrap(float maxe, float min, Coord add);
 
-// std::string toString () const {
-//     std::ostringstream oss;
-//     oss << std::fixed << std::setprecision(2) << std::showpoint;
-//     oss << "(" << X << ", " << Y << ", " << Z << ")";
-//     std::string str = oss.str();
-//     str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-//     str.erase(str.find_last_not_of('.') + 1, std::string::npos);
-//     return str;
-// }
+    operator float* () const {
+        return new float[3]{X, Y, Z};
+    }
+
+    Coord vecToAngles() const {
+        return {atan2(Z, X), asin(Y), 0};
+    }
+
+    Coord radiansToDegrees() const;
+
+    Coord degToRad();
+
+    Coord dirVecToRad() const;
 
     std::string *toStrings(int precision) const;
 

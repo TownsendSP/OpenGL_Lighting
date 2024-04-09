@@ -11,7 +11,7 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
-#include "Coord.hpp"
+#include "Coord.h"
 
 
 class ColorData {
@@ -92,7 +92,7 @@ public:
     //<editor-fold desc="Bitwise">
     ColorData operator&(const int i) const {
         return ColorData(i & 8 ? R : 0, i & 4 ? G : 0, i & 2 ? B : 0,
-                      i & 1 ? A : 0); // 8 = 1000, 4 = 0100, 2 = 0010, 1 = 0001
+                         i & 1 ? A : 0); // 8 = 1000, 4 = 0100, 2 = 0010, 1 = 0001
     }
 
     ColorData operator|(const ColorData i) const {
@@ -102,35 +102,44 @@ public:
     ColorData operator|(const float i) const {
         return {R == 0 ? i : R, G == 0 ? i : G, B == 0 ? i : B, A == 0 ? i : A};
     }
+
     //</editor-fold>
 
     //otherMath:
     ColorData clamp(float min, float max) const {
-        return {clmp(R, min, max),
-                clmp(G, min, max),
-                clmp(B, min, max),
-                clmp(A, min, max)};
+        return {
+            clmp(R, min, max),
+            clmp(G, min, max),
+            clmp(B, min, max),
+            clmp(A, min, max)
+        };
     }
 
     ColorData clamp(ColorData min, ColorData max) const {
-        return {clmp(R, min.R, max.R),
-                clmp(G, min.G, max.G),
-                clmp(B, min.B, max.B),
-                clmp(A, min.A, max.A)};
+        return {
+            clmp(R, min.R, max.R),
+            clmp(G, min.G, max.G),
+            clmp(B, min.B, max.B),
+            clmp(A, min.A, max.A)
+        };
     }
 
     ColorData scale(float min, float max) const {
-        return {clscl(R, min, max),
-                clscl(G, min, max),
-                clscl(B, min, max),
-                clscl(A, min, max)};
+        return {
+            clscl(R, min, max),
+            clscl(G, min, max),
+            clscl(B, min, max),
+            clscl(A, min, max)
+        };
     }
 
     ColorData scale(ColorData min, ColorData max) const {
-        return {clscl(R, min.R, max.R),
-                clscl(G, min.G, max.G),
-                clscl(B, min.B, max.B),
-                clscl(A, min.A, max.A)};
+        return {
+            clscl(R, min.R, max.R),
+            clscl(G, min.G, max.G),
+            clscl(B, min.B, max.B),
+            clscl(A, min.A, max.A)
+        };
     }
 
     ColorData pow(const float exponent) const {
@@ -143,9 +152,9 @@ public:
 
     float dist(const ColorData &other) const {
         return std::sqrt(
-                std::abs(R - other.R) * std::abs(R - other.R) +
-                std::abs(G - other.G) * std::abs(G - other.G) +
-                std::abs(B - other.B) * std::abs(B - other.B));
+            std::abs(R - other.R) * std::abs(R - other.R) +
+            std::abs(G - other.G) * std::abs(G - other.G) +
+            std::abs(B - other.B) * std::abs(B - other.B));
     }
 
     std::string toString() const {
@@ -180,19 +189,28 @@ public:
         return new float[4]{R, G, B, A};
     }
 
-    operator float*() const {
-    return new float[4]{R, G, B, A};
-}
-operator Coord () const {
-    return {R, G, B};
-}
+    GLfloat *toGLfloatArray() {
+        return new GLfloat[4]{R, G, B, A};
+    }
+
+    // operator GLfloat*() const {
+    //     return new GLfloat[4]{R, G, B, A};
+    // }
+
+    operator float *() const {
+        return new float[4]{R, G, B, A};
+    }
+
+
+    operator Coord() const {
+        return {R, G, B};
+    }
 };
 
 
 bool isColorCloseEnough(ColorData color1, ColorData color2, float closeness);
 
 class QuadPos : public ColorData {
-
 };
 
 

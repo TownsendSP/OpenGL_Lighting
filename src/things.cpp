@@ -3,6 +3,7 @@
 //
 
 #include "things.h"
+#include "Coord.h"
 
 #include <iostream>
 #ifdef __APPLE__
@@ -230,4 +231,51 @@ void drawBMPStr(std::string str, void* font) {
     for (int8_t c: str) {
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c);
     }
+}
+
+
+void drawFlatPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions) {
+    // corner1 = corner1 - Coord(1, 1, 1);
+    // corner2 = corner2 - Coord(1, 1, 1);
+    // Calculate the size of each subdivision
+    float xStep = (corner2.X - corner1.X) / numSubDivisions;
+    float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
+
+    // Draw the grid of triangle strips
+    glNormal3f(normalVec.X, normalVec.Y, normalVec.Z);
+    for (int i = 0; i < numSubDivisions; ++i) {
+        glBegin(GL_TRIANGLE_STRIP);
+        for (int j = 0; j <= numSubDivisions; ++j) {
+            glVertex3f(corner1.X + i * xStep, corner1.Y, corner1.Z + j * zStep);
+            glVertex3f(corner1.X + (i + 1) * xStep, corner1.Y, corner1.Z + j * zStep);
+        }
+        glEnd();
+    }
+}
+
+void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions){
+    //draw the flat plane with the correct dimensions and location
+
+    //figure out how the final plane will need to be rotated based on the corners;
+
+    // XZ plane:
+    if(corner1.Y - corner2.Y == 0){
+        glPushMatrix();
+        drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
+        glPopMatrix();
+
+    }
+
+    // XY plane:
+    if(corner1.Z - corner2.Z == 0){ //rotate 90 degrees about the x axis
+        glPushMatrix();
+        glRotatef(90, 1.0, 0.0, 0.0);
+        drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
+        glPopMatrix();
+    }
+
+    //YZ plane: rotate 90 degrees about the y axis
+
+
+
 }

@@ -13,9 +13,9 @@ include_directories(${OPENGL_INCLUDE_DIR}   ${GLUT_INCLUDE_DIRS})
 
 add_executable(tgsouthaHW4 main.cpp
         src/Camera.cpp
-        src/Camera.hpp
+        src/Camera.h
         src/Coord.cpp
-        src/Coord.hpp
+        src/Coord.h
         src/LeftVP.cpp
         src/LeftVP.h
         src/things.cpp
@@ -24,10 +24,31 @@ add_executable(tgsouthaHW4 main.cpp
         src/ColorData.h
         src/lighting.cpp
         src/lighting.h
+        src/globals.h
+        src/PlaneMesh.cpp
+        src/PlaneMesh.h
+)
+target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+
+
+add_executable(testing mainForTesting.cpp
+        src/Camera.cpp
+        src/Camera.h
+        src/Coord.cpp
+        src/Coord.h
+        src/LeftVP.cpp
+        src/LeftVP.h
+        src/things.cpp
+        src/things.h
+        src/ColorData.cpp
+        src/ColorData.h
+        src/lighting.cpp
         src/lighting.h
         src/globals.h
-        Lights.cpp
-        Lights.h
+        src/PlaneMesh.cpp
+        src/PlaneMesh.h
+        src/Objects.cpp
+        src/Objects.h
 )
 
-target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries (testing ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

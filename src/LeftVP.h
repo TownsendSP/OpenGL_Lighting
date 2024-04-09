@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include "Coord.hpp"
+#include "Coord.h"
 
 class LeftVP {
     std::string debug_strings[60];
