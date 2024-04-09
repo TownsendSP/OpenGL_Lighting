@@ -130,37 +130,7 @@ public:
 };
 
 
-Material wallMaterial = Material(
-    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
-    10.0f);
 
-Material floorMaterial = Material( //pale brown color
-    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
-    33.0f);
-
-
-Material ceilingMaterial = Material( //matte cream color
-    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
-    5.0f);
-
-Material lampMaterial = Material( //emissive golden color.
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    5.0f);
-
-Material cardMaterial = Material( // metallic blue color
-    ColorData(0.3f, 0.3f, 0.7f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.4f, 1.0f),
-    ColorData(0.1f, 0.2f, 0.7f, 1.0f),
-    5.0f);
 
 
 #endif //LIGHTING_H

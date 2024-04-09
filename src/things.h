@@ -103,7 +103,7 @@ class Wall {
 };
 
 void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions);
-
+void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions);
 
 
 #endif //TGSOUTHAHW4_THINGS_H

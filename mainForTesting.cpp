@@ -83,11 +83,16 @@ auto prevTime = std::chrono::high_resolution_clock::now();
 
 #endif
 
+#ifndef FOLDING_REGION_MATERIALS
+
+
+
 //materials and lights
 Light hallwayLight;
 Light sunlight;
 Spotlight headlamp;
 Light fakeSun;
+#endif
 
 #ifndef FOLDING_REGION_TESTvARS
 uint8_t animInfo = 0b000;
@@ -167,6 +172,21 @@ void testCamBindings() {
     testInRightPlace();
 }
 
+void testDrawingPlanes() {
+    glColor4f(1, 1, 0, 0.3f);
+    drawPlane(Coord(0, 0, 0), Coord(1, 0, 1), Coord(0, 1, 0), 10);
+
+    glColor4f(1, 0, 1, 0.3f);
+    drawPlane(Coord(0, 0, 0), Coord(1, 1, 0), Coord(0, 0, 1), 10);
+
+    glColor4f(0, 1, 1, 0.3f);
+    drawPlane(Coord(0, 0, 0), Coord(0, 1, 1), Coord(1, 0, 0), 10);
+
+
+
+    // glColor4f(1, 1, 0, 0.3f);
+}
+
 #endif
 
 #ifndef FOLDING_REGION_Draw
@@ -227,6 +247,14 @@ void setupRight() {
     gluPerspective(fov, (float) totalWidth / (float) height, 1.0, 500.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glShadeModel(GL_SMOOTH);
+
+
     cam.lookAt();
 
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
@@ -245,7 +273,7 @@ void drawMoreShapes() {
     GLfloat test_light_position_pointlight[] = {-2.0f, 3.0f, -2.0f, 1.0f}; // Include positional component (w = 1.0)
     GLfloat test_light_diffuse_pointlight[] = {0.9f, 0.8f, 0.1f, 1.0f}; // Warm color
 
-    glDisable(GL_LIGHT0);
+    // glDisable(GL_LIGHT0);
 
     // Set material properties
     // glMaterialfv(GL_FRONT, GL_AMBIENT, testmaterial_ambient);
@@ -254,21 +282,15 @@ void drawMoreShapes() {
     // glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
     wallMaterial.apply();
 
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
-    glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //smooth shading
-    glShadeModel(GL_SMOOTH);
     // ground plane (y = -0.5)
     glPushMatrix();
 
-
+    glEnable(GL_LIGHT1);
     drawPlane(Coord(0, 0, -2), Coord(10, 0, 2), Coord(0, 1, 0), 50); //floor
     drawPlane(Coord(0, 3, -2), Coord(10, 3, 2), Coord(0, -1, 0), 50); //ceiling
-    drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wall:
-    drawPlane(Coord(0, 0, 2), Coord(10, 3, 2.1), Coord(0, 0, -1), 50); //- Right Wall:
-    drawPlane(Coord(0, 0, -2.1), Coord(10, 3, -2), Coord(0, 0, 1), 50); //- left Wall:
+    // drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wall:
+    // drawPlane(Coord(0, 0, 2), Coord(10, 3, 2.1), Coord(0, 0, -1), 50); //- Right Wall:
+    // drawPlane(Coord(0, 0, -2.1), Coord(10, 3, -2), Coord(0, 0, 1), 50); //- left Wall:
 
     glPopMatrix();
     glDisable(GL_LIGHT1);
@@ -311,9 +333,11 @@ void drawUnlitShapes() {
         glPopMatrix();
     }
 
-    testConeArot();
+    // testConeArot();
 
-    testCamBindings();
+    // testCamBindings();
+
+    testDrawingPlanes();
 
     glEnable(GL_LIGHTING);
 }
@@ -350,8 +374,8 @@ void drawWindow() {
     }
     setupRight();
     drawUnlitShapes();
-    drawMoreShapes();
-    drawLitShapes();
+    // drawMoreShapes();
+    // drawLitShapes();
 
 
     glutSwapBuffers();

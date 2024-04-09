@@ -4,6 +4,7 @@
 
 #include "things.h"
 #include "Coord.h"
+#include <map>
 
 #include <iostream>
 #ifdef __APPLE__
@@ -19,7 +20,8 @@
 
 
 //Window Blinds Routines
-Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
+#ifndef FOLDING_REGION_BLINDS
+  Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
     matSpecBlinds = ColorData(0.5, 0.5, 0.5, 1.0);
     matShineBlinds[0] = 50.0f;
     matAmbAndDifBlinds = ColorData(0.9, 0.9, 0.89, 1.0);
@@ -137,8 +139,12 @@ void Blinds::animate(float amt) {
         closedFactor = current <= 1.0 ? current : 1.0;
     }
 }
+#endif
+
 
 //Drawing a 3D Debug Axis
+#ifndef FOLDING_REGION_DEBUG3DX
+
 Debug3Dx::Debug3Dx(Coord *position, float size, float weight) {
     this->size = size;
     this->weight = weight;
@@ -225,6 +231,7 @@ void drawXZxGridlines(float range) {
 //
 //     glDisable(GL_LINE_STIPPLE);
 // }
+#endif
 
 
 void drawBMPStr(std::string str, void* font) {
@@ -242,7 +249,7 @@ void drawFlatPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivi
     float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
 
     // Draw the grid of triangle strips
-    glNormal3f(normalVec.X, normalVec.Y, normalVec.Z);
+    glNormal3fv(normalVec);
     for (int i = 0; i < numSubDivisions; ++i) {
         glBegin(GL_TRIANGLE_STRIP);
         for (int j = 0; j <= numSubDivisions; ++j) {
@@ -253,7 +260,26 @@ void drawFlatPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivi
     }
 }
 
-void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions){
+
+void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions) {
+      // corner1 = corner1 - Coord(1, 1, 1);
+      // corner2 = corner2 - Coord(1, 1, 1);
+      // Calculate the size of each subdivision
+      float xStep = (corner2.X - corner1.X) / numSubDivisions;
+      float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
+
+      // Draw the grid of triangle strips
+      for (int i = 0; i < numSubDivisions; ++i) {
+          glBegin(GL_TRIANGLE_STRIP);
+          for (int j = 0; j <= numSubDivisions; ++j) {
+              glVertex3f(corner1.X + i * xStep, corner1.Y, corner1.Z + j * zStep);
+              glVertex3f(corner1.X + (i + 1) * xStep, corner1.Y, corner1.Z + j * zStep);
+          }
+          glEnd();
+      }
+  }
+
+void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions, std::map<int, std::string>* debug_string_add_map_){
     //draw the flat plane with the correct dimensions and location
 
     //figure out how the final plane will need to be rotated based on the corners;
@@ -263,19 +289,64 @@ void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivision
         glPushMatrix();
         drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
         glPopMatrix();
-
     }
 
     // XY plane:
-    if(corner1.Z - corner2.Z == 0){ //rotate 90 degrees about the x axis
+    if(abs(corner1.Z - corner2.Z) <=0.01){
         glPushMatrix();
         glRotatef(90, 1.0, 0.0, 0.0);
-        drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
+        drawFlatPlane(Coord(corner1.X, 0, corner1.Y), Coord(corner2.X, 0, corner2.Y), normalVec, numSubDivisions);
         glPopMatrix();
     }
 
     //YZ plane: rotate 90 degrees about the y axis
+          if(abs(corner1.X - corner2.X) <=0.01){
+        glPushMatrix();
+        glRotatef(90, 1.0, 0.0, 0.0);
+        drawFlatPlane(Coord(corner1.X, 0, corner1.Y), Coord(corner2.X, 0, corner2.Y), normalVec, numSubDivisions);
+        glPopMatrix();
+    }
 
 
 
 }
+
+
+void cubeOfPlanes(Coord corner1, Coord corner2, bool insideout)
+
+void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions){
+      //draw the flat plane with the correct dimensions and location
+
+      //figure out how the final plane will need to be rotated based on the corners;
+
+      // XZ plane:
+      if(corner1.Y - corner2.Y == 0){
+          glPushMatrix();
+          drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
+          glPopMatrix();
+      }
+
+      // XY plane:
+
+      if(abs(corner1.Z - corner2.Z) <=0.01){ //a bit of fuzziness allowed for float weirdness
+          glNormal3fv(normalVec);
+          glPushMatrix();
+          glRotatef(90, -1.0, 0.0, 0.0);
+          drawFlatPlane(Coord(corner1.X, 0, corner1.Y), Coord(corner2.X, 0, corner2.Y), numSubDivisions);
+          glPopMatrix();
+      }
+
+      //YZ plane: rotate 90 degrees about the y axis
+        if(abs(corner1.X - corner2.X) <=0.01){ //rotate 90 degrees about the x axis
+            glNormal3fv(normalVec);
+            glPushMatrix();
+            glRotatef(90, 0.0, 0.0, 1.0);
+            drawFlatPlane(Coord(corner1.Z, 0, corner1.Y), Coord(corner2.Z, 0, corner2.Y), numSubDivisions);
+            glPopMatrix();
+        }
+
+      //
+
+
+
+  }
