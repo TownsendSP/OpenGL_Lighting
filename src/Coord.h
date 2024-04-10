@@ -189,6 +189,10 @@ public:
     std::string* toStrings(int precision = 2);
 };
 
+inline void glTranslatefv(Coord coord) {
+    glTranslatef(coord.X, coord.Y, coord.Z);
+};
+
 inline Coord randCoord(const Coord &min, const Coord &max) {
     return {srnd(std::min(min.X, max.X), std::max(min.X, max.X)),
             srnd(std::min(min.Y, max.Y), std::max(min.Y, max.Y)),

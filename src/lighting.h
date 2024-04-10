@@ -25,7 +25,7 @@ public:
     ColorData lightPos;
     lightNum whichLight;
 
-    Light() = default;
+
 
     Light(lightNum whichLight, ColorData pos, ColorData amb, ColorData diff, ColorData spec) {
         lightAmb = amb;
@@ -55,6 +55,9 @@ public:
     operator lightNum() const {
         return whichLight; //returns, for example, GL_LIGHT0
     };
+
+    //default constructor:
+    Light() = default;
 };
 
 class Spotlight: public Light {

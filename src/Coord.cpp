@@ -198,6 +198,7 @@ Coord genRandNonCoLinearCord(std::vector<Coord> coordsIn, float permissibleClose
 }
 
 
+
 bool isColorCloseEnough(Coord color1, Coord color2, float closeness) {
     if (abs(color1.X - color2.X) < closeness &&
         abs(color1.Y - color2.Y) < closeness &&

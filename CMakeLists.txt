@@ -25,9 +25,8 @@ add_executable(tgsouthaHW4 main.cpp
         src/lighting.cpp
         src/lighting.h
         src/globals.h
-        src/PlaneMesh.cpp
-        src/PlaneMesh.h
         src/globals.cpp
+        src/Scenedraw.cpp
 )
 target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
@@ -46,9 +45,9 @@ add_executable(testing mainForTesting.cpp
         src/lighting.cpp
         src/lighting.h
         src/globals.h
-        src/PlaneMesh.cpp
-        src/PlaneMesh.h
         src/globals.cpp
+        src/Scenedraw.cpp
+
 )
 
 target_link_libraries (testing ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

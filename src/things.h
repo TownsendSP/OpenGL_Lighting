@@ -11,17 +11,6 @@
 # include "globals.h"
 
 
-
-
-//big comment
-//   _  __       ____                __   __                __  __      __  __       _         __     __              _____         _       __ _      __ __   __
-//  | |/ / _    / __ \ ___   ____   / /_ / /_               \ \/ /_    / / / /___   (_)____ _ / /_   / /_            /__  /   _    | |     / /(_)____/ // /_ / /_
-//  |   / (_)  / / / // _ \ / __ \ / __// __ \   ______      \  /(_)  / /_/ // _ \ / // __ `// __ \ / __/  ______      / /   (_)   | | /| / // // __  // __// __ \
-// /   | _    / /_/ //  __// /_/ // /_ / / / /  /_____/      / /_    / __  //  __// // /_/ // / / // /_   /_____/     / /__ _      | |/ |/ // // /_/ // /_ / / / /
-///_/|_|(_)  /_____/ \___// .___/ \__//_/ /_/               /_/(_)  /_/ /_/ \___//_/ \__, //_/ /_/ \__/              /____/(_)     |__/|__//_/ \__,_/ \__//_/ /_/
-//                       /_/                                                        /____/
-
-
 // class things {
 //
 // };
@@ -104,6 +93,6 @@ class Wall {
 
 void drawPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions);
 void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions);
-
+void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut = 1, uint8_t whichFaces = 0b111111);
 
 #endif //TGSOUTHAHW4_THINGS_H
