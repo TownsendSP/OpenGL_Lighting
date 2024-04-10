@@ -1,6 +1,7 @@
 
 
 #include "Camera.h"
+#include "globals.h"
 
 //#include "bee.hpp"
 
@@ -11,6 +12,10 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <ostream>
+#include <streambuf>
+#include <iostream>
+#include <string>
 
 
 #ifdef __APPLE__
@@ -195,7 +200,6 @@ std::vector<std::string> Camera::toString(int prec) const {
     retVal.emplace_back(std::string("Pos X: " + p[0] + ", Y: " + p[1] + ", Z: " + p[2]));
     retVal.emplace_back("          Camera Info");
     return retVal;
-
 }
 
 std::string floatToHexString(float f) {
@@ -209,6 +213,7 @@ float hexStringToFloat(std::string s) {
     std::stringstream stream;
     stream << s;
     stream >> std::hex >> f;
+    glOut << "hexStringToFloat: " << hexStringToFloat("0x3f800000") << std::endl;
     return f;
 }
 

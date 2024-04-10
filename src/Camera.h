@@ -5,12 +5,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "globals.h"
 #include <complex.h>
 #include <map>
 #include <vector>
-
 #include "Coord.h"
-#include "globals.h"
+
 
 class Camera {
 private:
