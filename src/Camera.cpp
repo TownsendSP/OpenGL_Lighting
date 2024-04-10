@@ -9,7 +9,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#define PI 3.14159
+#include <fstream>
+#include <sstream>
+
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -40,6 +42,48 @@ Camera::Camera(Coord Pos, Coord Target, Coord orientation) {
     tgt = Target;
     up = orientation;
     ang = calcPitchYaw(pos, tgt); //pitch, yaw, roll
+}
+
+int Camera::saveToFile(std::ofstream& file) {
+    if (!file.is_open()) {
+        std::cerr << "Error: File is not open" << std::endl;
+        return -1;
+    }
+
+    for (std::tuple<Coord, Coord> state: storedStates) {
+        file << std::get<0>(state).toHexString() + std::get<1>(state).toHexString() << std::endl;
+    }
+
+    if (file.fail()) {
+        std::cerr << "Error: Failed to write to file" << std::endl;
+        return -2;
+    }
+
+    return 0;
+}
+
+int Camera::loadFromFile(std::ifstream &file) {
+    if (!file.is_open()) {
+        std::cerr << "Error: File is not open" << std::endl;
+        return -1;
+    }
+
+    std::string line;
+    int i = 0;
+
+    while (i < 5 && std::getline(file, line)) {
+        storedStates[i] = std::make_tuple(
+            Coord(line.substr(0, 60)),
+            Coord(line.substr(60, 120)));
+        i++;
+    }
+
+    if (file.fail() && !file.eof()) {
+        std::cerr << "Error: Failed to read from file" << std::endl;
+        return -2;
+    }
+
+    return 0;
 }
 
 void Camera::setPitchYaw() {
@@ -126,8 +170,8 @@ void Camera::lookAt(DebugLevel dbg) {
 
 
         std::vector<std::string> debugToAdd = toString(2);
-        for (int i = 0; i < debugToAdd.size(); i++) {
-            (*debug_string_add_map_)[i+31] = debugToAdd[i];
+        for (unsigned int i = 0; i < debugToAdd.size(); i++) {
+            (*debug_string_add_map_)[i + 31] = debugToAdd[i];
         }
 }
 
@@ -151,7 +195,39 @@ std::vector<std::string> Camera::toString(int prec) const {
     retVal.emplace_back(std::string("Pos X: " + p[0] + ", Y: " + p[1] + ", Z: " + p[2]));
     retVal.emplace_back("          Camera Info");
     return retVal;
+
 }
+
+std::string floatToHexString(float f) {
+    std::stringstream stream;
+    stream << std::hex << f;
+    return stream.str();
+}
+
+float hexStringToFloat(std::string s) {
+    float f;
+    std::stringstream stream;
+    stream << s;
+    stream >> std::hex >> f;
+    return f;
+}
+
+
+// int Camera::saveToFile(std::ofstream& file) { //6 semi-colon separated floats per line, 5 lines. pos x, y, z, tgt x, y, z
+//     std::string outString[6] = {floatToHexString(savedcam[0]), floatToHexString(savedcam[1]), floatToHexString(savedcam[2]),
+//                                 floatToHexString(savedcam[3]), floatToHexString(savedcam[4]), floatToHexString(savedcam[5])};
+//
+//
+//
+//
+// }
+
+// int Camera::loadFromFile(std::ifstream& file) {
+// }
+
+
+
+
 // void Camera::relRot(float pitchChange, float yawChange) {
 //
 //

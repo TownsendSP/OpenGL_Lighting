@@ -4,6 +4,7 @@
 
 #ifndef LIGHTING_H
 #define LIGHTING_H
+#include "globals.h"
 #include "ColorData.h"
 
 
@@ -19,12 +20,12 @@ public:
         LIGHT6 = GL_LIGHT6,
         LIGHT7 = GL_LIGHT7
     };
+
     ColorData lightAmb;
     ColorData lightDiff;
     ColorData lightSpec;
     ColorData lightPos;
     lightNum whichLight;
-
 
 
     Light(lightNum whichLight, ColorData pos, ColorData amb, ColorData diff, ColorData spec) {
@@ -60,14 +61,14 @@ public:
     Light() = default;
 };
 
-class Spotlight: public Light {
+class Spotlight : public Light {
 public:
     Coord spotDir; //angle: X rot, Y rot, Z rot, 1.0
     float spotAttenuation;
     float spotAngle;
 
     Spotlight(lightNum whichLight, ColorData pos, ColorData amb, ColorData diff, ColorData spec, ColorData dir,
-        float cutoff, float exponent): Light(whichLight, pos, amb, diff, spec) {
+              float cutoff, float exponent): Light(whichLight, pos, amb, diff, spec) {
         spotDir = dir;
         spotAttenuation = exponent;
         spotAngle = cutoff;
@@ -77,13 +78,14 @@ public:
     Spotlight() = default;
 
 
-    Spotlight(Light i, Coord dir, float cutoff, float exponent) : Light(i.whichLight, i.lightPos, i.lightAmb, i.lightDiff, i.lightSpec) {
+    Spotlight(Light i, Coord dir, float cutoff, float exponent) : Light(i.whichLight, i.lightPos, i.lightAmb,
+                                                                        i.lightDiff, i.lightSpec) {
         spotDir = dir;
         spotAttenuation = exponent;
         spotAngle = cutoff;
     };
 
-void setup();
+    void setup();
 
     void drawVis();
 };
@@ -129,11 +131,44 @@ public:
     };
 
     //default constructor:
-
 };
 
 
+class MatLib {
+public:
 
+    Material floor = Material( //pale brown color
+        ColorData(0.8f, 0.6f, 0.4f, 1.0f),
+        ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+        ColorData(0.8f, 0.6f, 0.4f, 1.0f),
+        33.0f);
+
+
+    Material ceiling = Material( //matte cream color
+        ColorData(0.9f, 0.9f, 0.8f, 1.0f),
+        ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+        ColorData(0.9f, 0.9f, 0.8f, 1.0f),
+        5.0f);
+
+    Material lamp = Material( //emissive golden color.
+        ColorData(1.0f, 0.9f, 0.7f, 1.0f),
+        ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+        ColorData(1.0f, 0.9f, 0.7f, 1.0f),
+        ColorData(1.0f, 0.9f, 0.7f, 1.0f),
+        5.0f);
+
+    Material card = Material( // metallic blue color
+        ColorData(0.3f, 0.3f, 0.7f, 1.0f),
+        ColorData(0.2f, 0.2f, 0.4f, 1.0f),
+        ColorData(0.1f, 0.2f, 0.7f, 1.0f),
+        5.0f);
+
+    Material wall = Material(
+        ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+        ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+        ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+        10.0f);
+};
 
 
 #endif //LIGHTING_H

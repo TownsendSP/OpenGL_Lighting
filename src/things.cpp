@@ -15,9 +15,11 @@
 # include <GL/glut.h>
 
 #endif
-#define PI 3.14159
+
 
 extern std::map<int, std::string> debugMap;
+extern std::vector<ConsoleScrollMsg> consoleMsgs;
+
 //Window Blinds Routines
 #ifndef FOLDING_REGION_BLINDS
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
@@ -259,12 +261,12 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     //draw the flat plane with the correct dimensions and location
 
     //figure out how the final plane will need to be rotated based on the corners;
-    debugMap[60-46] = "C1: " + c1.toString();
-    debugMap[60-47] = "C2: " + c2.toString();
+
 
     // XZ plane: CORRECT!
     if (c1.Y - c2.Y == 0) {
         glPushMatrix();
+        glNormal3fv(normalVec);
         glTranslatefv(c1);
         drawFlatPlane(Coord(), c2 - c1, numSubDivisions);
         glPopMatrix();
@@ -273,6 +275,7 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     // XY plane:x
     if (abs(c1.Z - c2.Z) <= 0.01) {
         glPushMatrix();
+        glNormal3fv(normalVec);
         glTranslatefv(c1);
         glRotatef(90, -1.0, 0.0, 0.0);
         drawFlatPlane(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
@@ -282,6 +285,7 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     //YZ plane: rotate 90 degrees about the y axis
     if (abs(c1.X - c2.X) <= 0.01) {
         glPushMatrix();
+        glNormal3fv(normalVec);
         glTranslatefv(c1);
         glRotatef(90, 0.0, 0.0, 1.0);
         drawFlatPlane(Coord(), Coord((c2-c1).Z, 0, (c2-c1).Y), numSubDivisions);
@@ -292,8 +296,8 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
 void cubeGLfrom2Points(Coord bnl, Coord tfr, uint8_t mode) {
     //draw the cube with the correct dimensions and location
     glPushMatrix();
-    glTranslatef(bnl.X, bnl.Y, bnl.Z);
-    glScalef(tfr.X - bnl.X, tfr.Y - bnl.Y, tfr.Z - bnl.Z);
+    glTranslatefv((tfr-bnl)/2+bnl);
+    glScalefv(tfr-bnl);
 if(mode == WiREFRAME)
     glutWireCube(1.0);
 else if(mode == SOLID)
@@ -318,7 +322,6 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t wh
         drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, Coord(0, insideOut, 0), numSubDiv);
     if (whichFaces >> 3 & 1) //right +Z
     	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, Coord(0, 0, insideOut), numSubDiv);
-
     if (whichFaces >> 2 & 1) //near -X
     	drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), Coord(0, 0, -insideOut), numSubDiv); // actually -x
     if (whichFaces >> 1 & 1) //bottom -Y
@@ -328,3 +331,5 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t wh
 
     glPopMatrix();
 }
+
+

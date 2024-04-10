@@ -4,7 +4,15 @@
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
-#include "lighting.h"
+
+#ifdef __APPLE__
+# include <GLUT/glut.h>
+#else
+
+# include <GL/glut.h>
+
+#endif
+
 
 #define PI 3.14159f
 #define D(radians) ((radians) * 180.0 / PI)
@@ -17,6 +25,20 @@
 #define PLZCONVERT 0b1
 #define NOCONVERT 0b0
 
+//cube faces, so I don't need to remember the order, or the bit stuff, I can do it just like GLUT defines stuff
+#define ALL_FACE         0b111111
+#define FRONT_FACE       0b100000
+#define TOP_FACE         0b010000
+#define RIGHT_FACE       0b001000
+#define BACK_FACE        0b000100
+#define BOTTOM_FACE      0b000010
+#define LEFT_FACE        0b000001
+
+#define XZ 0b101
+#define YZ 0b011
+#define XY 0b110
+#include <string>
+
 
 enum DebugLevel {
     NONE,
@@ -26,41 +48,18 @@ enum DebugLevel {
 };
 
 
-#ifndef FOLDING_REGION_MATERIALS
+// its getting annoying not being able to pass in arrays to glTranslateStuff
+inline void glTranslatefv(float in[3]) {
+    glTranslatef(in[0], in[1], in[2]);
+};
 
-inline Material wallMaterial = Material(
-    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
-    10.0f);
+inline void glScalefv(float in[3]) {
+    glScalef(in[0], in[1], in[2]);
+};
 
-inline Material floorMaterial = Material( //pale brown color
-    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
-    33.0f);
-
-
-inline Material ceilingMaterial = Material( //matte cream color
-    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
-    5.0f);
-
-inline Material lampMaterial = Material( //emissive golden color.
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    ColorData(1.0f, 0.9f, 0.7f, 1.0f),
-    5.0f);
-
-inline Material cardMaterial = Material( // metallic blue color
-    ColorData(0.3f, 0.3f, 0.7f, 1.0f),
-    ColorData(0.2f, 0.2f, 0.4f, 1.0f),
-    ColorData(0.1f, 0.2f, 0.7f, 1.0f),
-    5.0f);
-#endif
-
-
+struct ConsoleScrollMsg {
+    std::string msg;
+    int time;
+};
 
 #endif //GLOBALS_H

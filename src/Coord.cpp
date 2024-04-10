@@ -34,6 +34,8 @@ std::string trunc(float fl, int prec) {
     return buffer;
 }
 
+
+
 float dist(Coord point1, Coord point2) {
     float distX = std::abs(point1.X - point2.X);
     float distY = std::abs(point1.Y - point2.Y);
@@ -54,6 +56,24 @@ float srnd(float min, float max) {
 
 float srndi(float min, float max) {
     return static_cast<int>(srnd(min, max + 1));
+}
+
+Coord::Coord(std::string hexString) {
+    std::stringstream Xstr (hexString.substr(0, 20));
+    std::stringstream Ystr (hexString.substr(20, 20));
+    std::stringstream Zstr (hexString.substr(40, 20));
+    // float outX, outY, outZ;
+    Xstr >> std::hexfloat >> X;
+    Ystr >> std::hexfloat >> Y;
+    Zstr >> std::hexfloat >> Z;
+}
+
+
+
+std::string Coord::toHexString() { //remember, comma-delimited
+    std::stringstream stream;
+    stream << std::hexfloat << X << Y << Z;
+    return stream.str();
 }
 
 

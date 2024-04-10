@@ -13,9 +13,10 @@
 #include "globals.h"
 
 class Camera {
-    private:
-    std::string* debug_string_add_;
-    std::map<int, std::string>* debug_string_add_map_;
+private:
+    std::string *debug_string_add_;
+    std::map<int, std::string> *debug_string_add_map_;
+    std::tuple<Coord, Coord> storedStates[5];
 
 public:
     Coord pos;
@@ -28,9 +29,18 @@ public:
     // constructor:
 
     Camera(float position[3], float target[3], float orientation[3], float trans_speed, float rot_sens);
+
     Camera(Coord pos, Coord target, Coord orientation, float trans_speed, float rot_sens);
 
     Camera(Coord Pos, Coord Target, Coord orientation);
+
+    int saveToFile(std::ofstream &file);
+
+    int loadFromFile(std::ifstream &file);
+
+    void Camera::storeState(int index) {
+        storedStates[index] = std::make_tuple(pos, tgt);
+    }
 
     void setPitchYaw();
 
@@ -50,7 +60,7 @@ public:
 
     void relRot(float pitch, float yaw);
 
-    void setDebugStringAdd(std::map<int, std::string>* mapPtr) {
+    void setDebugStringAdd(std::map<int, std::string> *mapPtr) {
         this->debug_string_add_map_ = mapPtr;
     }
 
@@ -59,13 +69,13 @@ public:
     Coord vec() const {
         return Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X));
     };
-
 };
 
 Coord calcPitchYaw(Coord position, Coord target);
+
 Coord calcTarget(Coord position, Coord pitchYaw);
 
-std::string trunc(float fl, int prec=3);
+std::string trunc(float fl, int prec = 3);
 
-void mapInsert(std::map<int, std::string>* mapthing, std::vector<std::string>, int indexInsert);
+void mapInsert(std::map<int, std::string> *mapthing, std::vector<std::string>, int indexInsert);
 #endif //CAMERA_H

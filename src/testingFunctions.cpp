@@ -7,7 +7,7 @@
 #else
 # include <GL/glut.h>
 #endif
-#define PI 3.14159
+
 
 #include <iostream>
 #include <chrono>
@@ -73,7 +73,7 @@ void testInRightPlace(Camera cam) { // tests the cone originating from the camer
     glScalef(1, 1, -1);
     glTranslatef(0, 5,0);
     testConeCrot(Coord(D(cam.ang.X), D(cam.ang.Y-PI/2), 0) ,
-        ColorData(0, 1, 0, 0.3));
+        ColorData(0, 1, 0, 0.3, NOCONVERT));
     glPopMatrix();
 }
 
@@ -121,6 +121,7 @@ void testDrawingCubes() {
 }
 
 
+
 void windowTest() {
     Coord wall1a = Coord(0, 0, 6);
     Coord wall1B = Coord(7, 6, 6.5);
@@ -138,25 +139,31 @@ void windowTest() {
     Coord window2b = Coord(3.5, 2.5, 4.4);
     Coord window2Color = ColorData(0x02BCEA, 0.3);
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_BLEND);
+
+    //wall 1 should be untouched
+    glColor4fv(wall1Color);
+    cubeGLfrom2Points(wall1a, wall1B);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    //wall 2 should have a hole through it
+    glColor4fv(wall2Color);
+    cubeGLfrom2Points(wall2a, wall2B);
+
+    //window 1 will use its transparency to cut a hole in the wall
+    glColor4fv(window1Color);
+    cubeGLfrom2Points(window1a, window1b);
+
+    glDisable(GL_BLEND);
 
 
+    // glColor4fv(window2Color);
+    // cubeGLfrom2Points(window2a, window2b);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    glEnable(GL_LIGHTING);
 }
 
 

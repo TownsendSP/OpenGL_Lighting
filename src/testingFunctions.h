@@ -30,5 +30,5 @@ void testInRightPlace(Camera cam);
 void testInRightPlace();
 void testDrawingPlanes();
 void testDrawingCubes();
-
+void windowTest();
 #endif //TESTINGFUNCTIONS_H

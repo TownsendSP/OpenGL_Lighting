@@ -5,7 +5,7 @@
 #else
 # include <GL/glut.h>
 #endif
-#define PI 3.14159
+
 
 #include <iostream>
 #include <chrono>
@@ -342,7 +342,35 @@ void specialKeyboard(int key, int x, int y) {
 #endif
 
 
+void loadCoord(std::string inString) {
+    //x is first 20 chars, y is next 20, z is last 20
+    std::stringstream Xstr (inString.substr(0, 20));
+    std::stringstream Ystr (inString.substr(20, 20));
+    std::stringstream Zstr (inString.substr(40, 20));
+    float outX, outY, outZ;
+    Xstr >> std::hexfloat >> outX;
+    Ystr >> std::hexfloat >> outY;
+    Zstr >> std::hexfloat >> outZ;
+    Coord outCoord = Coord(outX, outY, outZ);
+    std::cout << outCoord.toString(7) << std::endl;
+
+
+
+    exit(0);
+
+
+}
+
+void testFun() {
+    Coord test  = Coord(1.23, 4.56, 7.89);
+    std::cout <<test.toHexString() << std::endl;
+    std::string testString = test.toHexString();
+    loadCoord(testString);
+}
+
+
 int main(int argc, char **argv) {
+    testFun();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(totalWidth, height);

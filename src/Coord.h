@@ -10,15 +10,7 @@
 #include <iomanip>
 #include <sstream>
 
-#ifdef __APPLE__
-# include <GLUT/glut.h>
-#else
-
-# include <GL/glut.h>
-
-#endif
-#define PI 3.14159
-
+#include "globals.h"
 
 
 float srnd(float min, float max);
@@ -47,6 +39,10 @@ public:
         Y = y;
         Z = z;
     }
+
+    Coord(std::string hexString);
+
+    std::string toHexString();
 
     explicit Coord(const float in[3]) {
         X = in[0];
@@ -163,6 +159,18 @@ public:
                 std::abs(Y - other.Y) * std::abs(Y - other.Y) +
                 std::abs(Z - other.Z) * std::abs(Z - other.Z));
     }
+    //swapping will be done by overloading rightshift
+
+    Coord operator>>(const uint8_t m) {
+        return(
+            (m==XZ) ? Coord(Z, Y, X) :
+            (m==YZ) ? Coord(X, Z, Y) :
+            (m==XY) ? Coord(Z, X, Y) : *this
+            );
+    };
+
+
+
 #endif
 
     Coord wrap(Coord maxes, Coord mins, Coord add);
@@ -189,9 +197,7 @@ public:
     std::string* toStrings(int precision = 2);
 };
 
-inline void glTranslatefv(Coord coord) {
-    glTranslatef(coord.X, coord.Y, coord.Z);
-};
+
 
 inline Coord randCoord(const Coord &min, const Coord &max) {
     return {srnd(std::min(min.X, max.X), std::max(min.X, max.X)),

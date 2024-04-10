@@ -5,7 +5,7 @@
 #else
 # include <GL/glut.h>
 #endif
-#define PI 3.14159
+
 
 #include <iostream>
 #include <chrono>
@@ -23,6 +23,7 @@
 #include "src/globals.h"
 #include "src/lighting.h"
 #include "src/testingFunctions.h"
+#include "src/LeftVP.h"
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
@@ -39,6 +40,8 @@ int height = 900;
 Camera cam = Camera();
 std::vector<Debug3Dx> debugXes;
 Blinds windowBlinds;
+
+MatLib mat = MatLib();
 
 
 #endif
@@ -58,10 +61,9 @@ float blindAnimSpeed = 0.05;
 bool showInfoViewport = true;
 //function pointer to infoVP addDebugString
 
-std::string *debug_strings;
-std::string infoStrings[60];
-
 std::map<int, std::string> debugMap;
+std::vector<ConsoleScrollMsg> consoleMsgs;
+
 
 std::vector<std::string> instructionVec = {
     "======Keybinds======",
@@ -73,6 +75,7 @@ float rVPColor[] = {0.2, 0.2, 0.2, 1.0};
 ColorData rVPColorData = ColorData(0.2, 0.2, 0.2, 1.0);
 ColorData solarizedBG = ColorData(0.02745, 0.21176, 0.25882, 1.0);
 ColorData solarizedText = ColorData(0.71373, 0.58039, 0.58824, 1.0);
+float scrollConsolePercent = 0.2;
 
 
 DebugLevel defaultDebug = WEAK;
@@ -116,6 +119,20 @@ void drawLeft() {
     glDrawArrays(GL_QUADS, 0, 4);
     glDisableClientState(GL_VERTEX_ARRAY);
 
+    //draw thick solarized orange line along the right edge
+    glColor4f(0.86275, 0.19608, 0.18431, 1.0);
+    glLineWidth(5.0f);
+    glBegin(GL_LINES);
+    glVertex2i(lVportW, 0);
+    glVertex2i(lVportW, height);
+    glEnd();
+
+    //draw thick horizontal solarized orange line 20% from the bottom
+    glBegin(GL_LINES);
+    glVertex2i(0, scrollConsolePercent * height);
+    glVertex2i(lVportW, scrollConsolePercent * height);
+    glEnd();
+    glLineWidth(1.0f);
 
     glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
     for (const auto &pair: debugMap) {
@@ -139,6 +156,8 @@ void setupLeft() {
     glOrtho(0, lVportW, 0, height, -10, 10.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    //add message to
 }
 
 void setupRight() {
@@ -186,7 +205,8 @@ void drawMoreShapes() {
     // glMaterialfv(GL_FRONT, GL_DIFFUSE, test_material_diffuse);
     // glMaterialfv(GL_FRONT, GL_SPECULAR, test_material_specular);
     // glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
-    wallMaterial.apply();
+
+    mat.wall.apply();
 
     // ground plane (y = -0.5)
     glPushMatrix();
@@ -240,7 +260,8 @@ void drawUnlitShapes() {
 
     // testCamBindings();
 
-    testDrawingCubes();
+    // testDrawingCubes();
+    windowTest();
 
     glEnable(GL_LIGHTING);
 }

@@ -5,6 +5,7 @@
 #ifndef COLORDATA_H
 #define COLORDATA_H
 
+#include "globals.h"
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -12,7 +13,6 @@
 #include <iomanip>
 #include <sstream>
 #include "Coord.h"
-#include "globals.h"
 
 
 
@@ -39,7 +39,7 @@ public:
             B = conv?(b/ 255.0):b;
             A = a;
     }
-    ColorData(uint8_t hexColor, float a) {
+    ColorData(uint32_t hexColor, float a) {
         R = ((hexColor >> 16) & 0xFF) / 255.0;
         G = ((hexColor >> 8) & 0xFF) / 255.0;
         B = (hexColor & 0xFF) / 255.0;
