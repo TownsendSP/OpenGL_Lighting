@@ -12,6 +12,7 @@
 Coord hallBnl = Coord(0, 0, -2);
 Coord halltfr = Coord(10, 3, 2);
 
+
 void drawHall() {
 
 }

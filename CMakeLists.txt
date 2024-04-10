@@ -27,6 +27,8 @@ add_executable(tgsouthaHW4 main.cpp
         src/globals.h
         src/globals.cpp
         src/Scenedraw.cpp
+        src/testingFunctions.cpp
+        src/testingFunctions.h
 )
 target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
@@ -47,6 +49,8 @@ add_executable(testing mainForTesting.cpp
         src/globals.h
         src/globals.cpp
         src/Scenedraw.cpp
+        src/testingFunctions.cpp
+        src/testingFunctions.h
 
 )
 

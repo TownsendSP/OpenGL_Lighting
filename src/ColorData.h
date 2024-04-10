@@ -12,6 +12,9 @@
 #include <iomanip>
 #include <sstream>
 #include "Coord.h"
+#include "globals.h"
+
+
 
 
 class ColorData {
@@ -30,6 +33,19 @@ public:
         A = a;
     }
 
+    ColorData(int r, int g, int b, float a, uint8_t conv = NOCONVERT) {
+            R = conv?(r/ 255.0):r;
+            G = conv?(g/ 255.0):g;
+            B = conv?(b/ 255.0):b;
+            A = a;
+    }
+    ColorData(uint8_t hexColor, float a) {
+        R = ((hexColor >> 16) & 0xFF) / 255.0;
+        G = ((hexColor >> 8) & 0xFF) / 255.0;
+        B = (hexColor & 0xFF) / 255.0;
+        A = a;
+    }
+
     ColorData(const float in[4]) {
         R = in[0];
         G = in[1];
@@ -43,6 +59,13 @@ public:
         G = 0;
         B = 0;
         A = 0;
+    }
+
+    ColorData(GLdouble r, GLdouble g, GLdouble b, GLdouble a) {
+        R = r;
+        G = g;
+        B = b;
+        A = a;
     }
 
 #ifndef ARITHMETIC_OPERATORS

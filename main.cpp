@@ -22,6 +22,7 @@
 #include "src/ColorData.h"
 #include "src/globals.h"
 #include "src/lighting.h"
+#include "src/testingFunctions.h"
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
@@ -94,141 +95,6 @@ Spotlight headlamp;
 Light fakeSun;
 #endif
 
-#ifndef FOLDING_REGION_TESTvARS
-uint8_t animInfo = 0b000;
-Coord coneRotAnim = Coord(0, 0, 0);
-float coneHeight = 3;
-float coneRotSpeed = 5;
-
-
-void testConeA(float height, ColorData colorThing = ColorData(1, 0, 1, 1)) {
-    float baseR = height / 2;
-    glPushMatrix();
-    glTranslatef(0, 0, -height);
-    glColor4f(colorThing.R, colorThing.G, colorThing.B, colorThing.A);
-    glutSolidCone(baseR, height, 20, 20);
-    glColor3f(0, 0, 0);
-    glLineWidth(2.0f);
-    glutWireCone(baseR, height, 20, 20);
-    glLineWidth(1.0f);
-    glPopMatrix();
-}
-
-void testConeArot(Coord angle = coneRotAnim) {
-    glPushMatrix();
-    glRotatef(angle.X, 1, 0, 0);
-    glRotatef(angle.Y, 0, 1, 0);
-    glRotatef(angle.Z, 0, 0, 1);
-    testConeA(coneHeight);
-    glPopMatrix();
-}
-
-bool where = false;
-
-void testConeCrot(Coord angle, ColorData coloraaaa) {
-    //add info to debugMap
-    std::string thing = where ? "B" : "R";
-    debugMap[60 - (where ? 16 : 15)] = thing + "FinalAngle: " + angle.toString();
-
-    glPushMatrix();
-    glRotatef(angle.Y, 0, 1, 0);
-    glRotatef(angle.X, 1, 0, 0);
-    // glRotatef(-angle.Z, 0, 0, 1);
-    testConeA(10, coloraaaa);
-    glPopMatrix();
-}
-
-void printConeInfos() {
-    debugMap[60 - 9] = "Cam.Deg: " + cam.ang.radiansToDegrees().toString();
-    debugMap[60 - 10] = "Cam.Vec: " + cam.vec().toString();
-    debugMap[60 - 11] = "Cam.Ang: " + cam.ang.toString();
-    debugMap[60 - 12] = "rCamAngToDegrees: " + cam.ang.radiansToDegrees().toString();
-    debugMap[60 - 13] = "CamDirVecToRad: " + cam.vec().dirVecToRad().toString();
-    debugMap[60 - 14] = "bCamDirVecToRadToDegrees: " + cam.vec().dirVecToRad().radiansToDegrees().toString();
-    // if y and z were added:
-    //dirvec
-    // debugMap[60-15] = "bYZCamDirVecToRadToDegrees: " + cam.vec().dirVecToRad().radiansToDegrees() & 6 + cam.vec().dirVecToRad().radiansToDegrees()
-}
-
-float d(float radians) {
-    return radians * 180 / PI;
-}
-
-void testInRightPlace() {
-    glPushMatrix();
-    glScalef(1, 1, -1);
-    glTranslatef(0, 5,0);
-    testConeCrot(Coord(d(cam.ang.X), d(cam.ang.Y-PI/2), 0) ,
-        ColorData(0, 1, 0, 0.3));
-    glPopMatrix();
-    printConeInfos();
-}
-
-void testCamBindings() {
-    Coord magicFactor = Coord(0, 0, 0);
-    where = false;
-
-
-    testInRightPlace();
-}
-
-
-void testDrawingPlanes() {
-    glColor4f(0, 0, 1, 0.3f);  //ZX
-    drawPlane(Coord(0, 0, 0) + Coord(0, 0, -5), Coord(1, 0, 1) + Coord(0, 0, -5), Coord(0, 1, 0), 10);
-
-    glColor4f(0, 1, 0, 0.3f); //XY
-    drawPlane(Coord(0, 0, 0) + Coord(0, 0, -5), Coord(1, 1, 0) + Coord(0, 0, -5), Coord(0, 0, 1), 10);
-
-    glColor4f(1, 0, 0, 0.3f);
-    drawPlane(Coord(0, 0, 0) + Coord(0, 0, -5), Coord(0, 1, 1) + Coord(0, 0, -5), Coord(1, 0, 0), 10);
-
-
-
-
-    glColor4f(0.5, 0.5, 1, 0.3f);
-    drawPlane(Coord(0, 0, 0), Coord(1, 0, 1), Coord(0, 1, 0), 10);
-
-    glColor4f(0.5, 1, 0.5, 0.3f);
-    drawPlane(Coord(0, 0, 0), Coord(1, 1, 0), Coord(0, 0, 1), 10);
-
-    glColor4f(1, 0.5, 0.5, 0.3f);
-    drawPlane(Coord(0, 0, 0), Coord(0, 1, 1), Coord(1, 0, 0), 10);
-
-    glColor4f(1, 1, 0.5, 0.3f);
-    drawPlane(Coord(0, 0, 0) + Coord(-4, 0, 0), Coord(1, 0, 1) + Coord(-4, 0, 0), Coord(0, 1, 0), 10);
-
-    glColor4f(1, 0.5, 1, 0.3f);
-    drawPlane(Coord(0, 0, 0) + Coord(-4, 0, 0), Coord(1, 1, 0) + Coord(-4, 0, 0), Coord(0, 0, 1), 10);
-
-    glColor4f(0.5, 1, 1, 0.3f);
-    drawPlane(Coord(0, 0, 0) + Coord(-4, 0, 0), Coord(0, 1, 1) + Coord(-4, 0, 0), Coord(1, 0, 0), 10);
-}
-
-void testDrawingCubes() {
-    // testDrawingPlanes();
-
-
-    // glColor4f(1, 1, 0, 0.3f);
-    // glColor4f(0, 0, 1, 0.3f);
-    cubeOfPlanes(Coord(0, 0, 0), Coord(1, 1, 1), 10, 1, 0b100100); //front and back
-
-    // glColor4f(0, 1,0, 0.3f);
-    cubeOfPlanes(Coord(2, 0, 0), Coord(3, 1, 1), 10, 1, 0b010010); //top and bottom
-
-    // glColor4f(1, 0, 0, 0.3f);
-    cubeOfPlanes(Coord(4, 0, 0), Coord(5, 1, 1), 10, 1, 0b001001); //Left and right
-
-    // cubeOfPlanes(Coord(2, 0, 2), Coord(3, 1, 4), 10, 1);
-
-
-
-
-
-}
-
-#endif
-
 #ifndef FOLDING_REGION_Draw
 
 void drawLeft() {
@@ -284,13 +150,13 @@ void setupRight() {
     }
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(fov, (float) totalWidth / (float) height, 1.0, 500.0);
+    gluPerspective(fov, totalWidth / height, 1.0, 500.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
-    glEnable(GL_BLEND);
+    // glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
 
@@ -363,10 +229,7 @@ void drawUnlitShapes() {
         glPushMatrix();
         drawXZxGridlines(50);
         glPopMatrix();
-
-
         glPushMatrix();
-
         for (Debug3Dx debug_x: debugXes) {
             debug_x.draw();
         }
@@ -385,12 +248,6 @@ void drawUnlitShapes() {
 
 #endif
 
-void testHelper() {
-    glPushMatrix();
-    glTranslatef(1, 1, 1);
-    drawMoreShapes();
-    glPopMatrix();
-}
 // fps function
 void calculateFPS() {
     frame++;

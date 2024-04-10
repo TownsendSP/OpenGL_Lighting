@@ -6,6 +6,18 @@
 #define GLOBALS_H
 #include "lighting.h"
 
+#define PI 3.14159f
+#define D(radians) ((radians) * 180.0 / PI)
+#define R(degrees) ((degrees) * PI / 180.0)
+
+#define WiREFRAME 0x19
+#define SOLID 0x1A
+
+//used for determining whether to convert color values to 0-1 range
+#define PLZCONVERT 0b1
+#define NOCONVERT 0b0
+
+
 enum DebugLevel {
     NONE,
     WEAK,

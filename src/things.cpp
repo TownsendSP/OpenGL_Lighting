@@ -2,6 +2,7 @@
 // Created by tgsp on 4/3/2024.
 //
 
+
 #include "things.h"
 #include "Coord.h"
 #include <map>
@@ -230,30 +231,9 @@ void drawXZxGridlines(float range) {
 // }
 #endif
 
-
 void drawBMPStr(std::string str, void *font) {
     for (int8_t c: str) {
         glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c);
-    }
-}
-
-
-void drawFlatPlane(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions) {
-    // corner1 = corner1 - Coord(1, 1, 1);
-    // corner2 = corner2 - Coord(1, 1, 1);
-    // Calculate the size of each subdivision
-    float xStep = (corner2.X - corner1.X) / numSubDivisions;
-    float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
-
-    // Draw the grid of triangle strips
-    glNormal3fv(normalVec);
-    for (int i = 0; i < numSubDivisions; ++i) {
-        glBegin(GL_TRIANGLE_STRIP);
-        for (int j = 0; j <= numSubDivisions; ++j) {
-            glVertex3f(corner1.X + i * xStep, corner1.Y, corner1.Z + j * zStep);
-            glVertex3f(corner1.X + (i + 1) * xStep, corner1.Y, corner1.Z + j * zStep);
-        }
-        glEnd();
     }
 }
 
@@ -275,13 +255,6 @@ void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions) {
     }
 }
 
-// void drawFlatPlane(Coord corner, int numSubdivs) {
-//       drawFlatPlane()
-//   }
-
-
-
-
 void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     //draw the flat plane with the correct dimensions and location
 
@@ -293,16 +266,16 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     if (c1.Y - c2.Y == 0) {
         glPushMatrix();
         glTranslatefv(c1);
-        drawFlatPlane(Coord(), c2 - c1, normalVec, numSubDivisions);
+        drawFlatPlane(Coord(), c2 - c1, numSubDivisions);
         glPopMatrix();
     }
 
-    // XY plane:
+    // XY plane:x
     if (abs(c1.Z - c2.Z) <= 0.01) {
         glPushMatrix();
         glTranslatefv(c1);
         glRotatef(90, -1.0, 0.0, 0.0);
-        drawFlatPlane(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), normalVec, numSubDivisions);
+        drawFlatPlane(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
         glPopMatrix();
     }
 
@@ -311,43 +284,22 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
         glPushMatrix();
         glTranslatefv(c1);
         glRotatef(90, 0.0, 0.0, 1.0);
-        drawFlatPlane(Coord(), Coord((c2-c1).Z, 0, (c2-c1).Y), normalVec, numSubDivisions);
+        drawFlatPlane(Coord(), Coord((c2-c1).Z, 0, (c2-c1).Y), numSubDivisions);
         glPopMatrix();
     }
 }
 
-
-void drawPlaneBad(Coord corner1, Coord corner2, Coord normalVec, int numSubDivisions,
-                  std::map<int, std::string> *debug_string_add_map_) {
-    //draw the flat plane with the correct dimensions and location
-
-    //figure out how the final plane will need to be rotated based on the corners;
-
-    // XZ plane:
-    if (corner1.Y - corner2.Y == 0) {
-        glPushMatrix();
-        drawFlatPlane(corner1, corner2, normalVec, numSubDivisions);
-        glPopMatrix();
-    }
-
-    // XY plane:
-    if (abs(corner1.Z - corner2.Z) <= 0.01) {
-        glPushMatrix();
-
-        glRotatef(90, -1.0, 0.0, 0.0);
-        drawFlatPlane(Coord(corner1.X, 0, corner1.Y), Coord(corner2.X, 0, corner2.Y), normalVec, numSubDivisions);
-        glPopMatrix();
-    }
-
-    //YZ plane: rotate 90 degrees about the y axis
-    if (abs(corner1.X - corner2.X) <= 0.01) {
-        glPushMatrix();
-        glRotatef(90, 0.0, 0.0, -1.0);
-        drawFlatPlane(Coord(corner1.X, 0, corner1.Y), Coord(corner2.Z, 0, corner2.Y), normalVec, numSubDivisions);
-        glPopMatrix();
-    }
+void cubeGLfrom2Points(Coord bnl, Coord tfr, uint8_t mode) {
+    //draw the cube with the correct dimensions and location
+    glPushMatrix();
+    glTranslatef(bnl.X, bnl.Y, bnl.Z);
+    glScalef(tfr.X - bnl.X, tfr.Y - bnl.Y, tfr.Z - bnl.Z);
+if(mode == WiREFRAME)
+    glutWireCube(1.0);
+else if(mode == SOLID)
+    glutSolidCube(1.0);
+    glPopMatrix();
 }
-
 
 void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t whichFaces) {
     /*draw the cube of planes with the correct dimensions and location
