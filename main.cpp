@@ -6,7 +6,7 @@
 # include <GL/glut.h>
 #endif
 
-
+#include "src/globals.h"
 #include <iostream>
 #include <chrono>
 #include <cmath>
@@ -16,11 +16,13 @@
 #include <map>
 
 //My Imports and Defines
+#include <fstream>
+
 #include "src/Coord.h"
 #include "src/Camera.h"
 #include "src/things.h"
 #include "src/ColorData.h"
-#include "src/globals.h"
+
 #include "src/lighting.h"
 #include "src/testingFunctions.h"
 #include "src/LeftVP.h"
@@ -34,7 +36,7 @@ int rVportW = 1600;
 
 int height = 900;
 
-int consoleTime
+
 #endif
 
 #ifndef FOLDING_REGION_Global_Objects
@@ -58,18 +60,36 @@ bool started = false;
 int xClick;
 int yClick;
 
+
 float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
 float blindAnimSpeed = 0.05;
 bool showInfoViewport = true;
 //function pointer to infoVP addDebugString
 
 std::map<int, std::string> debugMap;
-std::vector<ConsoleScrollMsg> consoleMsgs;
 
 
+bool showKeybinds = true;
 std::vector<std::string> instructionVec = {
     "======Keybinds======",
-    "Scream Internally and resist the urge to throw your computer out the window"
+    "F1: Toggle Information Panel",
+    "F2: Shrink Console",
+    "F3: Grow Console",
+    "F5: Load Camera States from disk",
+    "F9: Save Camera states to disk",
+    "F12: Print test bitmap Alphabet",
+    "1-5: Load Camera state from memory slot",
+    "!-%: Save Camera state to memory slot",
+    "PGUP, PGDN: Pitch camera",
+    "HOME: FOV++",
+    "END: FOV --",
+    "Up/DArrow: Move forward/back in the XZ plane",
+    "L/RArrow: Rotate Clockwise/Counterclockwise about Y",
+    "W/D: Move forward/back relative to camera in XZ",
+    "A/S: Strafe Left/Right in XZ",
+    "F/C: Ascend/Descend",
+    "SPACE: Toggle mouse Camera Control",
+    "?: View/Hide Keybindings (return to console)"
 };
 
 //mid-dark grey, kinda like blender's default background
@@ -210,6 +230,8 @@ void drawUnlitShapes() {
 
 #endif
 
+
+
 // fps function
 void calculateFPS() {
     frame++;
@@ -292,6 +314,21 @@ void resize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+void showKeybindings() {
+    glout << NOPREFIX;
+    glout << CLEARALL;
+    glout << MAX;
+    for (const std::string &i: instructionVec) {
+        glout << i << '\n';
+    }
+}
+
+void hideKeybindings() {
+    glout << CLEARALL;
+    glout << DEFAULT;
+    glout << PREFIX;
+}
+
 //control
 #ifndef FOLDING_REGION_Control
 
@@ -328,7 +365,22 @@ void toggleMouse() {
 }
 bool useCaps = false;
 void keyboard(unsigned char key, int x, int y) {
-    Coord newFlowerCoord;
+    // if(1<=(int)key <=5) {
+    //     cam.restoreState(((int)key)-1);
+    //     glout << "Camera State " << key << " Restored" << std::endl;
+    //     glout << "Cam Pos: " << cam.pos.toString() << " Cam Tgt: " << cam.tgt.toString();
+    //
+    // }
+    if(showKeybinds) {
+        if(key == '?') {
+            showKeybinds = false;
+            hideKeybindings();
+        }
+        else {
+            showKeybindings();
+        }
+    }
+
     switch (key) {
         case 'w': //CAMERA FORWARD
             cam.relTrans(Coord(1 * speed, 0, 0));
@@ -349,40 +401,56 @@ void keyboard(unsigned char key, int x, int y) {
             cam.relTrans(Coord(0, 1 * speed, 0));
         break;
         case 'r': //reset all but the camera
-            setup();
-        // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
-
+            glout << MAX;
             break;
         case 'R': //reset all
-            started = false;
-            setup();
+            glout << DEFAULT;
         // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 
             break;
         case ' ': //Toggle Mouse control of Camera
             toggleMouse();
+            glout << "Mouse Control: " << (useMouse ? "Enabled" : "Disabled; Use ← →  and PG↑↓") << '\n';
             break;
 
-        case '1':
-            animInfo ^= 0b100;
+        case '1': cam.restoreState(0);
+            glout << "Camera State 1 Restored" << '\n';
+            glout << "Pos: " << cam.pos.toString(0) << "Tgt: " << cam.tgt.toString(0) << '\n';
             break;
-        case '2':
-            animInfo ^= 0b010;
+        case '2': cam.restoreState(1);
+            glout << "Camera State "<<key<<" Restored" << '\n';
+            glout << "Pos: " << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
             break;
-        case '3':
-            animInfo ^= 0b001;
+        case '3': cam.restoreState(2);
+        glout << "Camera State "<<key<<" Restored" << '\n';
+        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
             break;
-        case '!':
-            coneRotAnim = coneRotAnim.wrap(180, -180, Coord(15, 0, 0));
+        case '4': cam.restoreState(3);
+        glout << "Camera State "<<key<<" Restored" << '\n';
+        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
             break;
-        case '@':
-            coneRotAnim = coneRotAnim.wrap(180, -180, Coord(0, 15, 0));
+        case '5': cam.restoreState(4);
+        glout << "Camera State "<<key<<" Restored" << '\n';
+        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
             break;
-        case '#':
-            coneRotAnim = coneRotAnim.wrap(180, -180, Coord(PI / 16, 0, 0).radiansToDegrees());
+        case '!': cam.storeState(0);
+            glout << "State1:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
             break;
-        case '$':
-            coneRotAnim = coneRotAnim.wrap(180, -180, Coord(0, PI / 16, 0).radiansToDegrees());
+        case '@': cam.storeState(1);
+            glout << "State2:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
+            break;
+        case '#': cam.storeState(2);
+            glout << "State3:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
+            break;
+        case '$': cam.storeState(3);
+            glout << "State4:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
+            break;
+        case '%': cam.storeState(4);
+            glout << "State5:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
+            break;
+        case '?': //print keybinds:
+            if(showKeybinds){hideKeybindings();showKeybinds = false;}
+            else{showKeybindings();showKeybinds = true;}
             break;
 
         case 27: //Escape Key: Exit
@@ -394,22 +462,100 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
+int counter = 0;
+
+void testCharacterPrinting() {
+    for (unsigned int i = counter * 5; i <= 255; i++) {
+        // Print newline and increment counter every 5 characters
+        // Print character hex value (formatted as 2-digit hex)
+        glout << std::hex << std::setw(2) << std::setfill('0') << i << ": ";
+
+        // Print character itself
+        glout << (char)i << " ";
+        if (i % 5 == 4) {
+            glout << '\n';
+            counter++;
+            break;
+        }
+        if(counter >= 0xFE || i >= 0xFE)
+            counter = 0;
+    }
+}
+
+std::string cameraSaveFile = "cameraSave.txt";
 void specialKeyboard(int key, int x, int y) {
+    std::ofstream fptro(cameraSaveFile, std::ios::out);
+    std::ifstream fptri(cameraSaveFile, std::ios::in);
     switch (key) {
         case GLUT_KEY_F1:
-            showInfoViewport = !showInfoViewport;
-            resize(totalWidth, height);
+            if(!showKeybinds){
+                showInfoViewport = !showInfoViewport;
+                resize(totalWidth, height);
+            } else {
+                glout << "Cannot toggle Information Panel while Keybindings are displayed" << '\n';
+                glout << "Dismiss Keybinds with ? to toggle Information Panel" << '\n';
+            }
+
             break;
-        case GLUT_KEY_F3:
-            useCaps = !useCaps;
+        case GLUT_KEY_F2:
+            conHeightPercent = clmp(conHeightPercent - 0.02, 0.0, 0.52);
+            glout << "Shrank console to " << conHeightPercent << '\n';
         break;
+
+        case GLUT_KEY_F3:
+            conHeightPercent = clmp(conHeightPercent + 0.02, 0.0, 0.52);
+            glout << "Grew console to " << conHeightPercent << '\n';
+        break;
+        case GLUT_KEY_F4:
+            glout << 0x00;
+        std::cout << "CONTROLOFF 0x00"<< "   AsHex: " << xx8(CONTROLOFF) << std::endl;
+        std::cout << "CONTROLON 0xFF"<< "   AsHex: " << xx8(CONTROLON) << std::endl;
+        std::cout << "NOPREFIX 0x03"<< "   AsHex: " << xx8(NOPREFIX) << std::endl;
+        std::cout << "PREFIX 0x05"<< "   AsHex: " << xx8(PREFIX) << std::endl;
+        std::cout << "CLEARALL 0x04"<< "   AsHex: " << xx8(CLEARALL) << std::endl;
+        std::cout << "LINEFEED 0x06"<< "   AsHex: " << xx8(LINEFEED) << std::endl;
+        std::cout << "NEWLINE 0x09"<< "   AsHex: " << xx8(NEWLINE) << std::endl;
+        std::cout << "DEL 0x08"<< "   AsHex: " << xx8(DEL) << std::endl;
+        std::cout << "GROW 0x7f"<< "   AsHex: " << xx8(GROW) << std::endl;
+        std::cout << "SHRINK 0x80"<< "   AsHex: " << xx8(SHRINK) << std::endl;
+        std::cout << "MAX 0x81"<< "   AsHex: " << xx8(MAX) << std::endl;
+        std::cout << "DEFAULT 0x82"<< "   AsHex: " << xx8(DEFAULT) << std::endl;
+        break;
+
+
+        case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
+            //open file pointer for writing:
+                cam.saveToFile(fptro);
+
+                glout << "Camera states saved to " << cameraSaveFile << '\n';
+        break;
+        case GLUT_KEY_F12: //call Camera::saveToFile(std::ofstream& file)
+            //open file pointer for writing:
+                glout << CONTROLOFF;
+                testCharacterPrinting();
+                glout << CONTROLON;
+        break;
+        case GLUT_KEY_F5:
+            cam.loadFromFile(fptri);
+
+        glout << "Camera Profiles loaded from " << cameraSaveFile << '\n';
+        glout << "Available States: " << '\n';
+        for (int i = 0; i < 5; i++) {
+            glout << i+1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) << " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
+        }
+
+        break;
+
+
 
         case GLUT_KEY_UP: // up arrow does windowBlind.open()
             windowBlinds.open(blindAnimSpeed);
+            glout << "Blinds Opened" << '\n';
             break;
         case // up arrow does windowBlind.open()
         GLUT_KEY_DOWN:
             windowBlinds.close(blindAnimSpeed);
+            glout << "Blinds Closed" << '\n';
             break;
         case GLUT_KEY_RIGHT:
             cam.relRot(Coord(0, 5, 0).degToRad());
@@ -463,6 +609,8 @@ int testMain() {
 
 
 int main(int argc, char **argv) {
+    std::ofstream fptro(cameraSaveFile, std::ios::out);
+    std::ifstream fptri(cameraSaveFile, std::ios::in);
     // testMain();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -482,11 +630,13 @@ int main(int argc, char **argv) {
 
 
     for (const std::string &i: instructionVec) {
-        std::cout << i << std::endl;
+        std::cout << i << '\n';
     }
 
 
     glutMainLoop();
+    fptro.close();
+fptri.close();
 
 
     return 0;

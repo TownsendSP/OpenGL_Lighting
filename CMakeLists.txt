@@ -55,3 +55,12 @@ add_executable(testing mainForTesting.cpp
 )
 
 target_link_libraries (testing ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+
+
+set(CMAKE_CURRENT_SOURCE_DIR "C:/Users/tgsp/AppData/Roaming/JetBrains/CLion2024.1/scratches")
+file(GLOB SCRATCH_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+foreach(SCRATCH_SOURCE ${SCRATCH_SOURCES})
+    get_filename_component(SCRATCH_NAME ${SCRATCH_SOURCE} NAME_WE)
+    add_executable(${SCRATCH_NAME} ${SCRATCH_SOURCE})
+    target_link_libraries(${SCRATCH_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+endforeach()

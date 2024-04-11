@@ -104,6 +104,7 @@ private:
 
 public:
     //constructor:
+
     Material(ColorData spec, ColorData amb, ColorData diff, ColorData emission, float shine) {
         matSpec = spec;
         matAmb = amb;
@@ -141,7 +142,7 @@ public:
         ColorData(0.8f, 0.6f, 0.4f, 1.0f),
         ColorData(0.2f, 0.2f, 0.2f, 1.0f),
         ColorData(0.8f, 0.6f, 0.4f, 1.0f),
-        33.0f);
+        33.0f); //just a bit glossy
 
 
     Material ceiling = Material( //matte cream color
@@ -161,7 +162,7 @@ public:
         ColorData(0.3f, 0.3f, 0.7f, 1.0f),
         ColorData(0.2f, 0.2f, 0.4f, 1.0f),
         ColorData(0.1f, 0.2f, 0.7f, 1.0f),
-        5.0f);
+        100.0f);
 
     Material wall = Material(
         ColorData(0.8f, 0.8f, 0.8f, 1.0f),

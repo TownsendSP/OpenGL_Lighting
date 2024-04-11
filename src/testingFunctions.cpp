@@ -148,14 +148,15 @@ void windowTest() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+    //window 1 will use its transparency to cut a hole in the wall
+    glColor4fv(window1Color);
+    cubeGLfrom2Points(window1a, window1b);
 
     //wall 2 should have a hole through it
     glColor4fv(wall2Color);
     cubeGLfrom2Points(wall2a, wall2B);
 
-    //window 1 will use its transparency to cut a hole in the wall
-    glColor4fv(window1Color);
-    cubeGLfrom2Points(window1a, window1b);
+
 
     glDisable(GL_BLEND);
 

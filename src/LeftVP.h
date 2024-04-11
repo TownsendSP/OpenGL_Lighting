@@ -10,6 +10,7 @@
 #include "Coord.h"
 
 
+extern float conHeightPercent;
 void drawLeft();
 void setupLeft();
 

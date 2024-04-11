@@ -16,9 +16,9 @@ class Camera {
 private:
     std::string *debug_string_add_;
     std::map<int, std::string> *debug_string_add_map_;
-    std::tuple<Coord, Coord> storedStates[5];
 
 public:
+    std::tuple<Coord, Coord> storedStates[5];
     Coord pos;
     Coord tgt;
     Coord up;
@@ -40,6 +40,12 @@ public:
 
     void Camera::storeState(int index) {
         storedStates[index] = std::make_tuple(pos, tgt);
+    }
+
+    void Camera::restoreState(int index) {
+        pos = std::get<0>(storedStates[index]);
+        tgt = std::get<1>(storedStates[index]);
+        lookAt();
     }
 
     void setPitchYaw();

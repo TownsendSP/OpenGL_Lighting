@@ -51,6 +51,7 @@ Camera::Camera(Coord Pos, Coord Target, Coord orientation) {
 
 int Camera::saveToFile(std::ofstream& file) {
     if (!file.is_open()) {
+        glout << "Error: File is not open" << std::endl;
         std::cerr << "Error: File is not open" << std::endl;
         return -1;
     }
@@ -60,7 +61,8 @@ int Camera::saveToFile(std::ofstream& file) {
     }
 
     if (file.fail()) {
-        std::cerr << "Error: Failed to write to file" << std::endl;
+        glout << "Error: Failed to save camera" << std::endl;
+        std::cerr << "Error: Failed to save camera" << std::endl;
         return -2;
     }
 
@@ -84,7 +86,7 @@ int Camera::loadFromFile(std::ifstream &file) {
     }
 
     if (file.fail() && !file.eof()) {
-        std::cerr << "Error: Failed to read from file" << std::endl;
+        std::cerr << "Error: Failed to load camera" << std::endl;
         return -2;
     }
 
@@ -140,12 +142,10 @@ void Camera::relTrans(Coord deltaTranslation) {
     float cosYaw = cos(ang.Y);
     float sinYaw = sin(ang.Y);
 
-
     Coord transVec;
     transVec.X = deltaTranslation.X * cosYaw - deltaTranslation.Z * sinYaw;
     transVec.Y = deltaTranslation.Y;
     transVec.Z = deltaTranslation.X * sinYaw + deltaTranslation.Z * cosYaw;
-
 
     pos = pos + transVec;
     tgt = tgt + transVec;
@@ -172,8 +172,6 @@ void Camera::relRot(Coord deltaAngle) {
 
 void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
-
-
         std::vector<std::string> debugToAdd = toString(2);
         for (unsigned int i = 0; i < debugToAdd.size(); i++) {
             (*debug_string_add_map_)[i + 31] = debugToAdd[i];
@@ -213,7 +211,7 @@ float hexStringToFloat(std::string s) {
     std::stringstream stream;
     stream << s;
     stream >> std::hex >> f;
-    glOut << "hexStringToFloat: " << hexStringToFloat("0x3f800000") << std::endl;
+    glout << "hexStringToFloat: " << hexStringToFloat("0x3f800000") << std::endl;
     return f;
 }
 

@@ -354,18 +354,38 @@ void loadCoord(std::string inString) {
     Coord outCoord = Coord(outX, outY, outZ);
     std::cout << outCoord.toString(7) << std::endl;
 
-
-
     exit(0);
 
 
 }
 
-void testFun() {
+void testFuna() {
     Coord test  = Coord(1.23, 4.56, 7.89);
     std::cout <<test.toHexString() << std::endl;
     std::string testString = test.toHexString();
     loadCoord(testString);
+}
+#define TESTTHING 0x04
+bool test2Fun(char inTest) {
+    if (inTest == TESTTHING) {
+        std::cout << "inTest is " << xs8(inTest) << " And " << TESTTHING << " " << xs8(TESTTHING)<<std::endl;
+        return true;
+    } else {
+        std::cout << "inTest is " << xs8(inTest) << " And " << TESTTHING << " " << xs8(TESTTHING)<<std::endl;
+        return false;
+    }
+}
+void testFun() {
+    char test = 0x04;
+    char testa = 0x03;
+    test2Fun(test);
+    test2Fun(testa);
+
+
+
+
+
+    exit(0);
 }
 
 

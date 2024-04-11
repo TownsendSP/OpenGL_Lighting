@@ -14,6 +14,8 @@ Coord halltfr = Coord(10, 3, 2);
 
 
 void drawHall() {
+    // MatLib.wall.apply();
+    cubeOfPlanes(hallBnl, halltfr, 40, -1, BACK_FACE|LEFT_FACE|RIGHT_FACE);
 
 }
 

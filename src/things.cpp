@@ -2,7 +2,7 @@
 // Created by tgsp on 4/3/2024.
 //
 
-
+#include "globals.h"
 #include "things.h"
 #include "Coord.h"
 #include <map>
@@ -18,7 +18,7 @@
 
 
 extern std::map<int, std::string> debugMap;
-extern std::vector<ConsoleScrollMsg> consoleMsgs;
+
 
 //Window Blinds Routines
 #ifndef FOLDING_REGION_BLINDS

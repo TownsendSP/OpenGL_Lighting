@@ -13,17 +13,14 @@ extern float rVPColor[];
 extern ColorData rVPColorData;
 extern ColorData solarizedBG;
 extern ColorData solarizedText;
-float scrollConsolePercent = 0.3;
-int numConsoleLines;
+float conHeightPercent = 0.3;
 extern std::map<int, std::string> debugMap;
-extern std::vector<std::string> consoleMsgs;
 extern int lVportW;
 extern int height;
 
 
-
 // void processConsoleMsgs() {
-//     numConsoleLines = scrollConsolePercent * height / 15;
+//     numConsoleLines = conHeightPercent * height / 15;
 //     for(int i = 0; i < (consoleMsgs.size()<(numConsoleLines-1))?consoleMsgs.size():(numConsoleLines-1); i++) {
 //         glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
 //         glRasterPos3f(3.0, 0.3 * height - i * 15, -1.0);
@@ -37,26 +34,27 @@ extern int height;
 //     }
 // }
 
-
+int mNum = 0;
+float rposX = 3;
 void processConsoleMsgs() {
-    // Calculate the maximum height for messages
-    int maxHeight = numConsoleLines * 15;
+    for (int i = glConsole.size() - 1; i >= 0; --i) {
+        int messageHeight = 3 + (glConsole.size() - i) * 15;
 
-    // Iterate over the messages in reverse order (from newest to oldest)
-    for (int i = consoleMsgs.size() - 1; i >= 0; --i) {
-        // Calculate the height of the current message
-        int messageHeight = (consoleMsgs.size() - i) * 15;
-
-        // If the message's height is above the maximum, remove it
-        if (messageHeight > maxHeight) {
-            consoleMsgs.erase(consoleMsgs.begin() + i);
+        if (messageHeight > conHeightPercent * height) {
+            glConsole.rm(i);
+            // std::cout << "Removed message " << i << "because messageHeight " << messageHeight << " > maxHeight " <<
+            //         static_cast<int>(conHeightPercent * height) << std::endl;
         }
-        // Otherwise, draw the message
         else {
             glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
-            glRasterPos3f(3.0, messageHeight, -1.0);
-            std::for_each(consoleMsgs[i].msg.begin(), consoleMsgs[i].msg.end(),
-                          [](int8_t c) { glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c); });
+            glRasterPos3f(rposX, messageHeight, -1.0);
+
+            for (int8_t c: glConsole[i]) {
+                if (c <= 0x7f && c != 0x00 && c != 0x0a) {
+                    //just don't print the rest of the line if there is an illegal character
+                    glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c);
+                }
+            }
         }
     }
 }
@@ -91,8 +89,8 @@ void drawLeft() {
     //draw thick horizontal solarized orange line 20% from the bottom
     glLineWidth(2.50f);
     glBegin(GL_LINES);
-    glVertex2i(0, scrollConsolePercent * height);
-    glVertex2i(lVportW, scrollConsolePercent * height);
+    glVertex2i(0, conHeightPercent * height);
+    glVertex2i(lVportW, conHeightPercent * height);
     glEnd();
     glLineWidth(1.0f);
 
@@ -122,4 +120,3 @@ void setupLeft() {
 
     //add message to
 }
-
