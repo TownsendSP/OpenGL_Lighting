@@ -31,11 +31,11 @@ bool GLStreamOut::parseControlChars(char in_char) {
             case 0x00:
                 control = 0;
                 // std::cout << "Control off" << std::endl;
-                return false;break;
+                return false;
             case 0xFF:
                 control = 1;
                 // std::cout << "Control on" << std::endl;
-                return false;break;
+                return false;
             case 0x03:
                 pref = 0;
                 // std::cout << "No prefix" << std::endl;
@@ -49,48 +49,48 @@ bool GLStreamOut::parseControlChars(char in_char) {
                 glConsoleVec.push_back("$>");
                 buffer.clear();
 
-                return false;break;
+                return false;
             case 0x05:
                 // std::cout << "Prefix On" << std::endl;
                 pref = 1;
-                return false;break;
+                return false;
             case 0x06:
                 glConsoleVec.push_back(buffer);
                 // std::cout << "Linefeed" << std::endl;
                 buffer.clear();
-                return false;break;
+                return false;
             case 0x09:
                 glConsoleVec.push_back(buffer);
                 buffer.clear();
                 buffer += "  ";
                 // std::cout << "Carriage return" << std::endl;
-                return false;break;
+                return false;
             case 0x0A:
                 if(buffer.size() > 2)
                     buffer.pop_back();
                 else if(glConsoleVec.size() > 1)
                     glConsoleVec.pop_back();
                 // std::cout << "Delete" << std::endl;
-                return false;break;
+                return false;
             case 0x7f:
                 conHeightPercent += 0.1;
                 if(conHeightPercent > 0.52)
                     conHeightPercent = 0.52;
                 // std::cout << "Grow" << std::endl;
-                return false;break;
+                return false;
             case 0x80:
                 conHeightPercent -= 0.1;
                 if(conHeightPercent < 0.0)
                     conHeightPercent = 0.0;
-                return false;break;
+                return false;
             case 0x81:
                 conHeightPercent =0.52;
                 // std::cout << "MAX" << std::endl;
-                return false;break;
+                return false;
             case 0x82:
                 conHeightPercent = 0.3;
                 // std::cout << "Default" << std::endl;
-                return false;break;
+                return false;
             default:
                 return true;
         }
@@ -100,15 +100,6 @@ bool GLStreamOut::parseControlChars(char in_char) {
 }
 
 std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
-    //print c as hex:
-    bool result = parseControlChars(reinterpret_cast<std::streambuf::int_type &>(c));
-    // if(!result) {
-        // std::cout << c << ": " << std::hex << c;
-        // std::cout << " "  << result << std::endl;
-    // }
-    // std::streambuf::int_type c = parseControlChars(c)?c:EOF;
-
-    // c = c = parseControlChars(c);
     if (c != EOF ) {
         // the buffer should always start with $> to look like a cli
         if (buffer.empty() && pref) {

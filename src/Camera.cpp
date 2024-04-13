@@ -97,9 +97,9 @@ std::vector<std::string> readFileLines(const std::string& filename) {
         std::cerr << "Error: Unable to open file " << filename << std::endl;
         return lines;
     }
-    std::string line;
-    while (std::getline(file, line)) {
-        lines.push_back(line);
+    std::string lineForWriting;
+    while (std::getline(file, lineForWriting)) {
+        lines.push_back(lineForWriting);
     }
 
     file.close();
@@ -124,8 +124,8 @@ int Camera::loadFromFile(const std::string& filename) {
     std::vector<std::string> lines = readFileLines(filename);
     std::vector<float> floats;
     int i = 0;
-    for (const auto& line : lines) {
-        floats = splitAndConvertToFloats(line, ',');
+    for (const auto& lineForIteration : lines) {
+        floats = splitAndConvertToFloats(lineForIteration, ',');
         storedStates[i] = std::make_tuple(Coord(floats[0], floats[1], floats[2]), Coord(floats[3], floats[4], floats[5]));
         // glout << "Loaded state " << i << " as " << std::get<0>(storedStates[i]).toString() << ", " << std::get<1>(storedStates[i]).toString() << std::endl;
         i++;
@@ -261,8 +261,8 @@ void Camera::lookAt(DebugLevel dbg) {
         }
 }
 
-void Camera::useDebugStringAdd(int line, std::string message) {
-    (*debug_string_add_map_)[line] = message;
+void Camera::useDebugStringAdd(int lineInt, std::string message) {
+    (*debug_string_add_map_)[lineInt] = message;
 }
 
 std::vector<std::string> Camera::toString(int prec) const {

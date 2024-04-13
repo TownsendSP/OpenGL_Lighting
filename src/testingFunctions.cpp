@@ -56,10 +56,7 @@ void testConeArot(Coord angle) {
     glPopMatrix();
 }
 
-void testConeCrot(Coord angle, ColorData coloraaaa) {
-    //add info to debugMap
-
-
+void testConeCrot(Coord angle, ColorData coloraaaa) {  //add info to debugMap
     glPushMatrix();
     glRotatef(angle.Y, 0, 1, 0);
     glRotatef(angle.X, 1, 0, 0);

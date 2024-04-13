@@ -121,10 +121,51 @@ ColorData globAmb;
 
 #ifndef FOLDING_REGION_Draw
 
+Coord rotToVec(float rotRadX, float rotRadY) {
+    return Coord(cos(rotRadX) * sin(rotRadY), sin(rotRadX), cos(rotRadX) * cos(rotRadY));
+}
+
 void updateSpotlight() {
+
+
     headLamp.setup();
-    headLamp.lightPos = ColorData(cam.pos, 1.0);
-    headLamp.spotDir = cam.normDirVec();
+    redLight.setup();
+    greenLight.setup();
+    blueLight.setup();
+
+    glEnable(GL_LIGHT3);
+    glEnable(GL_LIGHT4);
+    glEnable(GL_LIGHT5);
+    glEnable(GL_LIGHT6);
+
+
+    // headLamp.lightPos = ColorData(cam.pos, 1.0);
+    headLamp.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    redLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    greenLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    blueLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+
+    Coord cameraVec = cam.vec();
+    Coord cameraVecN = cam.normDirVec() * Coord(1, 0, -1);
+    Coord camAngles = cam.ang;
+
+    headLamp.spotDir = camAngles.radiansToDirVec();
+    redLight.spotDir = cameraVec;
+    greenLight.spotDir = cameraVecN;
+    blueLight.spotDir = Coord(cam.ang.X, cam.ang.Y-PI/2, 0).radiansToDirVec();
+
+
+    //add debug information:
+    debugMap[29] = "Blue: " + blueLight.lightPos.toString();
+    debugMap[28] = "Blue: " + blueLight.spotDir.toString();
+    debugMap[27] = "Green: " + greenLight.lightPos.toString();
+    debugMap[26] = "Green: " + greenLight.spotDir.toString();
+    debugMap[25] = "Red: " + redLight.lightPos.toString();
+    debugMap[24] = "Red: " + redLight.spotDir.toString();
+    debugMap[23] = "Headlamp: " + headLamp.lightPos.toString();
+    debugMap[22] = "Headlamp: " + headLamp.spotDir.toString();
+
+
 }
 
 void setupRight() {
@@ -190,12 +231,14 @@ void drawMoreShapes() {
 }
 
 //update spotlight position and direction to match the camera
+void drawTestCone(Coord directionVector) {
 
+}
 
 void drawLitShapes() {
     glEnable(GL_LIGHTING);
 
-    glEnable(headLamp);
+    headLamp.enable();
 
     glEnable(GL_LIGHT0);
     glPushMatrix();
@@ -204,7 +247,25 @@ void drawLitShapes() {
     glPopMatrix();
     glDisable(GL_LIGHT0);
 
-    drawHall();
+    // drawHall();
+
+
+
+
+    glDisable(GL_LIGHT0);
+    glEnable(GL_LIGHT3);
+    glEnable(GL_LIGHT4);
+    glEnable(GL_LIGHT5);
+    glEnable(GL_LIGHT6);
+    ceilingMat.apply();
+    glPushMatrix();
+    glTranslatef(0, 10, 0);
+    glRotatef(90, 1, 0, 0);
+    glutSolidTorus(50, 50, 100, 100);
+    glutSolidSphere(20, 100, 100);
+    glPopMatrix();
+
+
 
     glDisable(GL_LIGHTING);
 
@@ -251,9 +312,26 @@ void drawUnlitShapes() {
 
     // testConeArot();
 
+    redLight.enable();
+    greenLight.enable();
+    blueLight.enable();
+    glColor3f(1, 0, 1);
+    glPushMatrix();
+    glutSolidCone(1, 1, 20, 20);
+    glPopMatrix();
+
+    blueLight.disable();
+    greenLight.disable();
+    redLight.disable();
+
+
     // testCamBindings();
 
-    // testDrawingCubes();
+
+    // testInRightPlace(cam);
+
+
+    testDrawingCubes();
 
     windowTest();
     glEnable(GL_LIGHTING);
@@ -298,10 +376,14 @@ void drawWindow() {
         drawLeft();
     }
     setupRight();
+
     drawUnlitShapes();
     // drawMoreShapes();
 
-
+    glEnable(GL_LIGHT3);
+    glEnable(GL_LIGHT4);
+    glEnable(GL_LIGHT5);
+    glEnable(GL_LIGHT6);
 
     drawLitShapes();
 
@@ -314,7 +396,16 @@ void setupObjects() {
     cam = Camera(Coord(-2, 7, -2), Coord(-1, 6, -1), Coord(0, 1, 0));
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 30);
-    headLamp.setup();
+
+    glEnable(GL_LIGHT3);
+    glEnable(GL_LIGHT4);
+    glEnable(GL_LIGHT5);
+    glEnable(GL_LIGHT6);
+
+    // headLamp.setup();
+    redLight.setup();
+    greenLight.setup();
+    blueLight.setup();
 
     //giving them access to the debugging info map
     cam.setDebugStringAdd(&debugMap);
@@ -339,6 +430,11 @@ void setupLights() {
 
     //enabling global ambient light:
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
+
+    glEnable(GL_LIGHT3);
+    glEnable(GL_LIGHT4);
+    glEnable(GL_LIGHT5);
+    glEnable(GL_LIGHT6);
 
 
 }
@@ -506,7 +602,6 @@ void keyboard(unsigned char key, int x, int y) {
 
         case 27: //Escape Key: Exit
             exit(0);
-            break;
         default:
             break;
     }
@@ -552,7 +647,7 @@ void specialKeyboard(int key, int x, int y) {
         break;
         case GLUT_KEY_F4:
             headLamp.lightswitch();
-            glout << "Headlamp switched off" << '\n';
+            glout << "Headlamp switched " << headLamp.enabled ? "On\n" : "Off\n";
             debugMap[60 - 20] = "Headlamp: " + headLamp.enabled ? "On" : "Off";
 
         break;

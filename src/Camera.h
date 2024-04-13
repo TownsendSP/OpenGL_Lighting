@@ -73,7 +73,7 @@ public:
         this->debug_string_add_map_ = mapPtr;
     }
 
-    void useDebugStringAdd(int line, std::string message);
+    void useDebugStringAdd(int lineInt, std::string message);
 
     Coord vec() const {
         return Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X));

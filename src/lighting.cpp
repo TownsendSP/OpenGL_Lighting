@@ -211,11 +211,55 @@ Light brightWhite = Light(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f),
     ColorData(1.0f, 1.0f, 1.0f, 1.0f));
 
+Light brightRed = Light(
+    Light::LIGHT4,
+    ColorData(Coord(0, 10, 0), 1.0),
+    ColorData(0.2f, 0.05f, 0.05f, 1),
+    ColorData(1.0f, 0.2f, 0.2f, 1.0f),
+    ColorData(1.0f, 0.2f, 0.2f, 1.0f));
+
+Light brightGreen = Light(
+    Light::LIGHT5,
+    ColorData(Coord(0, 10, 0), 1.0),
+ColorData(0.05f, 0.2f, 0.05f, 1),
+ColorData(0.2f, 1.0f, 0.2f, 1.0f),
+ColorData(0.2f, 1.0f, 0.2f, 1.0f));
+
+Light brightBlue = Light(
+    Light::LIGHT6,
+    ColorData(Coord(0, 10, 0), 1.0),
+    ColorData(0.05f, 0.05f, 0.2f, 1),
+    ColorData(0.2f, 0.2f, 1.0f, 1.0f),
+    ColorData(0.2f, 0.2f, 1.0f, 1.0f));
+
+
+
 Spotlight headLamp = Spotlight(
     brightWhite,
-    Coord(0, 0, 0),
+    Coord(1, 0, 0),
     30.0f,
     10.0f);
+
+Spotlight redLight = Spotlight(
+    brightRed,
+    Coord(1, 0, 0),
+    30.0f,
+    10.0f);
+
+Spotlight greenLight = Spotlight(
+    brightGreen,
+    Coord(1, 0, 0),
+    30.0f,
+    10.0f);
+
+Spotlight blueLight = Spotlight(
+    brightBlue,
+    Coord(1, 0, 0),
+    30.0f,
+    10.0f);
+
+
+
 
 
 Light sunLight = Light( //directional sunlight, high in the sky

@@ -171,6 +171,12 @@ Coord Coord::dirVecToRad() const {
         return Coord(pitch, yaw, 0);
 }
 
+Coord Coord::radiansToDirVec() const {
+    float pitch = X;
+    float yaw = Y;
+    return Coord(sin(pitch) * cos(yaw), sin(pitch) * sin(yaw), cos(pitch));
+}
+
 
 std::string* Coord::toStrings(int precision) const{
       std::string* ret = new std::string[3];

@@ -166,7 +166,7 @@ public:
         return(
             (m==XZ) ? Coord(Z, Y, X) :
             (m==YZ) ? Coord(X, Z, Y) :
-            (m==XY) ? Coord(Z, X, Y) : *this
+            (m==XY) ? Coord(X, Y, Z) : *this
             );
     };
 
@@ -194,6 +194,8 @@ public:
     Coord degToRad();
 
     Coord dirVecToRad() const;
+
+    Coord radiansToDirVec() const;
 
     std::string *toStrings(int precision) const;
 
