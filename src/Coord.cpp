@@ -68,14 +68,11 @@ Coord::Coord(std::string hexString) {
     Zstr >> std::hexfloat >> Z;
 }
 
-
-
-std::string Coord::toHexString() { //remember, comma-delimited
+std::string Coord::toHexString(char delim) { //remember, comma-delimited
     std::stringstream stream;
-    stream << std::hexfloat << X << Y << Z;
+    stream << std::hexfloat << X << delim << std::hexfloat << Y << delim << std::hexfloat << Z;
     return stream.str();
 }
-
 
 float randomNaiveNotSeeded(float min, float max) {
     float randthing = min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (max - min));

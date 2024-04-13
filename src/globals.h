@@ -20,53 +20,13 @@
 #include <iomanip>
 #include <limits>
 #include <map>
-#include <vector>
-
-#ifndef FOLDING_REGION_GLOBALDEFS
-
-
-#define PI 3.14159f
-#define D(radians) ((radians) * 180.0 / PI)
-#define R(degrees) ((degrees) * PI / 180.0)
-
-#define WiREFRAME 0x19
-#define SOLID 0x1A
-
-//used for determining whether to convert color values to 0-1 range
-#define PLZCONVERT 0b1
-#define NOCONVERT 0b0
-
-//cube faces, so I don't need to remember the order, or the bit stuff, I can do it just like GLUT defines stuff
-#define ALL_FACE         0b111111
-#define FRONT_FACE       0b100000
-#define TOP_FACE         0b010000
-#define RIGHT_FACE       0b001000
-#define BACK_FACE        0b000100
-#define BOTTOM_FACE      0b000010
-#define LEFT_FACE        0b000001
-
-#define XZ 0b101
-#define YZ 0b011
-#define XY 0b110
 #include <map>
 #include <string>
 #include <vector>
+#include <vector>
 
-//defines for console:
-#define CONTROLOFF 0x00
-#define CONTROLON 0xFF
-#define NOPREFIX 0x03
-#define CLEARALL 0x04
-#define PREFIX 0x05
-#define LINEFEED 0x06
-#define NEWLINE 0x09
-#define DEL 0x0A
-#define GROW 0x7f
-#define SHRINK 0x80
-#define MAX 0x81
-#define DEFAULT 0x82
 
-#endif
+
 
 int_fast8_t xx8(char input);
 int_fast16_t xx16(int input);
@@ -80,6 +40,52 @@ std::string xs8(int_fast8_t value);
 std::string xs16(int_fast16_t value);
 std::string xs32(int_fast32_t value);
 std::string xs64(int_fast64_t value);
+
+#ifndef FOLDING_REGION_GLOBALDEFS
+
+
+#define PI 3.14159f
+#define D(radians) ((radians) * 180.0 / PI)
+#define R(degrees) ((degrees) * PI / 180.0)
+
+#define WiREFRAME 0x19
+#define SOLID 0x1A
+
+//used for determining whether to convert color values to 0-1 range
+#define PLZCONVERT true
+#define NOCONVERT false
+
+//cube faces, so I don't need to remember the order, or the bit stuff, I can do it just like GLUT defines stuff
+#define ALL_FACE         0b111111
+#define FRONT_FACE       0b100000
+#define TOP_FACE         0b010000
+#define RIGHT_FACE       0b001000
+#define BACK_FACE        0b000100
+#define BOTTOM_FACE      0b000010
+#define LEFT_FACE        0b000001
+
+#define XZ 0b101
+#define YZ 0b011
+#define XY 0b110
+
+
+//defines for console:
+#define CONTROLOFF xx8(0x00)
+#define CONTROLON xx8(0xFF)
+#define NOPREFIX xx8(0x03)
+#define CLEARALL xx8(0x04)
+#define PREFIX xx8(0x05)
+#define LINEFEED xx8(0x06)
+#define NEWLINE xx8(0x09)
+#define DEL xx8(0x0A)
+#define GROW xx8(0x7f)
+#define SHRINK xx8(0x80)
+#define MAX xx8(0x81)
+#define DEFAULT xx8(0x82)
+
+#endif
+
+
 
 enum DebugLevel {
     NONE,
@@ -143,6 +149,9 @@ public:
 
 extern GLInfo glStatus;
 extern std::ostream glInfoOut;
+
+const std::string cameraSaveFile = "cam.txt";
+
 
 
 #endif //GLOBALS_H

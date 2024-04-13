@@ -34,15 +34,16 @@ public:
 
     Camera(Coord Pos, Coord Target, Coord orientation);
 
-    int saveToFile(std::ofstream &file);
+    int saveToFile(const std::string &filename);
 
-    int loadFromFile(std::ifstream &file);
+    int loadFromFile(const std::string &filename);
 
-    void Camera::storeState(int index) {
+    void storeState(int index) {
         storedStates[index] = std::make_tuple(pos, tgt);
     }
 
-    void Camera::restoreState(int index) {
+    void restoreState(int index) {
+
         pos = std::get<0>(storedStates[index]);
         tgt = std::get<1>(storedStates[index]);
         lookAt();

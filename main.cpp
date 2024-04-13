@@ -26,6 +26,7 @@
 #include "src/lighting.h"
 #include "src/testingFunctions.h"
 #include "src/LeftVP.h"
+#include "src/Scenedraw.h"
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
@@ -40,12 +41,9 @@ int height = 900;
 #endif
 
 #ifndef FOLDING_REGION_Global_Objects
-
 Camera cam = Camera();
 std::vector<Debug3Dx> debugXes;
 Blinds windowBlinds;
-
-MatLib mat = MatLib();
 
 
 #endif
@@ -68,7 +66,7 @@ bool showInfoViewport = true;
 
 std::map<int, std::string> debugMap;
 
-
+int alt, ctrl, modifiers, shift;
 bool showKeybinds = true;
 std::vector<std::string> instructionVec = {
     "======Keybinds======",
@@ -110,13 +108,11 @@ auto prevTime = std::chrono::high_resolution_clock::now();
 
 #ifndef FOLDING_REGION_MATERIALS
 
-
-
 //materials and lights
 Light hallwayLight;
-Light sunlight;
 Spotlight headlamp;
 Light fakeSun;
+ColorData globAmb;
 #endif
 
 #ifndef FOLDING_REGION_Draw
@@ -130,19 +126,15 @@ void setupRight() {
     }
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(fov, totalWidth / height, 1.0, 500.0);
+    gluPerspective(fov, totalWidth / height, 0.0001, 500.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
-    // glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
 
-
     cam.lookAt();
-
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 }
 
@@ -167,7 +159,7 @@ void drawMoreShapes() {
     // glMaterialfv(GL_FRONT, GL_SPECULAR, test_material_specular);
     // glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
 
-    mat.wall.apply();
+    wallMat.apply();
 
     // ground plane (y = -0.5)
     glPushMatrix();
@@ -175,7 +167,7 @@ void drawMoreShapes() {
     glEnable(GL_LIGHT1);
     drawPlane(Coord(0, 0, -2), Coord(10, 0, 2), Coord(0, 1, 0), 50); //floor
     drawPlane(Coord(0, 3, -2), Coord(10, 3, 2), Coord(0, -1, 0), 50); //ceiling
-    // drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wall:
+    // drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wallMat:
     // drawPlane(Coord(0, 0, 2), Coord(10, 3, 2.1), Coord(0, 0, -1), 50); //- Right Wall:
     // drawPlane(Coord(0, 0, -2.1), Coord(10, 3, -2), Coord(0, 0, 1), 50); //- left Wall:
 
@@ -187,11 +179,25 @@ void drawMoreShapes() {
     glEnable(GL_LIGHT0);
 }
 
+//update spotlight position and direction to match the camera
+void updateSpotlight() {
+    headlamp.lightPos = ColorData(cam.pos, 1.0);
+    headlamp.spotDir = cam.tgt;
+}
+
 void drawLitShapes() {
+    glEnable(GL_LIGHTING);
+
+    glEnable(GL_LIGHT0);
     glPushMatrix();
     glTranslatef(-2, 0, -2);
     windowBlinds.draw(ALL);
     glPopMatrix();
+    glDisable(GL_LIGHT0);
+
+    drawHall();
+
+    glDisable(GL_LIGHTING);
 
 
     // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
@@ -205,7 +211,6 @@ void drawLitShapes() {
 
 void drawUnlitShapes() {
     glDisable(GL_LIGHTING);
-
     if (defaultDebug != NONE) {
         glPushMatrix();
         drawXZxGridlines(50);
@@ -223,14 +228,15 @@ void drawUnlitShapes() {
 
     // testDrawingCubes();
     windowTest();
+            glEnable(GL_LIGHTING);
 
-    glEnable(GL_LIGHTING);
 }
 
 
 #endif
 
 
+bool shownKeybinds = false;
 
 // fps function
 void calculateFPS() {
@@ -238,8 +244,6 @@ void calculateFPS() {
     auto currentTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(currentTime - prevTime);
     if (duration.count() >= 1) {
-        // std::cout << "FPS: " << frame << std::endl;
-        //add to debugMap
         debugMap[60 - 3] = " FPS: " + std::to_string(frame);
         debugMap[30] = " FOV: " + std::to_string(fov);
         frame = 0;
@@ -247,25 +251,42 @@ void calculateFPS() {
     }
 }
 
+void showKeybindings() {
+    glout << NOPREFIX;
+    glout << CLEARALL;
+    glout << MAX;
+    for (const std::string &i: instructionVec) {
+        glout << i << '\n';
+    }
+}
+
 void drawWindow() {
     if (showInfoViewport) {
         setupLeft();
         calculateFPS();
+        if (!shownKeybinds) {
+            showKeybindings();
+            shownKeybinds = true;
+        }
         drawLeft();
     }
     setupRight();
     drawUnlitShapes();
     // drawMoreShapes();
-    // drawLitShapes();
+
+
+
+    drawLitShapes();
+
 
 
     glutSwapBuffers();
 }
 
 void setupObjects() {
-    cam = Camera(Coord(0, 7, 0), Coord(0, 7, 0), Coord(0, 1, 0));
+    cam = Camera(Coord(-2, 7, -2), Coord(-1, 6, -1), Coord(0, 1, 0));
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
-    windowBlinds = Blinds(1, 2, 0.1, 15);
+    windowBlinds = Blinds(1, 2, 0.1, 30);
 
     //giving them access to the debugging info map
     cam.setDebugStringAdd(&debugMap);
@@ -274,28 +295,56 @@ void setupObjects() {
     //setup lvp class:
 }
 
-void setup() {
-    // Light property vectors.
+void setupLights() {
+
     float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
     float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
     float lightPos[] = {0.0, 7.0, 0.0, 0.0}; // Position remains the same
     float globAmb[] = {0.3, 0.3, 0.3, 1.0}; // Cool global ambient light
-
-    // Light0 properties. //light 0 is a
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
-    // Poperties of the ambient light.
+    // Spotlight headlamp = Spotlight(Light::lightNum(GL_LIGHT2), ColorData(cam.pos, 0.0f), ColorData(0.2, 0.2, 0.2, 1.0), ColorData(1.0, 1.0, 1.0, 1.0),
+    //                                ColorData(1.0, 1.0, 1.0, 1.0), cam.tgt, 30.0, 1.0);
+
+    //enabling global ambient light:
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
+
+
+}
+
+void setup() {
+    // Light property vectors.
+
+
+    float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
+    float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
+    float lightPos[] = {0.0, 7.0, 0.0, 1.0}; // Position remains the same;
+
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+
+    // Spotlight headlamp = Spotlight(Light::lightNum(GL_LIGHT2), ColorData(cam.pos, 0.0f), ColorData(0.2, 0.2, 0.2, 1.0), ColorData(1.0, 1.0, 1.0, 1.0),
+    //                                ColorData(1.0, 1.0, 1.0, 1.0), cam.tgt, 30.0, 1.0);
+
+    //enabling global ambient light:
+    globAmb = {0.3, 0.35, 0.3, 1.0}; // Cool global ambient light
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
 
-    glEnable(GL_LIGHTING); // Enable lighting calculations.
-    glEnable(GL_LIGHT0); // Enable particular light source.
+
     glEnable(GL_DEPTH_TEST); // Enable depth testing.
     glEnable(GL_NORMALIZE); // Enable automatic normalization of normals.
     glShadeModel(GL_SMOOTH);
+    //check if light0 is enabled with a printStatement:
+    //glListallEnabled:
+
+
 
     setupObjects();
     glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
@@ -314,28 +363,11 @@ void resize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-void showKeybindings() {
-    glout << NOPREFIX;
-    glout << CLEARALL;
-    glout << MAX;
-    for (const std::string &i: instructionVec) {
-        glout << i << '\n';
-    }
-}
-
-void hideKeybindings() {
-    glout << CLEARALL;
-    glout << DEFAULT;
-    glout << PREFIX;
-}
-
 //control
 #ifndef FOLDING_REGION_Control
 
-void mouse(int x, int y) {
-    // debug_strings[0] = ("Cursor: " + std::to_string(x) + ", " + std::to_string(y));
-
     static bool firstMouse = true;
+void mouse(int x, int y) {
     static int lastX = 0, lastY = 0;
 
     if (firstMouse) {
@@ -371,16 +403,7 @@ void keyboard(unsigned char key, int x, int y) {
     //     glout << "Cam Pos: " << cam.pos.toString() << " Cam Tgt: " << cam.tgt.toString();
     //
     // }
-    if(showKeybinds) {
-        if(key == '?') {
-            showKeybinds = false;
-            hideKeybindings();
-        }
-        else {
-            showKeybindings();
-        }
-    }
-
+    modifiers = glutGetModifiers();
     switch (key) {
         case 'w': //CAMERA FORWARD
             cam.relTrans(Coord(1 * speed, 0, 0));
@@ -449,8 +472,7 @@ void keyboard(unsigned char key, int x, int y) {
             glout << "State5:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
             break;
         case '?': //print keybinds:
-            if(showKeybinds){hideKeybindings();showKeybinds = false;}
-            else{showKeybindings();showKeybinds = true;}
+            showKeybindings();
             break;
 
         case 27: //Escape Key: Exit
@@ -466,11 +488,7 @@ int counter = 0;
 
 void testCharacterPrinting() {
     for (unsigned int i = counter * 5; i <= 255; i++) {
-        // Print newline and increment counter every 5 characters
-        // Print character hex value (formatted as 2-digit hex)
         glout << std::hex << std::setw(2) << std::setfill('0') << i << ": ";
-
-        // Print character itself
         glout << (char)i << " ";
         if (i % 5 == 4) {
             glout << '\n';
@@ -482,19 +500,11 @@ void testCharacterPrinting() {
     }
 }
 
-std::string cameraSaveFile = "cameraSave.txt";
 void specialKeyboard(int key, int x, int y) {
-    std::ofstream fptro(cameraSaveFile, std::ios::out);
-    std::ifstream fptri(cameraSaveFile, std::ios::in);
     switch (key) {
         case GLUT_KEY_F1:
-            if(!showKeybinds){
-                showInfoViewport = !showInfoViewport;
-                resize(totalWidth, height);
-            } else {
-                glout << "Cannot toggle Information Panel while Keybindings are displayed" << '\n';
-                glout << "Dismiss Keybinds with ? to toggle Information Panel" << '\n';
-            }
+            showInfoViewport = !showInfoViewport;
+            resize(totalWidth, height);
 
             break;
         case GLUT_KEY_F2:
@@ -507,25 +517,14 @@ void specialKeyboard(int key, int x, int y) {
             glout << "Grew console to " << conHeightPercent << '\n';
         break;
         case GLUT_KEY_F4:
-            glout << 0x00;
-        std::cout << "CONTROLOFF 0x00"<< "   AsHex: " << xx8(CONTROLOFF) << std::endl;
-        std::cout << "CONTROLON 0xFF"<< "   AsHex: " << xx8(CONTROLON) << std::endl;
-        std::cout << "NOPREFIX 0x03"<< "   AsHex: " << xx8(NOPREFIX) << std::endl;
-        std::cout << "PREFIX 0x05"<< "   AsHex: " << xx8(PREFIX) << std::endl;
-        std::cout << "CLEARALL 0x04"<< "   AsHex: " << xx8(CLEARALL) << std::endl;
-        std::cout << "LINEFEED 0x06"<< "   AsHex: " << xx8(LINEFEED) << std::endl;
-        std::cout << "NEWLINE 0x09"<< "   AsHex: " << xx8(NEWLINE) << std::endl;
-        std::cout << "DEL 0x08"<< "   AsHex: " << xx8(DEL) << std::endl;
-        std::cout << "GROW 0x7f"<< "   AsHex: " << xx8(GROW) << std::endl;
-        std::cout << "SHRINK 0x80"<< "   AsHex: " << xx8(SHRINK) << std::endl;
-        std::cout << "MAX 0x81"<< "   AsHex: " << xx8(MAX) << std::endl;
-        std::cout << "DEFAULT 0x82"<< "   AsHex: " << xx8(DEFAULT) << std::endl;
+            glout << "F4: " << '\n';
+
         break;
 
 
         case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
-                cam.saveToFile(fptro);
+                cam.saveToFile(cameraSaveFile);
 
                 glout << "Camera states saved to " << cameraSaveFile << '\n';
         break;
@@ -536,13 +535,13 @@ void specialKeyboard(int key, int x, int y) {
                 glout << CONTROLON;
         break;
         case GLUT_KEY_F5:
-            cam.loadFromFile(fptri);
+            cam.loadFromFile(cameraSaveFile);
 
-        glout << "Camera Profiles loaded from " << cameraSaveFile << '\n';
-        glout << "Available States: " << '\n';
-        for (int i = 0; i < 5; i++) {
-            glout << i+1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) << " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
-        }
+            glout << "Camera Profiles loaded from " << cameraSaveFile << '\n';
+            glout << "Available States: " << '\n';
+            for (int i = 0; i < 5; i++) {
+                glout << i+1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) << " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
+            }
 
         break;
 
@@ -597,21 +596,7 @@ void animate(int value) {
     glutPostRedisplay();
 }
 
-int testMain() {
-    Coord a = Coord(1, 1, 1);
-    Coord b = a*2;
-
-    std::cout << (a-(b&2)).toString();
-    std::cout <<a.toString();
-    std::cout <<b.toString();
-    exit(0);
-}
-
-
 int main(int argc, char **argv) {
-    std::ofstream fptro(cameraSaveFile, std::ios::out);
-    std::ifstream fptri(cameraSaveFile, std::ios::in);
-    // testMain();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(totalWidth, height);
@@ -628,16 +613,10 @@ int main(int argc, char **argv) {
 
     glutTimerFunc(5, animate, 1);
 
-
     for (const std::string &i: instructionVec) {
         std::cout << i << '\n';
     }
 
-
     glutMainLoop();
-    fptro.close();
-fptri.close();
-
-
     return 0;
 }

@@ -6,13 +6,7 @@
 #define SCENEDRAW_H
 #include "lighting.h"
 
-
-class Hallway{
-    Light hallLight = Light();
-
-
-};
-
+void drawHall();
 
 
 #endif //SCENEDRAW_H

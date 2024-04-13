@@ -34,23 +34,25 @@ target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
 add_executable(testing mainForTesting.cpp
-        src/Camera.cpp
-        src/Camera.h
         src/Coord.cpp
         src/Coord.h
-        src/LeftVP.cpp
-        src/LeftVP.h
-        src/things.cpp
-        src/things.h
-        src/ColorData.cpp
-        src/ColorData.h
-        src/lighting.cpp
-        src/lighting.h
-        src/globals.h
-        src/globals.cpp
-        src/Scenedraw.cpp
-        src/testingFunctions.cpp
-        src/testingFunctions.h
+#
+#        src/Camera.cpp
+#        src/Camera.h
+#
+#        src/LeftVP.cpp
+#        src/LeftVP.h
+#        src/things.cpp
+#        src/things.h
+#        src/ColorData.cpp
+#        src/ColorData.h
+#        src/lighting.cpp
+#        src/lighting.h
+#        src/globals.h
+#        src/globals.cpp
+#        src/Scenedraw.cpp
+#        src/testingFunctions.cpp
+#        src/testingFunctions.h
 
 )
 

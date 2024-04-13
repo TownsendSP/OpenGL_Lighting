@@ -49,15 +49,18 @@ Camera::Camera(Coord Pos, Coord Target, Coord orientation) {
     ang = calcPitchYaw(pos, tgt); //pitch, yaw, roll
 }
 
-int Camera::saveToFile(std::ofstream& file) {
+
+int Camera::saveToFile(const std::string& filename) {
+    // Open the file for output using the filename
+    std::ofstream file(filename);
+
     if (!file.is_open()) {
         glout << "Error: File is not open" << std::endl;
         std::cerr << "Error: File is not open" << std::endl;
         return -1;
     }
-
     for (std::tuple<Coord, Coord> state: storedStates) {
-        file << std::get<0>(state).toHexString() + std::get<1>(state).toHexString() << std::endl;
+        file << std::get<0>(state).toHexString() << "," << std::get<1>(state).toHexString() << std::endl;
     }
 
     if (file.fail()) {
@@ -65,33 +68,110 @@ int Camera::saveToFile(std::ofstream& file) {
         std::cerr << "Error: Failed to save camera" << std::endl;
         return -2;
     }
-
+    file.close();
     return 0;
 }
 
-int Camera::loadFromFile(std::ifstream &file) {
-    if (!file.is_open()) {
-        std::cerr << "Error: File is not open" << std::endl;
-        return -1;
+std::vector<float> sToF(const std::string &input, char delimiter) {
+    std::vector<float> floats;
+    std::istringstream stream(input);
+    std::string token;
+
+    while (std::getline(stream, token, delimiter)) {
+        // Convert hex string to float
+        double d = std::strtod(token.c_str(), nullptr);
+        floats.push_back(static_cast<float>(d));
     }
 
-    std::string line;
-    int i = 0;
+    return floats;
+}
 
-    while (i < 5 && std::getline(file, line)) {
-        storedStates[i] = std::make_tuple(
-            Coord(line.substr(0, 60)),
-            Coord(line.substr(60, 120)));
+std::vector<std::string> readFileLines(const std::string& filename) {
+    std::vector<std::string> lines;
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Unable to open file " << filename << std::endl;
+        return lines;
+    }
+    std::string line;
+    while (std::getline(file, line)) {
+        lines.push_back(line);
+    }
+
+    file.close();
+    return lines;
+}
+
+std::vector<float> splitAndConvertToFloats(const std::string &input, char delimiter) {
+    std::vector<float> floats;
+    std::istringstream stream(input);
+    std::string token;
+
+    while (std::getline(stream, token, delimiter)) {
+        // Convert hex string to float
+        double d = std::strtod(token.c_str(), nullptr);
+        floats.push_back(static_cast<float>(d));
+    }
+
+    return floats;
+}
+
+int Camera::loadFromFile(const std::string& filename) {
+    std::vector<std::string> lines = readFileLines(filename);
+    std::vector<float> floats;
+    int i = 0;
+    for (const auto& line : lines) {
+        floats = splitAndConvertToFloats(line, ',');
+        storedStates[i] = std::make_tuple(Coord(floats[0], floats[1], floats[2]), Coord(floats[3], floats[4], floats[5]));
+        glout << "Loaded state " << i << " as " << std::get<0>(storedStates[i]).toString() << ", " << std::get<1>(storedStates[i]).toString() << std::endl;
         i++;
     }
-
-    if (file.fail() && !file.eof()) {
-        std::cerr << "Error: Failed to load camera" << std::endl;
-        return -2;
-    }
-
     return 0;
 }
+
+//int Camera::loadFromFile(const std::string& filename) {
+//    // Open the file using the filename
+//    std::ifstream file(filename);
+//
+//    if (!file.is_open()) {
+//        std::cout << "Error: File is not open" << std::endl;
+//        return -1;
+//    }
+//
+//    std::string line;
+//    int i = 0;
+//
+//    // for each line in the file, split on commas; the first
+//    std::vector<float> f;
+//    // load line 0 into a string and print it:
+//    std::cout << "Loading camera from file: " << filename << std::endl;
+//    std::getline(file, line);
+//
+//
+//
+//
+//
+//
+//
+//    std::cout << "First line: " << line << std::endl;
+//    while (i < 5 && std::getline(file, line)) {
+//        f = sToF(line, ',');
+//        storedStates[i] = std::make_tuple(
+//            Coord(f[0], f[1], f[2]),
+//            Coord(f[3], f[4], f[5]));
+//        std::cout << "i: " << line << " loaded as \n\t" << f[0] << ", " << f[1] << ", " << f[2] << ", " << f[3] << ", "
+//                << f[4] << ", " << f[5] << std::endl;
+//        i++;
+//    }
+//
+//    if (file.fail() && !file.eof()) {
+//        std::cerr << "Error: Failed to load camera" << std::endl;
+//        return -2;
+//    }
+//    file.close();
+//    return 0;
+//}
 
 void Camera::setPitchYaw() {
     Coord dirVec = (tgt - pos);
@@ -174,7 +254,7 @@ void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);
         std::vector<std::string> debugToAdd = toString(2);
         for (unsigned int i = 0; i < debugToAdd.size(); i++) {
-            (*debug_string_add_map_)[i + 31] = debugToAdd[i];
+            (*debug_string_add_map_)[i + 45] = debugToAdd[i];
         }
 }
 
@@ -211,43 +291,5 @@ float hexStringToFloat(std::string s) {
     std::stringstream stream;
     stream << s;
     stream >> std::hex >> f;
-    glout << "hexStringToFloat: " << hexStringToFloat("0x3f800000") << std::endl;
     return f;
 }
-
-
-// int Camera::saveToFile(std::ofstream& file) { //6 semi-colon separated floats per line, 5 lines. pos x, y, z, tgt x, y, z
-//     std::string outString[6] = {floatToHexString(savedcam[0]), floatToHexString(savedcam[1]), floatToHexString(savedcam[2]),
-//                                 floatToHexString(savedcam[3]), floatToHexString(savedcam[4]), floatToHexString(savedcam[5])};
-//
-//
-//
-//
-// }
-
-// int Camera::loadFromFile(std::ifstream& file) {
-// }
-
-
-
-
-// void Camera::relRot(float pitchChange, float yawChange) {
-//
-//
-//     float tpitch += pitchChange;
-//     float tyaw += yawChange;
-//
-//     // clamping the pitch, preventing backflips
-     // pitch = std::max(-PI / 2.0f, std::min(PI / 2.0f, pitch));
-//
-//
-//     float dirX = cos(yaw) * cos(pitch);
-//     float dirY = sin(pitch);
-//     float dirZ = sin(yaw) * cos(pitch);
-//
-//     // applying the calculated directions
-//     centerx = eyeX + dirX;
-//     centery = eyeY + dirY;
-//     centerz = eyeZ + dirZ;
-// }
-

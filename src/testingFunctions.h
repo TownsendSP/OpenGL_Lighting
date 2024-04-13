@@ -23,7 +23,7 @@ extern std::map<int, std::string> debugMap;
 
 
 void testConeArot(Coord angle = coneRotAnim);
-void testConeA(float height, ColorData colorThing = ColorData(1, 0, 1, 1));
+void testConeA(float height, ColorData colorThing = ColorData(1.0f, 0.0f, 1.0f, 1.0f));
 void testConeCrot(Coord angle, ColorData coloraaaa) ;
 void testInRightPlace(Camera cam);
 

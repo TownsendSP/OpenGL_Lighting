@@ -33,12 +33,12 @@ public:
         A = a;
     }
 
-    ColorData(int r, int g, int b, float a, uint8_t conv = NOCONVERT) {
-            R = conv?(r/ 255.0):r;
-            G = conv?(g/ 255.0):g;
-            B = conv?(b/ 255.0):b;
-            A = a;
-    }
+    // ColorData(int r, int g, int b, float a, uint8_t conv = NOCONVERT) {
+    //         R = conv?(r/ 255.0):r;
+    //         G = conv?(g/ 255.0):g;
+    //         B = conv?(b/ 255.0):b;
+    //         A = a;
+    // }
     ColorData(uint32_t hexColor, float a) {
         R = ((hexColor >> 16) & 0xFF) / 255.0;
         G = ((hexColor >> 8) & 0xFF) / 255.0;
@@ -55,16 +55,29 @@ public:
 
     //default:
     ColorData() {
-        R = 0;
-        G = 0;
-        B = 0;
-        A = 0;
+        R = 0.0f;
+        G = 0.0f;
+        B = 0.0f;
+        A = 0.0f;
+    }
+
+    ColorData(bool a) {
+        R = 0.0f;
+        G = 0.0f;
+        B = 0.0f;
+        A = 0.0f;
     }
 
     ColorData(GLdouble r, GLdouble g, GLdouble b, GLdouble a) {
         R = r;
         G = g;
         B = b;
+        A = a;
+    }
+    ColorData(Coord qq, float a) {
+        R = qq.X;
+        G = qq.Y;
+        B = qq.Z;
         A = a;
     }
 

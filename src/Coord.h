@@ -2,6 +2,7 @@
 #define COORD_H
 
 //imports
+#include "globals.h"
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -10,7 +11,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "globals.h"
+
 
 
 float srnd(float min, float max);
@@ -42,7 +43,7 @@ public:
 
     Coord(std::string hexString);
 
-    std::string toHexString();
+    std::string toHexString(char delim = ',');
 
     explicit Coord(const float in[3]) {
         X = in[0];
@@ -183,6 +184,7 @@ public:
 
     Coord vecToAngles() const {
         return {atan2(Z, X), asin(Y), 0};
+
     }
 
     Coord radiansToDegrees() const;
@@ -196,8 +198,6 @@ public:
     std::string toString(int precision = 2);
     std::string* toStrings(int precision = 2);
 };
-
-
 
 inline Coord randCoord(const Coord &min, const Coord &max) {
     return {srnd(std::min(min.X, max.X), std::max(min.X, max.X)),

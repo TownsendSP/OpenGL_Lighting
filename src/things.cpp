@@ -22,6 +22,7 @@ extern std::map<int, std::string> debugMap;
 
 //Window Blinds Routines
 #ifndef FOLDING_REGION_BLINDS
+
 Blinds::Blinds(float width, float height, float depth, float pitchAngle, float closedFactor) {
     matSpecBlinds = ColorData(0.5, 0.5, 0.5, 1.0);
     matShineBlinds[0] = 50.0f;
@@ -264,7 +265,7 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
 
 
     // XZ plane: CORRECT!
-    if (c1.Y - c2.Y == 0) {
+    if (c1.Y - c2.Y <= 0.001) {
         glPushMatrix();
         glNormal3fv(normalVec);
         glTranslatefv(c1);
@@ -273,9 +274,9 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     }
 
     // XY plane:x
-    if (abs(c1.Z - c2.Z) <= 0.01) {
-        glPushMatrix();
+    if (abs(c1.Z - c2.Z) <= 0.001) {
         glNormal3fv(normalVec);
+        glPushMatrix();
         glTranslatefv(c1);
         glRotatef(90, -1.0, 0.0, 0.0);
         drawFlatPlane(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
@@ -283,12 +284,12 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     }
 
     //YZ plane: rotate 90 degrees about the y axis
-    if (abs(c1.X - c2.X) <= 0.01) {
-        glPushMatrix();
+    if (abs(c1.X - c2.X) <= 0.001) {
         glNormal3fv(normalVec);
+        glPushMatrix();
         glTranslatefv(c1);
         glRotatef(90, 0.0, 0.0, 1.0);
-        drawFlatPlane(Coord(), Coord((c2-c1).Z, 0, (c2-c1).Y), numSubDivisions);
+        drawFlatPlane(Coord(), Coord((c2-c1).Y, 0, (c2-c1).Z), numSubDivisions);
         glPopMatrix();
     }
 }
@@ -310,26 +311,21 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t wh
     whichFaces is a bitfield that determines which faces to draw; 1 is draw, 0 is don't draw
     1: front (YZ - X+), 2: top (XZ - Y+), 3: right (XY - Z+)
     4: back (YZ - X-), 5: bottom (XZ - Y-), 6: left (XY - Z-)*/
-
-    //topandbottom working
-
-    //switch with fallthrough to draw all the faces
+    //flat shading
 
     glPushMatrix();
     if (whichFaces >> 5 & 1) //far +X
-    	drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, Coord(insideOut, 0, 0), numSubDiv);
+    	drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, Coord(-insideOut, 0, 0), numSubDiv);
     if (whichFaces >> 4 & 1) //top +Y
         drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, Coord(0, insideOut, 0), numSubDiv);
     if (whichFaces >> 3 & 1) //right +Z
-    	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, Coord(0, 0, insideOut), numSubDiv);
+    	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, Coord(0, 0, -insideOut), numSubDiv);
     if (whichFaces >> 2 & 1) //near -X
-    	drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), Coord(0, 0, -insideOut), numSubDiv); // actually -x
+    	drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), Coord(-insideOut, 0, 0), numSubDiv);
     if (whichFaces >> 1 & 1) //bottom -Y
     	drawPlane(bnl, Coord(tfr.X, bnl.Y, tfr.Z), Coord(0, -insideOut, 0), numSubDiv);
     if (whichFaces & 1) //left -Z
-    	drawPlane(bnl, Coord(tfr.X, tfr.Y, bnl.Z), Coord(-insideOut, 0, 0), numSubDiv);
+    	drawPlane(bnl, Coord(tfr.X, tfr.Y, bnl.Z), Coord(0, 0, -insideOut), numSubDiv);
 
     glPopMatrix();
 }
-
-

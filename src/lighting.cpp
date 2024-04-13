@@ -5,7 +5,21 @@
 #include "lighting.h"
 
 
+Light::Light(lightNum whichLighta, ColorData pos, ColorData amb, ColorData diff, ColorData spec) {
+    whichLight = whichLighta;
+    lightAmb = amb;
+    lightDiff = diff;
+    lightSpec = spec;
+    lightPos = pos;
+}
 
+Light::Light(lightNum whichLighta, ColorData pos, ColorData amb, ColorData diffspec) {
+    whichLight = whichLighta;
+    lightAmb = amb;
+    lightDiff = diffspec;
+    lightSpec = diffspec;
+    lightPos = pos;
+}
 
 void Light::setup() {
     glLightfv(whichLight, GL_AMBIENT, lightAmb);
@@ -14,13 +28,51 @@ void Light::setup() {
     glLightfv(whichLight, GL_POSITION, lightPos);
 }
 
+void Light::enable() const {
+    if(enabled)
+    glEnable(whichLight);
+}
+
+void Light::disable() const {
+    glDisable(whichLight);
+}
+
+Light::operator lightNum() const {
+    return whichLight; //returns, for example, GL_LIGHT0
+}
+
+Light::Light() = default;
+
+
+Spotlight::Spotlight(lightNum whichLight, ColorData pos, ColorData amb, ColorData diff, ColorData spec, ColorData dir,
+                     float cutoff, float exponent): Light(whichLight, pos, amb, diff, spec) {
+    spotDir = dir;
+    spotAttenuation = exponent;
+    spotAngle = cutoff;
+}
+
+Spotlight::Spotlight(lightNum whichLight, ColorData pos, ColorData amb, ColorData diff, ColorData spec, Coord dir,
+                     float cutoff, float exponent): Light(whichLight, pos, amb, diff, spec) {
+    spotDir = dir;
+    spotAttenuation = exponent;
+    spotAngle = cutoff;
+}
+
+Spotlight::Spotlight() = default;
+
+Spotlight::Spotlight(Light i, Coord dir, float cutoff, float exponent): Light(i.whichLight, i.lightPos, i.lightAmb,
+                                                                              i.lightDiff, i.lightSpec) {
+    spotDir = dir;
+    spotAttenuation = exponent;
+    spotAngle = cutoff;
+}
+
 void Spotlight::setup() {
     Light::setup();
     glLightfv(whichLight, GL_SPOT_DIRECTION, spotDir);
     glLightf(whichLight, GL_SPOT_CUTOFF, spotAngle);
     glLightf(whichLight, GL_SPOT_EXPONENT, spotAttenuation);
 }
-
 
 void Spotlight::drawVis() {
     // // Rotate to match the direction of the spotlight
@@ -53,3 +105,106 @@ void Spotlight::drawVis() {
     // glPopMatrix(); // Restore matrix state
 }
 
+
+Material::Material(ColorData spec, ColorData amb, ColorData diff, ColorData emission, float shine) {
+    matSpec = spec;
+    matAmb = amb;
+    matEmission = emission;
+    matDiff = diff;
+    matShine = shine;
+}
+
+Material::Material(ColorData spec, ColorData amb, ColorData diff, float shine) {
+    matSpec = spec;
+    matAmb = amb;
+    matEmission = ColorData(0.0f, 0.0f, 0.0f, 0.0f);
+    matDiff = diff;
+    matShine = shine;
+}
+
+void Material::apply() {
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpec);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmb);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, matEmission);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiff);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, matShine);
+}
+
+//Material Library:
+#ifndef FOLDING_REGION_MaterialLibrary
+
+Material wallMat = Material(
+    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    10.0f);
+
+Material floorMat = Material( //pale brown color
+    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+    ColorData(0.8f, 0.6f, 0.4f, 1.0f),
+    33.0f); //just a bit glossy
+
+
+Material ceilingMat = Material( //matte cream color
+    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+    ColorData(0.9f, 0.9f, 0.8f, 1.0f),
+    5.0f);
+
+Material lampMat = Material( //emissive golden color.
+    ColorData(1.0f, 0.9f, 0.3f, 1.0f),
+    ColorData(0.2f, 0.2f, 0.1f, 1.0f),
+    ColorData(1.0f, 0.9f, 0.3f, 1.0f),
+    ColorData(1.0f, 0.9f, 0.3f, 1.0f),
+    5.0f);
+
+Material cardMat = Material(
+        // Metallic blue color with high specular
+        ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+        ColorData(0.05f, 0.05f, 0.1f, 1.0f), // Lower ambient for better shine
+        ColorData(0.15f, 0.25f, 0.8f, 1.0f), // Slightly lighter blue (optional)
+        1000.0f
+        ); // Very high shininess for sharp highlight
+
+
+Material castIronMat = Material( // nearly black, metallic
+    ColorData(0.3f, 0.3f, 0.3f, 1.0f),
+    ColorData(0.0f, 0.0f, 0.0f, 1.0f),
+    ColorData(0.0f, 0.0f, 0.0f, 1.0f),
+    100000.0f);
+#endif
+
+
+//globally accessible object hallLight;
+Light hallLight = Light(
+    Light::LIGHT1,
+    ColorData(Coord(5, 2.5, 0), 1.0), //pos
+    ColorData(1.0f, 0.9f, 0.85f, 1.0f), //amb
+    ColorData(1.0f, 0.9f, 0.85f, 1.0f), //diff
+    ColorData(1.0f, 0.9f, 0.85f, 1.0f) //spec
+);
+    // ColorData(0.2f, 0.2f, 0.2f, 1),
+    // ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    // ColorData(1.0f, 1.0f, 1.0f, 1.0f));
+
+Light brightWhite = Light(
+    Light::LIGHT3,
+    ColorData(Coord(0, 0, 0), 1.0),
+    ColorData(0.2f, 0.2f, 0.2f, 1),
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f));
+
+Spotlight headLamp = Spotlight(
+    brightWhite,
+    Coord(0, 0, 0),
+    30.0f,
+    10.0f);
+
+
+Light sunLight = Light( //directional sunlight, high in the sky
+    Light::LIGHT2,
+    ColorData(1.0f, 1.0f, 1.0f, 0.0f),
+    ColorData(0.2f, 0.2f, 0.2f, 1),
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f));

@@ -22,26 +22,27 @@
 bool GLStreamOut::parseControlChars(char in_char) {
     //cast to hex for comparison
     // unsigned char c = in_char;
-    uint_fast16_t c = xx8(in_char);
-    if (c == 0xFF || control == true) {
+    // uint_fast16_t c = xx8(in_char);
+
+    int_fast8_t c = xx8(in_char);
+    if (c == xx8(0xFF) || control == true) {
         // std::cout << "Control char: " << c << std::endl;
         switch (c) {
             case 0x00:
                 control = 0;
-                std::cout << "Control off" << std::endl;
-                return false;
-                break;
+                // std::cout << "Control off" << std::endl;
+                return false;break;
             case 0xFF:
                 control = 1;
-                std::cout << "Control on" << std::endl;
+                // std::cout << "Control on" << std::endl;
                 return false;break;
             case 0x03:
                 pref = 0;
-                std::cout << "No prefix" << std::endl;
+                // std::cout << "No prefix" << std::endl;
                 return false;
             break;
             case 0x04: //clear buffer and console
-                std::cout << "Clear all" << std::endl;
+                // std::cout << "Clear all" << std::endl;
                 buffer.clear();
                 glConsoleVec.clear();
                 pref = true;
@@ -50,46 +51,45 @@ bool GLStreamOut::parseControlChars(char in_char) {
 
                 return false;break;
             case 0x05:
-                std::cout << "Prefix On" << std::endl;
+                // std::cout << "Prefix On" << std::endl;
                 pref = 1;
                 return false;break;
             case 0x06:
                 glConsoleVec.push_back(buffer);
-                std::cout << "Linefeed" << std::endl;
+                // std::cout << "Linefeed" << std::endl;
                 buffer.clear();
                 return false;break;
             case 0x09:
                 glConsoleVec.push_back(buffer);
                 buffer.clear();
                 buffer += "  ";
-                std::cout << "Carriage return" << std::endl;
+                // std::cout << "Carriage return" << std::endl;
                 return false;break;
             case 0x0A:
                 if(buffer.size() > 2)
                     buffer.pop_back();
                 else if(glConsoleVec.size() > 1)
                     glConsoleVec.pop_back();
-                std::cout << "Delete" << std::endl;
+                // std::cout << "Delete" << std::endl;
                 return false;break;
             case 0x7f:
                 conHeightPercent += 0.1;
                 if(conHeightPercent > 0.52)
                     conHeightPercent = 0.52;
-                std::cout << "Grow" << std::endl;
+                // std::cout << "Grow" << std::endl;
                 return false;break;
             case 0x80:
                 conHeightPercent -= 0.1;
                 if(conHeightPercent < 0.0)
                     conHeightPercent = 0.0;
-                std::cout << "Shrink" << std::endl;
                 return false;break;
             case 0x81:
-                conHeightPercent =0.3;
-                std::cout << "Default" << std::endl;
+                conHeightPercent =0.52;
+                // std::cout << "MAX" << std::endl;
                 return false;break;
             case 0x82:
-                conHeightPercent = 0.52;
-                std::cout << "Max" << std::endl;
+                conHeightPercent = 0.3;
+                // std::cout << "Default" << std::endl;
                 return false;break;
             default:
                 return true;
@@ -102,10 +102,10 @@ bool GLStreamOut::parseControlChars(char in_char) {
 std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
     //print c as hex:
     bool result = parseControlChars(reinterpret_cast<std::streambuf::int_type &>(c));
-    if(!result) {
-        std::cout << c << ": " << std::hex << c;
-        std::cout << " "  << result << std::endl;
-    }
+    // if(!result) {
+        // std::cout << c << ": " << std::hex << c;
+        // std::cout << " "  << result << std::endl;
+    // }
     // std::streambuf::int_type c = parseControlChars(c)?c:EOF;
 
     // c = c = parseControlChars(c);
@@ -124,13 +124,7 @@ std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
     return c;
 }
 
-// std::streambuf::int_type GLStreamOut::sync() {
-//     if (!buffer.empty()) {
-//         glConsoleVec.push_back(buffer);
-//         buffer.clear();
-//     }
-//     return 0;
-// }
+
 std::streambuf::int_type GLStreamOut::sync() {
     std::string parsedBuffer;
     std::cout << "before parsing: " << buffer << std::endl;
@@ -246,4 +240,8 @@ std::string xs64(int_fast64_t value) {
     ss << std::hex << std::setfill('0') << std::setw(16) << static_cast<int>(value);
     return ss.str();
 }
+
+
 #endif
+
+
