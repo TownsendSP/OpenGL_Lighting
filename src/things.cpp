@@ -106,9 +106,9 @@ void Blinds::draw(DebugLevel dbg) const {
     drawDbgPoints(dbg);
 
     if (debug_string_add_map_ != nullptr) {
-        (*debug_string_add_map_)[27] = "Blinds State: " + std::to_string(closedFactor);
-        (*debug_string_add_map_)[28] = "Blade Spacing: " + std::to_string(bladeSpacing);
-        (*debug_string_add_map_)[29] = "Num Blades: " + std::to_string(numBlades);
+        (*debug_string_add_map_)[60-17] = "Blinds State: " + std::to_string(closedFactor);
+        (*debug_string_add_map_)[60-18] = "Blade Spacing: " + std::to_string(bladeSpacing);
+        (*debug_string_add_map_)[60-19] = "Num Blades: " + std::to_string(numBlades);
     }
 }
 
@@ -157,6 +157,12 @@ Debug3Dx::Debug3Dx(Coord position, float size, float weight) {
     this->weight = weight;
 }
 
+Debug3Dx::Debug3Dx(float inStuff[5]) {
+    this->position = {inStuff[0], inStuff[1], inStuff[2]};
+    this->size = inStuff[3];
+    this->weight = inStuff[4];
+}
+
 void Debug3Dx::draw() const {
     //set line width to weight
     glLineWidth(weight);
@@ -189,11 +195,17 @@ void Debug3Dx::draw() const {
     glLineWidth(1);
 }
 
+void Debug3Dx::draw(Coord pos, float length, float weight) const {
+    //create a new Debug3Dx object and draw it, then delete it
+    Debug3Dx(pos, length, weight).draw();
+    //delete it when done
+}
+
 void drawXZxGridlines(float range) {
     glColor3f(0.7f, 0.7f, 0.7f); // Set color to light gray
     glEnable(GL_LINE_STIPPLE);
     glLineStipple(1, 0x0404);
-    for (int i = -range; i <= range; ++i) {
+    for (int i = -range; i <= range; ++i) { // NOLINT(*-narrowing-conversions)
         glBegin(GL_LINES);
         // x-axis
         glVertex3f(-range, 0.0f, static_cast<float>(i));
@@ -207,31 +219,6 @@ void drawXZxGridlines(float range) {
     glDisable(GL_LINE_STIPPLE);
 }
 
-//
-//
-// void drawXZxGridlines(float range) {
-//     glColor3f(0.7f, 0.7f, 0.7f); // Set color to light gray
-//     glEnable(GL_LINE_STIPPLE);
-//     glLineStipple(1, 0x0404);
-//
-//     float step = 1.0f; // Initial step size
-//     for (float i = -range; i <= range; i += step) {
-//         if (static_cast<int>(i) % 100 == 0 && i != 0) {
-//             step *= 2; // Double the step size every 100 units
-//         }
-//
-//         glBegin(GL_LINES);
-//         // x-axis
-//         glVertex3f(-range, 0.0f, i);
-//         glVertex3f(range, 0.0f, i);
-//         // z-axis
-//         glVertex3f(i, 0.0f, -range);
-//         glVertex3f(i, 0.0f, range);
-//         glEnd();
-//     }
-//
-//     glDisable(GL_LINE_STIPPLE);
-// }
 #endif
 
 void drawBMPStr(std::string str, void *font) {
@@ -244,7 +231,7 @@ void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions) {
     // corner1 = corner1 - Coord(1, 1, 1);
     // corner2 = corner2 - Coord(1, 1, 1);
     // Calculate the size of each subdivision
-    float xStep = (corner2.X - corner1.X) / numSubDivisions;
+    float xStep = (corner2.X - corner1.X) / numSubDivisions; // NOLINT(*-narrowing-conversions)
     float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
 
     // Draw the grid of triangle strips

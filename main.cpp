@@ -58,10 +58,13 @@ bool started = false;
 int xClick;
 int yClick;
 
-
 float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
 float blindAnimSpeed = 0.05;
 bool showInfoViewport = true;
+bool drawDebugPoints = false;
+bool focusPoint = false;
+bool drawAllPoints = false;
+int currPointDraw = 0;
 //function pointer to infoVP addDebugString
 
 std::map<int, std::string> debugMap;
@@ -110,12 +113,19 @@ auto prevTime = std::chrono::high_resolution_clock::now();
 
 //materials and lights
 Light hallwayLight;
-Spotlight headlamp;
+// Spotlight headlamp;
 Light fakeSun;
 ColorData globAmb;
 #endif
 
+
 #ifndef FOLDING_REGION_Draw
+
+void updateSpotlight() {
+    headLamp.setup();
+    headLamp.lightPos = ColorData(cam.pos, 1.0);
+    headLamp.spotDir = cam.normDirVec();
+}
 
 void setupRight() {
     if (showInfoViewport) {
@@ -133,23 +143,23 @@ void setupRight() {
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
-
+    updateSpotlight();
     cam.lookAt();
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 }
 
 void drawMoreShapes() {
     // Light properties for spotlight
-    GLfloat test_light_position_spotlight[] = {0.0f, 3.0f, 0.0f, 1.0f}; // Include positional component (w = 1.0)
-    GLfloat test_light_diffuse_spotlight[] = {1.0f, 0.0f, 1.0f, 1.0f}; // Slightly cool color
-    GLfloat test_light_specular_spotlight[] = {0.0f, 1.0f, 0.0f, 1.0f}; // Slightly cool color
-    GLfloat test_light_ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
-    GLfloat test_spotExponent = 1.0f;
+    // GLfloat test_light_position_spotlight[] = {0.0f, 3.0f, 0.0f, 1.0f}; // Include positional component (w = 1.0)
+    // GLfloat test_light_diffuse_spotlight[] = {1.0f, 0.0f, 1.0f, 1.0f}; // Slightly cool color
+    // GLfloat test_light_specular_spotlight[] = {0.0f, 1.0f, 0.0f, 1.0f}; // Slightly cool color
+    // GLfloat test_light_ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    // GLfloat test_spotExponent = 1.0f;
 
 
     // Light properties for point light
-    GLfloat test_light_position_pointlight[] = {-2.0f, 3.0f, -2.0f, 1.0f}; // Include positional component (w = 1.0)
-    GLfloat test_light_diffuse_pointlight[] = {0.9f, 0.8f, 0.1f, 1.0f}; // Warm color
+    // GLfloat test_light_position_pointlight[] = {-2.0f, 3.0f, -2.0f, 1.0f}; // Include positional component (w = 1.0)
+    // GLfloat test_light_diffuse_pointlight[] = {0.9f, 0.8f, 0.1f, 1.0f}; // Warm color
 
     // glDisable(GL_LIGHT0);
 
@@ -159,34 +169,33 @@ void drawMoreShapes() {
     // glMaterialfv(GL_FRONT, GL_SPECULAR, test_material_specular);
     // glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
 
-    wallMat.apply();
+    // wallMat.apply();
 
     // ground plane (y = -0.5)
-    glPushMatrix();
-
-    glEnable(GL_LIGHT1);
-    drawPlane(Coord(0, 0, -2), Coord(10, 0, 2), Coord(0, 1, 0), 50); //floor
-    drawPlane(Coord(0, 3, -2), Coord(10, 3, 2), Coord(0, -1, 0), 50); //ceiling
+    // glPushMatrix();
+    //
+    // glEnable(GL_LIGHT1);
+    // drawPlane(Coord(0, 0, -2), Coord(10, 0, 2), Coord(0, 1, 0), 50); //floor
+    // drawPlane(Coord(0, 3, -2), Coord(10, 3, 2), Coord(0, -1, 0), 50); //ceiling
     // drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wallMat:
     // drawPlane(Coord(0, 0, 2), Coord(10, 3, 2.1), Coord(0, 0, -1), 50); //- Right Wall:
     // drawPlane(Coord(0, 0, -2.1), Coord(10, 3, -2), Coord(0, 0, 1), 50); //- left Wall:
 
-    glPopMatrix();
-    glDisable(GL_LIGHT1);
-
-
-    glDisable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    // glPopMatrix();
+    // glDisable(GL_LIGHT1);
+    //
+    //
+    // glDisable(GL_LIGHTING);
+    // glEnable(GL_LIGHT0);
 }
 
 //update spotlight position and direction to match the camera
-void updateSpotlight() {
-    headlamp.lightPos = ColorData(cam.pos, 1.0);
-    headlamp.spotDir = cam.tgt;
-}
+
 
 void drawLitShapes() {
     glEnable(GL_LIGHTING);
+
+    glEnable(headLamp);
 
     glEnable(GL_LIGHT0);
     glPushMatrix();
@@ -198,6 +207,8 @@ void drawLitShapes() {
     drawHall();
 
     glDisable(GL_LIGHTING);
+
+    glDisable(headLamp);
 
 
     // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
@@ -219,7 +230,23 @@ void drawUnlitShapes() {
         for (Debug3Dx debug_x: debugXes) {
             debug_x.draw();
         }
+
         glPopMatrix();
+    }
+
+    if(drawAllPoints) {
+        std::vector<thingHolder> debugPoints = getDbgPts();
+        for (float* point: debugPoints) {
+            Debug3Dx(point).draw();
+        }
+    }
+
+    if(drawDebugPoints) {
+        float* dbg_pts = getDbgPts(currPointDraw);
+        Debug3Dx(dbg_pts).draw();
+        if(focusPoint) {
+            cam.tgt = Coord(dbg_pts[0], dbg_pts[1], dbg_pts[2]);
+        }
     }
 
     // testConeArot();
@@ -227,14 +254,14 @@ void drawUnlitShapes() {
     // testCamBindings();
 
     // testDrawingCubes();
+
     windowTest();
-            glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
 
 }
 
 
 #endif
-
 
 bool shownKeybinds = false;
 
@@ -287,6 +314,7 @@ void setupObjects() {
     cam = Camera(Coord(-2, 7, -2), Coord(-1, 6, -1), Coord(0, 1, 0));
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 30);
+    headLamp.setup();
 
     //giving them access to the debugging info map
     cam.setDebugStringAdd(&debugMap);
@@ -404,6 +432,7 @@ void keyboard(unsigned char key, int x, int y) {
     //
     // }
     modifiers = glutGetModifiers();
+
     switch (key) {
         case 'w': //CAMERA FORWARD
             cam.relTrans(Coord(1 * speed, 0, 0));
@@ -501,6 +530,11 @@ void testCharacterPrinting() {
 }
 
 void specialKeyboard(int key, int x, int y) {
+    //modifiers:
+    modifiers = glutGetModifiers();
+    alt = modifiers & GLUT_ACTIVE_ALT;
+    shift = modifiers & GLUT_ACTIVE_SHIFT;
+
     switch (key) {
         case GLUT_KEY_F1:
             showInfoViewport = !showInfoViewport;
@@ -517,11 +551,28 @@ void specialKeyboard(int key, int x, int y) {
             glout << "Grew console to " << conHeightPercent << '\n';
         break;
         case GLUT_KEY_F4:
-            glout << "F4: " << '\n';
+            headLamp.lightswitch();
+            glout << "Headlamp switched off" << '\n';
+            debugMap[60 - 20] = "Headlamp: " + headLamp.enabled ? "On" : "Off";
 
         break;
 
-
+        case GLUT_KEY_F6:
+        //     // if shift is pressed, toggle showDebugPoints
+        //         if(modifiers & GLUT_ACTIVE_SHIFT) {
+        //             drawDebugPoints = !drawDebugPoints;
+        //             glout << "Single Debug Point Draw: " << (drawDebugPoints ? "Enabled" : "Disabled") << '\n';
+        //         } else if (modifiers&GLUT_ACTIVE_ALT) {
+        //             focusPoint = !focusPoint;
+        //             drawDebugPoints = focusPoint;
+        //             glout << "Camera Focus Point: " << (focusPoint ? "Enabled" : "Disabled") << '\n';
+        //         } else {
+        //             currPointDraw = getNextPoint(currPointDraw);
+        //             glout << "Drawing Point " << std::to_string(currPointDraw) << ': ' << Coord(getDbgPts(currPointDraw)).toString() << '\n';
+        //         }
+        // std::cout << "Current Point: " << currPointDraw << '\n';
+        // std::cout << "DrawStatus: \n\t" << "draw single" << drawDebugPoints << "\n\t focusPoint: " << focusPoint << "\n\t number of points: " << getDbgPts().size() << '\n';
+        break;
         case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
                 cam.saveToFile(cameraSaveFile);

@@ -152,6 +152,51 @@ extern std::ostream glInfoOut;
 
 const std::string cameraSaveFile = "cam.txt";
 
+class thingHolder {
+public:
+    float a, b, c, d, e;
+    explicit thingHolder(const float input[5]) {
+        a = input[0];
+        b = input[1];
+        c = input[2];
+        d = input[3];
+        e = input[4];
+    }
+
+    thingHolder(float x, float x1, float x2, float size, float weight) {
+        a = x;
+        b = x1;
+        c = x2;
+        d = size;
+        e = weight;
+    }
+
+    operator float*() {
+        static float array[5] = {a, b, c, d, e};
+        return array;
+    }
+    //default
+    thingHolder() {
+        a = 0;
+        b = 0;
+        c = 0;
+        d = 0;
+        e = 0;
+    }
+};
+
+extern std::vector<thingHolder> staticPoints;
+
+
+void addDbgPt(int idx, float xyz[3], float size, float weight);
+
+
+std::vector<thingHolder> getDbgPts();
+
+float* getDbgPts(int which);
+
+
+int getNextPoint(int current);
 
 
 #endif //GLOBALS_H

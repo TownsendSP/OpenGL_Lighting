@@ -1,3 +1,4 @@
+#include "globals.h"
 #include <cmath>
 
 #ifdef __APPLE__
@@ -187,6 +188,12 @@ std::string* Coord::toStrings(int precision) {
     return ret;
 }
 
+void Coord::debug(int idx, float s, float w) {
+    addDbgPt(idx, new float[3]{X, Y, Z}, s, w);
+}
+
+
+
 std::string Coord::toString(int precision) {
     std::string* things = toStrings(precision);
     std::string str = "(" + things[0] + ", " + things[1] + ", " + things[2] + ")";
@@ -224,6 +231,7 @@ bool isColorCloseEnough(Coord color1, Coord color2, float closeness) {
         }
     return false;
 }
+
 
 
 

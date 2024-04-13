@@ -34,6 +34,8 @@ public:
 
     Camera(Coord Pos, Coord Target, Coord orientation);
 
+    Coord normDirVec();
+
     int saveToFile(const std::string &filename);
 
     int loadFromFile(const std::string &filename);

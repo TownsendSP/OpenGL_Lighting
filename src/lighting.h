@@ -40,6 +40,11 @@ public:
 
     void disable() const;
 
+    void lightswitch();;
+
+    void lightswitch(bool onoff);;
+
+
     // define a cast so I can use the light in glEnable
     operator lightNum() const;
 
@@ -100,6 +105,7 @@ extern Material ceilingMat;
 extern Material lampMat;
 extern Material cardMat;
 extern Material castIronMat;
+extern Material tableMat;
 
 //light Library:
 extern Light hallLight;

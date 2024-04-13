@@ -37,6 +37,14 @@ void Light::disable() const {
     glDisable(whichLight);
 }
 
+void Light::lightswitch() {
+    enabled = !enabled;
+}
+
+void Light::lightswitch(bool onoff) {
+    enabled = onoff;
+}
+
 Light::operator lightNum() const {
     return whichLight; //returns, for example, GL_LIGHT0
 }
@@ -167,12 +175,20 @@ Material cardMat = Material(
         1000.0f
         ); // Very high shininess for sharp highlight
 
-
 Material castIronMat = Material( // nearly black, metallic
     ColorData(0.3f, 0.3f, 0.3f, 1.0f),
     ColorData(0.0f, 0.0f, 0.0f, 1.0f),
     ColorData(0.0f, 0.0f, 0.0f, 1.0f),
     100000.0f);
+
+//shiny dark brown texture for table
+Material tableMat = Material(
+    ColorData(Coord(123, 63, 0)/255, 1.0f),
+    ColorData(0.1f,0.1f,0.1f, 1.0f),
+    ColorData(Coord(149, 69, 53)/255, 1.0f),
+    100.0f);
+
+
 #endif
 
 

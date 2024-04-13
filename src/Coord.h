@@ -45,11 +45,11 @@ public:
 
     std::string toHexString(char delim = ',');
 
-    explicit Coord(const float in[3]) {
-        X = in[0];
-        Y = in[1];
-        Z = in[2];
-    }
+    explicit Coord(const float* in) {
+    X = in[0];
+    Y = in[1];
+    Z = in[2];
+}
 
     //default:
     Coord() {
@@ -182,6 +182,8 @@ public:
         return new float[3]{X, Y, Z};
     }
 
+
+
     Coord vecToAngles() const {
         return {atan2(Z, X), asin(Y), 0};
 
@@ -197,6 +199,9 @@ public:
 
     std::string toString(int precision = 2);
     std::string* toStrings(int precision = 2);
+
+    void debug(int idx, float s = 0.5, float w = 0.5);
+
 };
 
 inline Coord randCoord(const Coord &min, const Coord &max) {

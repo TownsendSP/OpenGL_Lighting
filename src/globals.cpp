@@ -193,6 +193,38 @@ GLInfo glStatus;
 std::ostream glInfoOut(&glStatus);
 
 
+
+
+std::vector<thingHolder> staticPoints;
+
+void addDbgPt(int idx, float xyz[3], float size, float weight) {
+staticPoints.insert(staticPoints.begin() + idx, thingHolder(xyz[0], xyz[1], xyz[2], size, weight));
+    // staticPoints.emplace_back(xyz[0], xyz[1], xyz[2], size, weight);
+}
+
+std::vector<thingHolder> getDbgPts() {
+
+
+    return staticPoints;
+}
+float* getDbgPts(int which) {
+
+
+    // if which is in the range of the vector, return it, otherwise return the first element
+    if (which >= 0 && which < staticPoints.size()) {
+        return staticPoints[which];
+    } else {
+        return staticPoints[0];
+    }
+}
+
+int getNextPoint(int current) {
+
+
+    // simply returns the index of the next point, unless the next point would be outside the bounds of the vector, in which case it returns 0
+    return current + 1 < staticPoints.size() ? current + 1 : 0;
+}
+
 //I did write these, c++ was annoying me my not letting me have the hex
 #ifndef FOLDING_REGION_WHY_CPLUSPLUS_WHY
 int_fast8_t xx8(char input) {

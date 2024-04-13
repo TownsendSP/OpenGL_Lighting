@@ -49,6 +49,9 @@ Camera::Camera(Coord Pos, Coord Target, Coord orientation) {
     ang = calcPitchYaw(pos, tgt); //pitch, yaw, roll
 }
 
+Coord Camera::normDirVec() {
+    return (tgt - pos) / sqrt((tgt - pos).pow(2).sum());
+}
 
 int Camera::saveToFile(const std::string& filename) {
     // Open the file for output using the filename
@@ -124,7 +127,7 @@ int Camera::loadFromFile(const std::string& filename) {
     for (const auto& line : lines) {
         floats = splitAndConvertToFloats(line, ',');
         storedStates[i] = std::make_tuple(Coord(floats[0], floats[1], floats[2]), Coord(floats[3], floats[4], floats[5]));
-        glout << "Loaded state " << i << " as " << std::get<0>(storedStates[i]).toString() << ", " << std::get<1>(storedStates[i]).toString() << std::endl;
+        // glout << "Loaded state " << i << " as " << std::get<0>(storedStates[i]).toString() << ", " << std::get<1>(storedStates[i]).toString() << std::endl;
         i++;
     }
     return 0;

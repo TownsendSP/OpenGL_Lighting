@@ -5,11 +5,11 @@
 #ifndef TGSOUTHAHW4_THINGS_H
 #define TGSOUTHAHW4_THINGS_H
 
-# include "globals.h"
 #include <map>
 
-# include "Coord.h"
 # include "ColorData.h"
+# include "Coord.h"
+# include "globals.h"
 
 
 // class things {
@@ -28,9 +28,12 @@ public:
 
     explicit Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
 
+    Debug3Dx::Debug3Dx(float inStuff[5]);
+
     // Debug3Dx(float size = 1.0, float weight = 1.0, Coord position);
 
     void draw() const;
+    void draw(Coord pos, float length = 0.5, float weight = 0.5) const;
 };
 
 void drawXZxGridlines(float range);
@@ -57,7 +60,6 @@ class Blinds{
     void drawDbgPoints(DebugLevel dbg = NONE) const;
 
     bool opening = false;
-    std::vector<Debug3Dx> debugPoints;
 
 public:
     void setDebugStringAdd(std::map<int, std::string>* mapPtr) {
