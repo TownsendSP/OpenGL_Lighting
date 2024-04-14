@@ -25,6 +25,7 @@ public:
     Coord ang;
     float transSpeed;
     float rotSens;
+    Coord dirVecPublicUsage;
 
     // constructor:
 

@@ -134,50 +134,11 @@ Coord normalize(Coord vec) {
 
 void updateSpotlight() {
     //set it to local view:
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);;
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
     headLamp.setup();
-    redLight.setup();
-    greenLight.setup();
-    blueLight.setup();
-
-    glEnable(GL_LIGHT3);
-    glEnable(GL_LIGHT4);
-    glEnable(GL_LIGHT5);
-    glEnable(GL_LIGHT6);
-
-
-    // headLamp.lightPos = ColorData(cam.pos, 1.0);
-    // headLamp.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    // redLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    // greenLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    // blueLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-
-    headLamp.lightPos = ColorData(cam.pos, 1.0f);
-    redLight.lightPos = ColorData(cam.pos, 1.0f);
-    greenLight.lightPos = ColorData(cam.pos, 1.0f);
-    blueLight.lightPos = ColorData(cam.pos, 1.0f);
-
-    Coord cameraVec = normalize(cam.vec());
-    Coord cameraVecN = cam.normDirVec()/2;
-    Coord camAngles = cam.ang;
-
-    headLamp.spotDir = camAngles.radiansToDirVec();
-    redLight.spotDir = cameraVec * Coord(0.5, 0.5, 0.5);
-    greenLight.spotDir = cameraVecN * Coord(-1, 1, -1);
-    blueLight.spotDir = Coord(-1, 0, 0);
-
-
-    //add debug information:
-    debugMap[29] = "Blue: " + blueLight.lightPos.toString();
-    debugMap[28] = "Blue: " + blueLight.spotDir.toString();
-    debugMap[27] = "Green: " + greenLight.lightPos.toString();
-    debugMap[26] = "Green: " + greenLight.spotDir.toString();
-    debugMap[25] = "Red: " + redLight.lightPos.toString();
-    debugMap[24] = "Red: " + redLight.spotDir.toString();
-    debugMap[23] = "Headlamp: " + headLamp.lightPos.toString();
-    debugMap[22] = "Headlamp: " + headLamp.spotDir.toString();
-
+    headLamp.lightPos = ColorData(0,0,0, 1.0f);
+   headLamp.spotDir =  Coord(0, 0,-1);
 
 }
 
@@ -335,17 +296,11 @@ void drawUnlitShapes() {
 
     // testConeArot();
 
-    redLight.enable();
-    greenLight.enable();
-    blueLight.enable();
+
     glColor3f(1, 0, 1);
     glPushMatrix();
     glutSolidCone(1, 1, 20, 20);
     glPopMatrix();
-
-    blueLight.disable();
-    greenLight.disable();
-    redLight.disable();
 
 
     // testCamBindings();
@@ -420,15 +375,11 @@ void setupObjects() {
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 30);
 
-    glEnable(GL_LIGHT3);
-    glEnable(GL_LIGHT4);
-    glEnable(GL_LIGHT5);
-    glEnable(GL_LIGHT6);
+    // hallLight = Light(
+
+    headLamp.enable();
 
     // headLamp.setup();
-    redLight.setup();
-    greenLight.setup();
-    blueLight.setup();
 
     //giving them access to the debugging info map
     cam.setDebugStringAdd(&debugMap);

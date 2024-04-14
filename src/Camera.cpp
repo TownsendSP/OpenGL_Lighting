@@ -236,12 +236,13 @@ void Camera::relTrans(Coord deltaTranslation) {
 
 void Camera::relRot(Coord deltaAngle) {
     Coord tAng = ang + deltaAngle;
+    //begin Pitch clamping to ensure no backflips or frontflips
     float a = PI / 2.0f;
     float b = tAng.X;
     float c = std::min(a, b);
     float d = -PI / 2.0f;
     tAng.X = std::max(d, c);
-    // tAng.X = std::max(-PI / 2.0f, std::min((static_cast<float>PI)/ 2.0f, tAng.X));
+    //end Pitch clamping
 
     tAng.Y = fmod(tAng.Y, 2 * PI);
     if (tAng.Y < 0) {
@@ -251,6 +252,7 @@ void Camera::relRot(Coord deltaAngle) {
     ang = tAng;
     Coord dirVec = Coord(cos(tAng.Y) * cos(tAng.X), sin(tAng.X), sin(tAng.Y) * cos(tAng.X));
     tgt = pos + dirVec;
+    dirVecPublicUsage = dirVec;
 }
 
 void Camera::lookAt(DebugLevel dbg) {

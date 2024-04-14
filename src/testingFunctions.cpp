@@ -69,7 +69,7 @@ void testInRightPlace(Camera cam) { // tests the cone originating from the camer
     glPushMatrix();
     glScalef(1, 1, -1);
     glTranslatef(0, 5,0);
-    testConeCrot(Coord(D(cam.ang.X), D(cam.ang.Y-PI/2), 0) ,
+    testConeCrot(Coord(D(cam.ang.X), D(cam.ang.Y-PI/2), 0),
         ColorData(0.0f, 1.0f, 0.0f, 0.3f));
     glPopMatrix();
 }
