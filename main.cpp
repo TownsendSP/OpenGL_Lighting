@@ -125,8 +125,16 @@ Coord rotToVec(float rotRadX, float rotRadY) {
     return Coord(cos(rotRadX) * sin(rotRadY), sin(rotRadX), cos(rotRadX) * cos(rotRadY));
 }
 
-void updateSpotlight() {
+Coord normalize(Coord vec) {
+    float sqr = vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z;
+    float invSqr = 1 / sqrt(sqr);
+    return Coord(vec.X * invSqr, vec.Y * invSqr, vec.Z * invSqr);
+}
 
+
+void updateSpotlight() {
+    //set it to local view:
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);;
 
     headLamp.setup();
     redLight.setup();
@@ -140,19 +148,24 @@ void updateSpotlight() {
 
 
     // headLamp.lightPos = ColorData(cam.pos, 1.0);
-    headLamp.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    redLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    greenLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
-    blueLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    // headLamp.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    // redLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    // greenLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
+    // blueLight.lightPos = ColorData(0.0f, 10.0f, 0.0f, 1.0f);
 
-    Coord cameraVec = cam.vec();
-    Coord cameraVecN = cam.normDirVec() * Coord(1, 0, -1);
+    headLamp.lightPos = ColorData(cam.pos, 1.0f);
+    redLight.lightPos = ColorData(cam.pos, 1.0f);
+    greenLight.lightPos = ColorData(cam.pos, 1.0f);
+    blueLight.lightPos = ColorData(cam.pos, 1.0f);
+
+    Coord cameraVec = normalize(cam.vec());
+    Coord cameraVecN = cam.normDirVec()/2;
     Coord camAngles = cam.ang;
 
     headLamp.spotDir = camAngles.radiansToDirVec();
-    redLight.spotDir = cameraVec;
-    greenLight.spotDir = cameraVecN;
-    blueLight.spotDir = Coord(cam.ang.X, cam.ang.Y-PI/2, 0).radiansToDirVec();
+    redLight.spotDir = cameraVec * Coord(0.5, 0.5, 0.5);
+    greenLight.spotDir = cameraVecN * Coord(-1, 1, -1);
+    blueLight.spotDir = Coord(-1, 0, 0);
 
 
     //add debug information:
@@ -231,7 +244,7 @@ void drawMoreShapes() {
 }
 
 //update spotlight position and direction to match the camera
-void drawTestCone(Coord directionVector) {
+void backToBasicsCalculateTheDirVec(Coord directionVector) {
 
 }
 
@@ -252,7 +265,7 @@ void drawLitShapes() {
 
 
 
-    glDisable(GL_LIGHT0);
+
     glEnable(GL_LIGHT3);
     glEnable(GL_LIGHT4);
     glEnable(GL_LIGHT5);
@@ -261,8 +274,18 @@ void drawLitShapes() {
     glPushMatrix();
     glTranslatef(0, 10, 0);
     glRotatef(90, 1, 0, 0);
-    glutSolidTorus(50, 50, 100, 100);
-    glutSolidSphere(20, 100, 100);
+    glutSolidTorus(25, 50, 150, 100);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0, 10, 0);
+    glRotatef(90, 0, 1, 0);
+    glutSolidTorus(25, 50, 250, 100);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(0, 10, 0);
+    // glRotatef(90, 0, 1, 0);
+    // glRotatef(90, 0, 1, 0);
+    glutSolidTorus(25, 50, 250, 100);
     glPopMatrix();
 
 
@@ -393,7 +416,7 @@ void drawWindow() {
 }
 
 void setupObjects() {
-    cam = Camera(Coord(-2, 7, -2), Coord(-1, 6, -1), Coord(0, 1, 0));
+    cam = Camera(Coord(0, 10, 0), Coord(-1, 10, 0), Coord(0, 1, 0));
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 30);
 
@@ -624,6 +647,11 @@ void testCharacterPrinting() {
     }
 }
 
+
+Coord angle = Coord(0, 0.0872665, 0); //5 degrees
+
+
+
 void specialKeyboard(int key, int x, int y) {
     //modifiers:
     modifiers = glutGetModifiers();
@@ -703,7 +731,10 @@ void specialKeyboard(int key, int x, int y) {
             glout << "Blinds Closed" << '\n';
             break;
         case GLUT_KEY_RIGHT:
-            cam.relRot(Coord(0, 5, 0).degToRad());
+            // Coord angle = Coord(0, 0.0349066, 0); //2 degrees
+            // Coord angle = Coord(0, 0.0872665, 0); //5 degrees
+            // Coord radianAngle = angle.degToRad()
+            cam.relRot(angle);
             break;
         case GLUT_KEY_LEFT:
             cam.relRot(Coord(0, -5, 0).degToRad());

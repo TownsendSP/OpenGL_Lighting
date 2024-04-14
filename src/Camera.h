@@ -67,7 +67,7 @@ public:
 
     // std::vector<std::string> toString() const;
 
-    void relRot(float pitch, float yaw);
+    // void relRot(float pitch, float yaw);
 
     void setDebugStringAdd(std::map<int, std::string> *mapPtr) {
         this->debug_string_add_map_ = mapPtr;
