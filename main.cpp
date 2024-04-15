@@ -101,7 +101,7 @@ ColorData solarizedText = ColorData(0.71373, 0.58039, 0.58824, 1.0);
 
 
 DebugLevel defaultDebug = WEAK;
-
+bool detachSpotlight = false;
 //variables for FPS Counter:
 int frame = 0;
 auto prevTime = std::chrono::high_resolution_clock::now();
@@ -133,12 +133,9 @@ Coord normalize(Coord vec) {
 
 
 void updateSpotlight() {
-    //set it to local view:
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-
     headLamp.setup();
     headLamp.lightPos = ColorData(0,0,0, 1.0f);
-   headLamp.spotDir =  Coord(0, 0,-1);
+    headLamp.spotDir =  Coord(0, 0,-1);
 
 }
 
@@ -152,56 +149,18 @@ void setupRight() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(fov, totalWidth / height, 0.0001, 500.0);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
+
     updateSpotlight();
+
     cam.lookAt();
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
-}
-
-void drawMoreShapes() {
-    // Light properties for spotlight
-    // GLfloat test_light_position_spotlight[] = {0.0f, 3.0f, 0.0f, 1.0f}; // Include positional component (w = 1.0)
-    // GLfloat test_light_diffuse_spotlight[] = {1.0f, 0.0f, 1.0f, 1.0f}; // Slightly cool color
-    // GLfloat test_light_specular_spotlight[] = {0.0f, 1.0f, 0.0f, 1.0f}; // Slightly cool color
-    // GLfloat test_light_ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
-    // GLfloat test_spotExponent = 1.0f;
-
-
-    // Light properties for point light
-    // GLfloat test_light_position_pointlight[] = {-2.0f, 3.0f, -2.0f, 1.0f}; // Include positional component (w = 1.0)
-    // GLfloat test_light_diffuse_pointlight[] = {0.9f, 0.8f, 0.1f, 1.0f}; // Warm color
-
-    // glDisable(GL_LIGHT0);
-
-    // Set material properties
-    // glMaterialfv(GL_FRONT, GL_AMBIENT, testmaterial_ambient);
-    // glMaterialfv(GL_FRONT, GL_DIFFUSE, test_material_diffuse);
-    // glMaterialfv(GL_FRONT, GL_SPECULAR, test_material_specular);
-    // glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
-
-    // wallMat.apply();
-
-    // ground plane (y = -0.5)
-    // glPushMatrix();
-    //
-    // glEnable(GL_LIGHT1);
-    // drawPlane(Coord(0, 0, -2), Coord(10, 0, 2), Coord(0, 1, 0), 50); //floor
-    // drawPlane(Coord(0, 3, -2), Coord(10, 3, 2), Coord(0, -1, 0), 50); //ceiling
-    // drawPlane(Coord(0.1, 0, -2), Coord(0, 3, 2), Coord(1, 0, 0), 20); //- Back wallMat:
-    // drawPlane(Coord(0, 0, 2), Coord(10, 3, 2.1), Coord(0, 0, -1), 50); //- Right Wall:
-    // drawPlane(Coord(0, 0, -2.1), Coord(10, 3, -2), Coord(0, 0, 1), 50); //- left Wall:
-
-    // glPopMatrix();
-    // glDisable(GL_LIGHT1);
-    //
-    //
-    // glDisable(GL_LIGHTING);
-    // glEnable(GL_LIGHT0);
 }
 
 //update spotlight position and direction to match the camera
@@ -221,16 +180,14 @@ void drawLitShapes() {
     glPopMatrix();
     glDisable(GL_LIGHT0);
 
-    // drawHall();
+    drawHall();
 
 
 
 
 
-    glEnable(GL_LIGHT3);
-    glEnable(GL_LIGHT4);
-    glEnable(GL_LIGHT5);
-    glEnable(GL_LIGHT6);
+    headLamp.enable();
+
     ceilingMat.apply();
     glPushMatrix();
     glTranslatef(0, 10, 0);
@@ -244,25 +201,12 @@ void drawLitShapes() {
     glPopMatrix();
     glPushMatrix();
     glTranslatef(0, 10, 0);
-    // glRotatef(90, 0, 1, 0);
-    // glRotatef(90, 0, 1, 0);
     glutSolidTorus(25, 50, 250, 100);
     glPopMatrix();
 
-
-
     glDisable(GL_LIGHTING);
-
     glDisable(headLamp);
 
-
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, windowBlinds.matSpecBlinds);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, windowBlinds.matShineBlinds);
-    // glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, windowBlinds.matAmbAndDifBlinds);
-    // glPushMatrix();
-    // glTranslatef(2, 0, 2);
-    // glutSolidDodecahedron();
-    // glPopMatrix();
 }
 
 void drawUnlitShapes() {
@@ -358,7 +302,7 @@ void drawWindow() {
     drawUnlitShapes();
     // drawMoreShapes();
 
-    glEnable(GL_LIGHT3);
+    headLamp.enable();
     glEnable(GL_LIGHT4);
     glEnable(GL_LIGHT5);
     glEnable(GL_LIGHT6);
@@ -405,7 +349,7 @@ void setupLights() {
     //enabling global ambient light:
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
 
-    glEnable(GL_LIGHT3);
+    headLamp.enable();
     glEnable(GL_LIGHT4);
     glEnable(GL_LIGHT5);
     glEnable(GL_LIGHT6);
@@ -414,13 +358,13 @@ void setupLights() {
 }
 
 void setup() {
+    winner = useTimeToSeedRandomToSetWinner();
     // Light property vectors.
 
 
     float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
     float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
     float lightPos[] = {0.0, 7.0, 0.0, 1.0}; // Position remains the same;
-
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
@@ -441,8 +385,6 @@ void setup() {
     glShadeModel(GL_SMOOTH);
     //check if light0 is enabled with a printStatement:
     //glListallEnabled:
-
-
 
     setupObjects();
     glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
@@ -495,12 +437,6 @@ void toggleMouse() {
 }
 bool useCaps = false;
 void keyboard(unsigned char key, int x, int y) {
-    // if(1<=(int)key <=5) {
-    //     cam.restoreState(((int)key)-1);
-    //     glout << "Camera State " << key << " Restored" << std::endl;
-    //     glout << "Cam Pos: " << cam.pos.toString() << " Cam Tgt: " << cam.tgt.toString();
-    //
-    // }
     modifiers = glutGetModifiers();
 
     switch (key) {
@@ -629,23 +565,52 @@ void specialKeyboard(int key, int x, int y) {
             glout << "Headlamp switched " << headLamp.enabled ? "On\n" : "Off\n";
             debugMap[60 - 20] = "Headlamp: " + headLamp.enabled ? "On" : "Off";
 
-        break;
+            break;
+        case GLUT_KEY_F7:
+            //if shift
+            if (modifiers & GLUT_ACTIVE_SHIFT) {
+                winner = 1;
+                glout << "Win-Cheat: " << retWinner() << "\n";
+            } else if (modifiers & GLUT_ACTIVE_ALT) {
+                winner = 0;
+                glout << "Win-Cheat: " << retWinner() << "\n";;
+            } else {
+                winner = useTimeToSeedRandomToSetWinner();
+                glout << "Win-Rand: " << retWinner() << "\n";;
+            }
+
+            break;
 
         case GLUT_KEY_F6:
-        //     // if shift is pressed, toggle showDebugPoints
-        //         if(modifiers & GLUT_ACTIVE_SHIFT) {
-        //             drawDebugPoints = !drawDebugPoints;
-        //             glout << "Single Debug Point Draw: " << (drawDebugPoints ? "Enabled" : "Disabled") << '\n';
-        //         } else if (modifiers&GLUT_ACTIVE_ALT) {
-        //             focusPoint = !focusPoint;
-        //             drawDebugPoints = focusPoint;
-        //             glout << "Camera Focus Point: " << (focusPoint ? "Enabled" : "Disabled") << '\n';
-        //         } else {
-        //             currPointDraw = getNextPoint(currPointDraw);
-        //             glout << "Drawing Point " << std::to_string(currPointDraw) << ': ' << Coord(getDbgPts(currPointDraw)).toString() << '\n';
-        //         }
-        // std::cout << "Current Point: " << currPointDraw << '\n';
-        // std::cout << "DrawStatus: \n\t" << "draw single" << drawDebugPoints << "\n\t focusPoint: " << focusPoint << "\n\t number of points: " << getDbgPts().size() << '\n';
+            switch (animateDoor){
+                case DOOR_CLOSED_STOPPED:
+                    glout << "Door Opening" << '\n';
+                    animateDoor = DOOR_OPENING;
+                break;
+                case DOOR_OPENED_STOPPED:
+                    glout << "Door Closing" << '\n';
+                    animateDoor = DOOR_CLOSING;
+                break;
+                case DOOR_OPENING:
+                    animateDoor = DOOR_OPENED_STOPPED;
+                    glout << "Door Opened" << '\n';
+                break;
+                case DOOR_CLOSING:
+                    glout << "Door Closed" << '\n';
+                    animateDoor = DOOR_CLOSED_STOPPED;
+                break;
+                default:
+                    break;
+        }
+        case GLUT_KEY_F8 :
+            if(cardRotState == CARDROTNONE) {
+                cardRotState = CARDROTNOW;
+            }else {
+                cardRotState = CARDROTNONE;
+                cardRotPercent = 0;
+                glout << "CardReset" << std::endl;
+            }
+
         break;
         case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
@@ -653,12 +618,14 @@ void specialKeyboard(int key, int x, int y) {
 
                 glout << "Camera states saved to " << cameraSaveFile << '\n';
         break;
+
         case GLUT_KEY_F12: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
                 glout << CONTROLOFF;
                 testCharacterPrinting();
                 glout << CONTROLON;
         break;
+
         case GLUT_KEY_F5:
             cam.loadFromFile(cameraSaveFile);
 
@@ -667,7 +634,6 @@ void specialKeyboard(int key, int x, int y) {
             for (int i = 0; i < 5; i++) {
                 glout << i+1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) << " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
             }
-
         break;
 
 
@@ -710,14 +676,42 @@ void specialKeyboard(int key, int x, int y) {
 }
 #endif
 
+void doorAnimate() {
+    if(animateDoor == DOOR_OPENING) {
+        doorOpenPercent +=1;
+        if (doorOpenPercent >= 100) {
+            animateDoor = DOOR_OPENED_STOPPED;
+            doorOpenPercent = 100;
+        }
+    } else if (animateDoor == DOOR_CLOSING) {
+        doorOpenPercent -=1;
+        if (doorOpenPercent <= 0) {
+            animateDoor = DOOR_CLOSED_STOPPED;
+            doorOpenPercent = 0;
+        }
+    }
+}
+
+void cardAnimate() {
+    if(cardRotState == CARDROTNOW) {
+        // cardRotState++;
+        cardRotPercent ++;
+        if(cardRotPercent>=100*cardRotSpeed) {
+            cardRotState = CARDROTCOMPLETE;
+            glout << "Card Done!" << std::endl;
+        }
+    }
+}
+
 void animate(int value) {
-    coneRotAnim = coneRotAnim.wrap(180, -180, Coord(
-                                       animInfo & 0b100 ? coneRotSpeed : 0,
-                                       animInfo & 0b010 ? coneRotSpeed : 0,
-                                       animInfo & 0b001 ? coneRotSpeed : 0
-                                   ));
+
     // add value to the debugMap
     debugMap[60 - 5] = "MysteryValue: " + std::to_string(value);
+
+    doorAnimate();
+    if(cardRotState == CARDROTNOW) {
+        cardAnimate();
+    }
 
     glutTimerFunc(5, animate, 1);
 

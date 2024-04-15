@@ -83,6 +83,11 @@ std::string xs64(int_fast64_t value);
 #define MAX xx8(0x81)
 #define DEFAULT xx8(0x82)
 
+#define DOOR_OPENING 1
+#define DOOR_CLOSING 0
+#define DOOR_OPENED_STOPPED 2
+#define DOOR_CLOSED_STOPPED 3
+
 #endif
 
 
@@ -197,6 +202,26 @@ float* getDbgPts(int which);
 
 
 int getNextPoint(int current);
+
+extern int8_t doorOpenPercent;
+extern int8_t animateDoor;
+
+#define UNAMEWIN 1;
+#define UNAMELOSE 0;
+
+#define CARDROTCOMPLETE 2
+#define CARDROTNOW 1
+#define CARDROTNONE 0
+
+extern int winner;
+int useTimeToSeedRandomToSetWinner();
+std::string getDayOfWeek();
+std::string getUName();
+std::string retWinner();
+
+extern int cardRotState;
+extern int cardRotPercent;
+extern int cardRotSpeed;
 
 
 #endif //GLOBALS_H

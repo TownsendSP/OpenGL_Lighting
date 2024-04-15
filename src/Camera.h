@@ -13,7 +13,7 @@
 
 
 class Camera {
-private:
+
     std::string *debug_string_add_;
     std::map<int, std::string> *debug_string_add_map_;
 

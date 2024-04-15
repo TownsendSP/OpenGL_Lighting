@@ -30,7 +30,7 @@ float srndi(float min, float max);
 
 
 class Coord {
-private:
+
 public:
     float X, Y, Z;
 

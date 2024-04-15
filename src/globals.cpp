@@ -4,8 +4,10 @@
 
 # include "globals.h"
 
+#include <chrono>
 #include <iostream>
 #include <map>
+#include <random>
 
 #include "LeftVP.h"
 
@@ -118,7 +120,6 @@ std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
 
 std::streambuf::int_type GLStreamOut::sync() {
     std::string parsedBuffer;
-    std::cout << "before parsing: " << buffer << std::endl;
     for (char c : buffer) {
         // std::streambuf::int_type parsedChar = parseControlChars(c);
         if(parseControlChars(reinterpret_cast<std::streambuf::int_type &>(c)))
@@ -267,4 +268,63 @@ std::string xs64(int_fast64_t value) {
 
 #endif
 
+
+int8_t doorOpenPercent = 0;
+
+
+int8_t animateDoor = 3;
+
+
+
+
+
+int winner;
+
+std::string getUName() {
+    const char* username;
+
+#ifdef _WIN32
+    username = std::getenv("USERNAME");
+#else
+    username = std::getenv("USER");
+#endif
+
+    if(username != nullptr) {
+        return username;
+    } else {
+        return "Unable to get username.";
+    }
+}
+
+std::string getDayOfWeek() {
+    std::vector<std::string> daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    auto now = std::chrono::system_clock::now();
+    auto timePoint = std::chrono::system_clock::to_time_t(now);
+    auto tm = *std::localtime(&timePoint);
+
+    return daysOfWeek[tm.tm_wday];
+}
+
+int useTimeToSeedRandomToSetWinner() {
+    std::random_device rd;
+    srand(rd());
+    int winnera = rand() % 2;
+    return winnera;
+}
+
+std::string retWinner() {
+    if(winner) {
+        return(getUName());
+    }
+    else {
+        return(getDayOfWeek());
+    }
+}
+
+
+
+int cardRotState = CARDROTNONE;
+int cardRotPercent = 0; //out of 100, but will be scaled
+int cardRotSpeed = 1;
 

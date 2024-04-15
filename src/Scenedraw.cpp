@@ -13,7 +13,7 @@ extern std::map<int, std::string> debugMap;
 extern Camera cam;
 
 Coord hallBnl = Coord(0, 0, -2);
-Coord halltfr = Coord(10, 3, 2);
+Coord halltfr = Coord(10, 4, 2);
 
 //Coord roomBnl = Coord(halltfr.X, 0, 3*hallBnl.Z);
 Coord roomBnl = Coord(halltfr.X, hallBnl.Y, 3 * hallBnl.Z);
@@ -21,7 +21,7 @@ Coord roomtfr = Coord(2 * halltfr.X, halltfr.Y, 3 * halltfr.Z);
 
 Coord troubleshootingBnl = halltfr * 0.45;
 Coord troubleshootingtfr = halltfr * 0.55;
-Coord lampPos = Coord(5, 2.7, 0);
+Coord lampPos = Coord(roomBnl.X+5, halltfr.Y-0.3, 0);
 
 float t() {
     return pow(1.15, (-1.3 * (cam.pos.dist(lampPos) - 12))) + 1;
@@ -63,6 +63,46 @@ float tableThickness = 0.1;
 float legRadT = 0.1;
 float legRadB = 0.1;
 
+float doorwayHeight = 3;
+float doorwayWidth = 2;
+
+
+
+void drawCardWinner1(int winnernum = 0) {
+    // Set the color to yellow
+
+    cardMat.apply();
+    glColor3f(0, 1.0f, 1.0f);
+    // Draw the flattened dodecahedron
+    glPushMatrix();
+    glScalef(1.0f, 1.0f, 0.01f); // Scale in Y dimension to flatten
+    glutSolidDodecahedron();
+    glPopMatrix();
+
+    // Set the normal in the Y dimension
+    // glNormal3f(0.0f, 1.0f, 0.0f);
+
+
+    lampMat.apply();
+    // Draw stroke text
+    glLineWidth(5);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glPushMatrix();
+    glTranslatef(-1.3f, -0.01f, 0.1f); // Position the text
+    glScalef(0.0045f, 0.0045f, 0.0045f); // Scale the text
+
+    std::string texts = retWinner();
+    const char *text = texts.c_str();
+
+    debugMap[60] = "             winner:" + std::string(texts);
+    debugMap[61] = "             winner:" + std::string(text);
+    while (*text) {
+        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, *text++);
+    }
+    glPopMatrix();
+}
+
+
 
 void makeLeg(float *legInfo) {
     glPushMatrix();
@@ -85,7 +125,8 @@ void drawLeg(Coord legLocBottom, float legInfo[3]) {
 void drawTable(Coord bnl, Coord tfr, float lInset = 0.2, float tThick = 0.1, float legRad = 0.1) {
     //table top
     tableMat.apply();
-    cubeOfPlanes(Coord(bnl.X, tfr.Y - tThick, bnl.Z), tfr, 40, 1, ALL_FACE);
+    cubeOfPlanes(Coord(bnl.X, tfr.Y - tThick, bnl.Z), tfr, 40, -1, ALL_FACE);
+
 
 
     /*     legs, use glutcylinders
@@ -100,19 +141,44 @@ void drawTable(Coord bnl, Coord tfr, float lInset = 0.2, float tThick = 0.1, flo
     // Coord leg1Loc = bnl + Coord(tfr.X-bnl.X - legInset, 0, legInset);
     Coord leg2Loc = tfr- Coord(legInset, tfr.Y, legInset);
     Coord leg3Loc = Coord(bnl.X +legInset, 0, tfr.Z - legInset);
-    Coord legInfo = Coord(legRadT, tfr.Y - tThick - bnl.Y, legRadB);
+    Coord legInfo = Coord(legRadT/4, tfr.Y - tThick - bnl.Y, legRadB/2);
 
     drawLeg(leg0Loc, legInfo);
     drawLeg(leg1Loc, legInfo);
     drawLeg(leg2Loc, legInfo);
     drawLeg(leg3Loc, legInfo);
+}
 
-    tfr.debug(0, 1, 0.75);
-    bnl.debug(1, 1, 0.75);
-    leg0Loc.debug(2);
-leg1Loc.debug(3);
-leg2Loc.debug(4);
-leg3Loc.debug(5);
+void drawContainer(Coord bnl, Coord tfr) {
+    //simple cube, no top
+    glPushMatrix();
+    shinyRed.apply();
+    cubeOfPlanes(bnl, tfr, 20, -1, ALL_FACE ^ TOP_FACE);
+    glPopMatrix();
+}
+
+ void lDoorExist() {
+    //door: simple cube
+    superShinySteel.apply();
+    float animPercent = -2.0f*(doorOpenPercent / 100.0);
+    glPushMatrix();
+    glTranslatef(0, 0, animPercent);
+    cubeOfPlanes(Coord(halltfr.X - 0.4, hallBnl.Y, hallBnl.Z),
+                 Coord(halltfr.X - 0.1, hallBnl.Y + doorwayHeight, 0), 20, 1, ALL_FACE);
+    glPopMatrix();
+}
+
+void rDoorExist() {
+    //just reflect it over the Z, the normals will be "good enough"
+    superShinySteel.apply();
+
+glPushMatrix();
+    glScalef(1, 1, -1);
+    lDoorExist();
+    glPopMatrix();
+
+    //draw container
+
 
 }
 
@@ -142,47 +208,140 @@ void drawLamp() {
     glLineWidth(1);
 }
 
+void lockInCardNormals() {
+    glPushMatrix();
+    glNormal3f(0, 0, 1);
+    drawCardWinner1();
+    glPopMatrix();
+}
+
+void drawCardFinalPos() {
+    glPushMatrix();
+    glRotatef(270, 0, 1, 0);
+    glRotatef(270, 1, 0, 0);
+    lockInCardNormals();
+    glPopMatrix();
+}
+
+void drawWinnerAndRotate() {
+    Coord finalRot = Coord(3*360, 7*360, 90);
+    float dumb = cardRotPercent;
+    float cardRot = dumb/(cardRotSpeed*100);
+    Coord currentRot = finalRot * cardRot;
+    glPushMatrix();
+    glTranslatef(0, 1*cardRot, 0);
+    glRotatef(currentRot.X, 1, 0, 0);
+    glRotatef(currentRot.Y, 0, 1, 0);
+    glRotatef(currentRot.Z, 0, 0, 1);
+    drawCardFinalPos();
+    glPopMatrix();
+}
+
 void drawHall() {
     hallLight.setup();
     glEnable(GL_LIGHTING);
+    hallLight.disable();
+    headLamp.enable();
+
+    //get rid of this later:
+    glPushMatrix();
+    glTranslatefv(lampPos);
+    drawLamp();
+    glPopMatrix();
     hallLight.enable();
+
+    wallMat.apply();
+    //doorframe, but only the back face:
+    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, hallBnl.Z),
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, -1, BACK_FACE);
+
+    //top of doorframe
+    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
+        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, -1, BACK_FACE);
+
+    //Left side of doorframe
+    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, halltfr.Z - doorwayWidth/2),
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, -1, BACK_FACE);
+
+
+
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, -1, BACK_FACE);
+    cubeOfPlanes(hallBnl, halltfr, 40, 1, LEFT_FACE | RIGHT_FACE);
+    floorMat.apply();
+    cubeOfPlanes(hallBnl, halltfr, 40, 1, BOTTOM_FACE);
+    ceilingMat.apply();
+    cubeOfPlanes(hallBnl, halltfr, 40, -1, TOP_FACE);
+
+
+#ifndef FOLDING_REGION_ROOM
+
 
     glPushMatrix();
     glTranslatefv(lampPos);
     drawLamp();
     glPopMatrix();
-
+    hallLight.enable();
 
     wallMat.apply();
     cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, -1, FRONT_FACE | BACK_FACE);
+    matteConcrete.apply();
     cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, -1, FRONT_FACE | BACK_FACE);
+
+    wallMat.apply();
     cubeOfPlanes(roomBnl, roomtfr, 40, -1, LEFT_FACE | RIGHT_FACE);
-
-
     floorMat.apply();
     cubeOfPlanes(roomBnl, roomtfr, 40, -1, BOTTOM_FACE);
     ceilingMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, -1, TOP_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, 1, TOP_FACE);
 
-    //this one does the gap in the back of the room, and the wall at 00
+
+    //doorframe, but not the back face:
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, hallBnl.Z),
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth / 2), 20, -1,
+                 ALL_FACE ^ BACK_FACE);
+
+    //top of doorframe
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
+                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, -1, ALL_FACE ^ BACK_FACE);
+
+    //Left side of doorframe
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, halltfr.Z - doorwayWidth / 2),
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, -1, ALL_FACE ^ BACK_FACE);
+
+
+    //this one does the gap in the back of the room,
     wallMat.apply();
-    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, -1, FRONT_FACE | BACK_FACE);
-
-
-    cubeOfPlanes(hallBnl, halltfr, 40, -1, LEFT_FACE | RIGHT_FACE);
-    floorMat.apply();
-    cubeOfPlanes(hallBnl, halltfr, 40, -1, BOTTOM_FACE);
-    ceilingMat.apply();
-    cubeOfPlanes(hallBnl, halltfr, 40, -1, TOP_FACE);
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, -1, FRONT_FACE);
 
 
     //small box for testing, use the shiny textures
     cardMat.apply();
     cubeOfPlanes(troubleshootingBnl, troubleshootingtfr, 10, 1, ALL_FACE);
 
+    //doors:
+    lDoorExist();
+    rDoorExist();
 
     //drawing the table
     drawTable(tableBnl, tableTfr);
+#endif
+
+    glPushMatrix();
+    glTranslatef(0.1 + tableBnl.X, tableTfr.Y, -0.25 );
+    drawContainer(Coord(0,0,0), Coord(0.5,0.51,0.5));
+
+    glPopMatrix();
+
+    // glDisable(GL_LIGHTING);
+
+    glPushMatrix();
+    glTranslatef(0.2 + tableBnl.X, tableTfr.Y, 0 );
+    glScalef(0.25, 0.25, 0.25);
+    drawWinnerAndRotate();
+    glPopMatrix();
+    
+            // glEnable(GL_LIGHTING);
+
 
     hallLight.disable();
 }

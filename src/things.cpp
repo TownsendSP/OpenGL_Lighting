@@ -304,7 +304,7 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t wh
     if (whichFaces >> 5 & 1) //far +X
     	drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, Coord(-insideOut, 0, 0), numSubDiv);
     if (whichFaces >> 4 & 1) //top +Y
-        drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, Coord(0, insideOut, 0), numSubDiv);
+        drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, Coord(0, -insideOut, 0), numSubDiv);
     if (whichFaces >> 3 & 1) //right +Z
     	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, Coord(0, 0, -insideOut), numSubDiv);
     if (whichFaces >> 2 & 1) //near -X
@@ -316,3 +316,5 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t wh
 
     glPopMatrix();
 }
+
+

@@ -106,6 +106,10 @@ extern Material lampMat;
 extern Material cardMat;
 extern Material castIronMat;
 extern Material tableMat;
+extern Material superShinySteel;
+extern Material matteConcrete;
+extern Material shinyRed;
+
 
 //light Library:
 extern Light hallLight;

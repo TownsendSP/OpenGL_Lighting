@@ -29,8 +29,9 @@ void Light::setup() {
 }
 
 void Light::enable() const {
-    if(enabled)
-    glEnable(whichLight);
+    if(enabled) {
+        glEnable(whichLight);
+    }
 }
 
 void Light::disable() const {
@@ -169,24 +170,42 @@ Material lampMat = Material( //emissive golden color.
 
 Material cardMat = Material(
         // Metallic blue color with high specular
-        ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+        ColorData(1.0f,1.0f,1.0f, 1.0f),
         ColorData(0.05f, 0.05f, 0.1f, 1.0f), // Lower ambient for better shine
         ColorData(0.15f, 0.25f, 0.8f, 1.0f), // Slightly lighter blue (optional)
         1000.0f
         ); // Very high shininess for sharp highlight
 
 Material castIronMat = Material( // nearly black, metallic
-    ColorData(0.3f, 0.3f, 0.3f, 1.0f),
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
     ColorData(0.0f, 0.0f, 0.0f, 1.0f),
-    ColorData(0.0f, 0.0f, 0.0f, 1.0f),
+    ColorData(0.1f, 0.1f, 0.1f, 1.0f),
     100000.0f);
 
 //shiny dark brown texture for table
 Material tableMat = Material(
-    ColorData(Coord(123, 63, 0)/255, 1.0f),
+    ColorData(1.0f, 1.0f, 0.5f, 1.0f),
     ColorData(0.1f,0.1f,0.1f, 1.0f),
     ColorData(Coord(149, 69, 53)/255, 1.0f),
     100.0f);
+
+Material superShinySteel = Material(
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    ColorData(0.1f, 0.1f, 0.1f, 1.0f),
+    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    1000.0f);
+
+Material matteConcrete = Material(
+    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f),
+    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    5.0f);
+
+Material shinyRed = Material(
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
+    ColorData(1.0f, 0.0f, 0.0f, 1.0f), //diffuse
+    1000000.0f); //shininess
 
 
 #endif
@@ -195,10 +214,10 @@ Material tableMat = Material(
 //globally accessible object hallLight;
 Light hallLight = Light(
     Light::LIGHT1,
-    ColorData(Coord(5, 2.5, 0), 1.0), //pos
+    ColorData(Coord(15, 3, 0), 1.0), //pos
     ColorData(1.0f, 0.9f, 0.85f, 1.0f), //amb
     ColorData(1.0f, 0.9f, 0.85f, 1.0f), //diff
-    ColorData(1.0f, 0.9f, 0.85f, 1.0f) //spec
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f) //spec
 );
     // ColorData(0.2f, 0.2f, 0.2f, 1),
     // ColorData(1.0f, 1.0f, 1.0f, 1.0f),
@@ -211,12 +230,12 @@ Light brightWhite = Light(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f),
     ColorData(1.0f, 1.0f, 1.0f, 1.0f));
 
-// Light brightRed = Light(
-//     Light::LIGHT4,
-//     ColorData(Coord(0, 10, 0), 1.0),
-//     ColorData(0.2f, 0.05f, 0.05f, 1),
-//     ColorData(1.0f, 0.2f, 0.2f, 1.0f),
-//     ColorData(1.0f, 0.2f, 0.2f, 1.0f));
+Light brightRed = Light(
+    Light::LIGHT4,
+    ColorData(Coord(0, 10, 0), 1.0),
+    ColorData(0.2f, 0.05f, 0.05f, 1),
+    ColorData(1.0f, 0.2f, 0.2f, 1.0f),
+    ColorData(1.0f, 0.2f, 0.2f, 1.0f));
 //
 // Light brightGreen = Light(
 //     Light::LIGHT5,
