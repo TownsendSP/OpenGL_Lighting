@@ -239,4 +239,16 @@ extern std::map<int, std::string> dbgNormMap;
 
 void glNormal3fvd(float whyAreMyNormalsBroken[3]);
 extern float scrollVar;
+
+
+extern bool selecting;
+extern int xClick;
+extern int yClick;
+extern float globAmb[4];
+
+extern float hallBnlF[3];
+extern float halltfrF[3];
+extern float roomBnlF[3];
+extern float roomtfrF[3];
+extern bool useCollision;
 #endif //GLOBALS_H

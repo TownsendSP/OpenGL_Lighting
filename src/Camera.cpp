@@ -298,3 +298,4 @@ float hexStringToFloat(std::string s) {
     stream >> std::hex >> f;
     return f;
 }
+

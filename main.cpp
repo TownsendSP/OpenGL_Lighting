@@ -53,10 +53,7 @@ float fov = 90.0;
 float animThing = 0;
 //Global Variables
 bool useMouse = false;
-bool selecting = false;
 bool started = false;
-int xClick;
-int yClick;
 
 float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
 float blindAnimSpeed = 0.05;
@@ -112,10 +109,9 @@ auto prevTime = std::chrono::high_resolution_clock::now();
 #ifndef FOLDING_REGION_MATERIALS
 
 //materials and lights
-Light hallwayLight;
 // Spotlight headlamp;
 Light fakeSun;
-ColorData globAmb;
+
 #endif
 
 
@@ -168,9 +164,7 @@ void backToBasicsCalculateTheDirVec(Coord directionVector) {
 
 void drawLitShapes() {
     glEnable(GL_LIGHTING);
-    sunLight.enable();
-
-
+    // sunLight.enable();
     headLamp.enable();
 
     glEnable(GL_LIGHT0);
@@ -298,9 +292,6 @@ void drawWindow() {
     // drawMoreShapes();
 
     headLamp.enable();
-    glEnable(GL_LIGHT4);
-    glEnable(GL_LIGHT5);
-    glEnable(GL_LIGHT6);
 
     drawLitShapes();
 
@@ -330,7 +321,7 @@ void setupLights() {
     float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
     float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
     float lightPos[] = {0.0, 7.0, 0.0, 0.0}; // Position remains the same
-    float globAmb[] = {0.3, 0.3, 0.3, 1.0}; // Cool global ambient light
+    // Cool global ambient light
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
@@ -367,7 +358,6 @@ void setup() {
     //                                ColorData(1.0, 1.0, 1.0, 1.0), cam.tgt, 30.0, 1.0);
 
     //enabling global ambient light:
-    globAmb = {0.3, 0.35, 0.3, 1.0}; // Cool global ambient light
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
 
@@ -429,32 +419,74 @@ void toggleMouse() {
     }
 }
 
+
+void activateDoor() {
+    switch (animateDoor) {
+        case DOOR_CLOSED_STOPPED:
+            glout << "Door Opening" << '\n';
+        animateDoor = DOOR_OPENING;
+        break;
+        case DOOR_OPENED_STOPPED:
+            glout << "Door Closing" << '\n';
+        animateDoor = DOOR_CLOSING;
+        break;
+        case DOOR_OPENING:
+            animateDoor = DOOR_OPENED_STOPPED;
+        glout << "Door Opened" << '\n';
+        break;
+        case DOOR_CLOSING:
+            glout << "Door Closed" << '\n';
+        animateDoor = DOOR_CLOSED_STOPPED;
+        break;
+        default:
+            break;
+    }
+}
+
 bool useCaps = false;
+
+
+void hallLightAction() {
+    std::string hallLightState;
+    hallLight.lightswitch();
+    hallLightState = hallLight.enabled ? "On" : "Off";
+    glout << "Hallway Light switched " << hallLightState << std::endl;
+}
 
 void keyboard(unsigned char key, int x, int y) {
     modifiers = glutGetModifiers();
+    std::string hallLightState;
 
     switch (key) {
-        case 'w': //CAMERA FORWARD
+        case 'W': //CAMERA FORWARD
             cam.relTrans(Coord(1 * speed, 0, 0));
             break;
-        case 's': //CAMERA BACKWARD
+        case 'S': //CAMERA BACKWARD
             cam.relTrans(Coord(-1 * speed, 0, 0));
             break;
-        case 'a': //CAMERA LEFT
+        case 'A': //CAMERA LEFT
             cam.relTrans(Coord(0, 0, -1 * speed));
             break;
-        case 'd': //CAMERA RIGHT
-            cam.relTrans(Coord(0, 0, 1 * speed));
+        case 'D': //CAMERA RIGHT
+            if(modifiers&GLUT_ACTIVE_ALT){
+                hallLightAction();
+            } else {
+                cam.relTrans(Coord(0, 0, 1 * speed));
+            }
             break;
-        case 'c': //CAMERA DOWN
+        case 'C': //CAMERA DOWN
             cam.relTrans(Coord(0, -1 * speed, 0));
             break;
-        case 'f': //CAMERA UP
+        case 'F': //CAMERA UP
             cam.relTrans(Coord(0, 1 * speed, 0));
             break;
-        case 'r': //reset all but the camera
-            glout << MAX;
+        case 'd': //reset all but the camera
+            if(modifiers&GLUT_ACTIVE_ALT) {
+                activateDoor();
+            } else{
+                hallLightAction();
+                activateDoor();
+            }
             break;
         case 'R': //reset all
             glout << DEFAULT;
@@ -545,6 +577,21 @@ void keyboard(unsigned char key, int x, int y) {
                 glout << "NormalColorization: " << dbgNormMap[dbgNormals] << '\n';
             }
             break;
+        case 'G':
+            globAmb[0] = clmp(globAmb[0] + 0.01, 0.0, 1.0);
+            globAmb[1] = clmp(globAmb[1] + 0.01, 0.0, 1.0);
+            globAmb[2] = clmp(globAmb[2] + 0.01, 0.0, 1.0);
+        glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
+        break;
+        case 'g':
+            globAmb[0] = clmp(globAmb[0] -0.01, 0.0, 1.0);
+            globAmb[1] = clmp(globAmb[1] -0.01, 0.0, 1.0);
+            globAmb[2] = clmp(globAmb[2] -0.01, 0.0, 1.0);
+        glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
+
+
+
+            break;
         case '?': //print keybinds:
             showKeybindings();
             break;
@@ -574,6 +621,8 @@ void testCharacterPrinting() {
 
 
 Coord angle = Coord(0, 0.0872665, 0); //5 degrees
+
+
 
 
 void specialKeyboard(int key, int x, int y) {
@@ -615,26 +664,7 @@ void specialKeyboard(int key, int x, int y) {
             break;
 
         case GLUT_KEY_F6:
-            switch (animateDoor) {
-                case DOOR_CLOSED_STOPPED:
-                    glout << "Door Opening" << '\n';
-                    animateDoor = DOOR_OPENING;
-                    break;
-                case DOOR_OPENED_STOPPED:
-                    glout << "Door Closing" << '\n';
-                    animateDoor = DOOR_CLOSING;
-                    break;
-                case DOOR_OPENING:
-                    animateDoor = DOOR_OPENED_STOPPED;
-                    glout << "Door Opened" << '\n';
-                    break;
-                case DOOR_CLOSING:
-                    glout << "Door Closed" << '\n';
-                    animateDoor = DOOR_CLOSED_STOPPED;
-                    break;
-                default:
-                    break;
-            }
+            activateDoor();
             break;
         case GLUT_KEY_F7:
             //if shift

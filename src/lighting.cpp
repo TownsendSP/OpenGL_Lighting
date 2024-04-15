@@ -168,33 +168,38 @@ Material lampMat = Material( //emissive golden color.
     ColorData(1.0f, 0.9f, 0.3f, 1.0f),
     5.0f);
 
+Material buttonMat = Material( //emissive bluish color
+    ColorData(0.3f, 0.9f, 0.9f, 1.0f),
+    ColorData(0.1f, 0.2f, 0.3f, 1.0f),
+    ColorData(0.0f, 0.3f, 1.0f, 1.0f),
+    ColorData(0.0f, 0.3f, 0.8f, 1.0f),
+    5.0f);
+
 Material cardMat = Material(
-        // Metallic blue color with high specular
-        ColorData(1.0f,1.0f,1.0f, 1.0f),
+       ColorData(1.0f,1.0f,1.0f, 1.0f),
         ColorData(0.05f, 0.05f, 0.1f, 1.0f), // Lower ambient for better shine
         ColorData(0.15f, 0.25f, 0.8f, 1.0f), // Slightly lighter blue (optional)
-        1000.0f
-        ); // Very high shininess for sharp highlight
+        10.0f); // Very high shininess for sharp highlight
 
 Material castIronMat = Material( // nearly black, metallic
     ColorData(1.0f, 1.0f, 1.0f, 1.0f),
     ColorData(0.0f, 0.0f, 0.0f, 1.0f),
     ColorData(0.1f, 0.1f, 0.1f, 1.0f),
-    100000.0f);
+    10.0f);
 
 //shiny dark brown texture for table
 Material tableMat = Material(
     ColorData(1.0f, 1.0f, 0.5f, 1.0f),
     ColorData(0.1f,0.1f,0.1f, 1.0f),
     ColorData(Coord(149, 69, 53)/255, 1.0f),
-    100.0f);
+    10.0f);
 
 Material superShinySteel = Material(
-    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    ColorData(0.8f, 1.0f, 1.0f, 1.0f),
     // ColorData(scrollVar, scrollVar, scrollvar, 1.0f),
     ColorData(0.1f, 0.1f, 0.1f, 1.0f),
     ColorData(scrollVar, scrollVar, scrollVar, 1.0f),
-    1000.0f);
+    10.0f);
 
 Material matteConcrete = Material(
     ColorData(0.8f, 0.8f, 0.8f, 1.0f),
@@ -203,22 +208,22 @@ Material matteConcrete = Material(
     5.0f);
 
 Material shinyRed = Material(
-    ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    ColorData(0.9f, 0.5f, 0.5f, 1.0f), //specular
     ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
     ColorData(1.0f, 0.0f, 0.0f, 1.0f), //diffuse
-    1000000.0f); //shininess
+    10.0f); //shininess
 
 Material shinyGreen = Material(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
     ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
     ColorData(0.0f, 1.0f, 0.0f, 1.0f), //diffuse
-    1000000.0f); //shininess
+    100.0f); //shininess
 
 Material shinyBlue = Material(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
     ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
     ColorData(0.0f, 0.0f, 1.0f, 1.0f), //diffuse
-    1000000.0f); //shininess
+    10.0f); //shininess
 
 
 #endif

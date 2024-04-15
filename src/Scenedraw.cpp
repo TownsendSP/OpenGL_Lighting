@@ -8,7 +8,8 @@
 #include "globals.h"
 #include "things.h"
 #include "lighting.h"
-#include "camera.h"
+#include "Camera.h"
+
 
 extern std::map<int, std::string> debugMap;
 extern Camera cam;
@@ -19,6 +20,23 @@ Coord halltfr = Coord(10, 4, 2);
 //Coord roomBnl = Coord(halltfr.X, 0, 3*hallBnl.Z);
 Coord roomBnl = Coord(halltfr.X, hallBnl.Y, 3 * hallBnl.Z);
 Coord roomtfr = Coord(2 * halltfr.X, halltfr.Y, 3 * halltfr.Z);
+
+
+bool roomCollides(Coord loc) {
+    return !((loc.X < roomBnl.X || loc.X > roomtfr.X)
+        && (loc.Y < roomBnl.Y || loc.Y > roomtfr.Y)
+        && (loc.Z < roomBnl.Z || loc.Z > roomtfr.Z));
+
+}
+bool hallCollides(Coord loc) {
+    return !(((loc.X < hallBnl.X || loc.X > halltfr.X)|| doorOpenPercent > 90)
+        && (loc.Y < hallBnl.Y || loc.Y > halltfr.Y)
+        && (loc.Z < hallBnl.Z || loc.Z > halltfr.Z));
+}
+
+
+
+
 
 Coord troubleshootingBnl = halltfr * 0.45;
 Coord troubleshootingtfr = halltfr * 0.55;

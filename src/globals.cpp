@@ -394,5 +394,17 @@ void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
     }
 }
 
+bool selecting = false;
+int xClick;
+int yClick;
 
+float globAmb[4] = {0.2, 0.2, 0.2, 1.0};
+
+float hallBnlF[3] = {0, 0, -2};
+float halltfrF[3] = {10, 4, 2};
+
+//Coord roomBnl = Coord(halltfr.X, 0, 3*hallBnl.Z);
+float roomBnlF[3] = {halltfrF[0], hallBnlF[1], 3 * hallBnlF[2]};
+float roomtfrF[3] = {2 * halltfrF[0], halltfrF[1], 3 * halltfrF[2]};
+bool useCollision;
 float scrollVar = 0.0; //used to bind to random stuff for testing
