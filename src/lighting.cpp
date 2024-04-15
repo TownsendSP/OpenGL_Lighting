@@ -176,7 +176,7 @@ Material buttonMat = Material( //emissive bluish color
     5.0f);
 
 Material cardMat = Material(
-       ColorData(1.0f,1.0f,1.0f, 1.0f),
+       ColorData(0.3f,0.3f,0.3f, 1.0f),
         ColorData(0.05f, 0.05f, 0.1f, 1.0f), // Lower ambient for better shine
         ColorData(0.15f, 0.25f, 0.8f, 1.0f), // Slightly lighter blue (optional)
         10.0f); // Very high shininess for sharp highlight
@@ -198,7 +198,7 @@ Material superShinySteel = Material(
     ColorData(0.8f, 1.0f, 1.0f, 1.0f),
     // ColorData(scrollVar, scrollVar, scrollvar, 1.0f),
     ColorData(0.1f, 0.1f, 0.1f, 1.0f),
-    ColorData(scrollVar, scrollVar, scrollVar, 1.0f),
+    ColorData(0.2f,0.2f,0.2f, 1.0f),
     10.0f);
 
 Material matteConcrete = Material(
@@ -220,7 +220,7 @@ Material shinyGreen = Material(
     100.0f); //shininess
 
 Material shinyBlue = Material(
-    ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    ColorData(0.4f, 0.4f, 1.0f, 1.0f), //specular
     ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
     ColorData(0.0f, 0.0f, 1.0f, 1.0f), //diffuse
     10.0f); //shininess
@@ -229,9 +229,17 @@ Material shinyBlue = Material(
 #endif
 
 
-//globally accessible object hallLight;
-Light hallLight = Light(
+//globally accessible object roomLight;
+Light roomLight = Light(
     Light::LIGHT1,
+    ColorData(Coord(15, 3, 0), 1.0), //pos
+    ColorData(1.0f, 0.9f, 0.85f, 1.0f), //amb
+    ColorData(1.0f, 0.9f, 0.85f, 1.0f), //diff
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f) //spec
+);
+
+Light hallLight = Light(
+    Light::LIGHT5,
     ColorData(Coord(15, 3, 0), 1.0), //pos
     ColorData(1.0f, 0.9f, 0.85f, 1.0f), //amb
     ColorData(1.0f, 0.9f, 0.85f, 1.0f), //diff

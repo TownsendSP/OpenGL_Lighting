@@ -114,6 +114,7 @@ extern Material shinyBlue;
 
 
 //light Library:
+extern Light roomLight;
 extern Light hallLight;
 extern Light sunLight;
 extern Spotlight headLamp;

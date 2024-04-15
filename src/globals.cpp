@@ -9,7 +9,6 @@
 #include <map>
 #include <random>
 
-#include "LeftVP.h"
 
 // #define NOPREFIX 0x03
 // #define PREFIX 0x05
@@ -188,8 +187,12 @@ std::ostream glInfoOut(&glStatus);
 std::vector<thingHolder> staticPoints;
 
 void addDbgPt(int idx, float xyz[3], float size, float weight) {
+    return;
+    // I think this may be causing the memory leak, happening @ ~2MB/s.
+    //This is the only thing i can think of that's actually creating data every frame,
+    //I was careful to destroy or overwrite all other data logging
     staticPoints.insert(staticPoints.begin() + idx, thingHolder(xyz[0], xyz[1], xyz[2], size, weight));
-    // staticPoints.emplace_back(xyz[0], xyz[1], xyz[2], size, weight);
+
 }
 
 std::vector<thingHolder> getDbgPts() {
@@ -323,11 +326,7 @@ std::string retWinner() {
     }
 }
 
-#define DBG_NORM_OFF 0
-#define ABS_NORM 1
-#define RAW_NORM 2
-#define POS_NORM 3
-#define NEG_NORM 4
+
 
 //mapping the state to strings for printing
 
@@ -348,12 +347,13 @@ int nextDbgState() {
     }
 }
 
-int cardRotState = CARDROTNONE;
+int cardRotState = CARD_ROT_NONE;
 int cardRotPercent = 0; //out of 100, but will be scaled
 int cardRotSpeed = 1;
 int dbgNormals = 0;
 uint8_t enabledFaces = 0b00111111;
 
+// this is what enables the normals visualization
 void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
     GLfloat normToColors[3];
     float debugWhyAreMyNormalsBroken[3]  = {whyAreMyNormalsBroken[0], whyAreMyNormalsBroken[1], whyAreMyNormalsBroken[2]};
@@ -394,6 +394,7 @@ void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
     }
 }
 
+
 bool selecting = false;
 int xClick;
 int yClick;
@@ -403,8 +404,17 @@ float globAmb[4] = {0.2, 0.2, 0.2, 1.0};
 float hallBnlF[3] = {0, 0, -2};
 float halltfrF[3] = {10, 4, 2};
 
-//Coord roomBnl = Coord(halltfr.X, 0, 3*hallBnl.Z);
-float roomBnlF[3] = {halltfrF[0], hallBnlF[1], 3 * hallBnlF[2]};
-float roomtfrF[3] = {2 * halltfrF[0], halltfrF[1], 3 * halltfrF[2]};
-bool useCollision;
-float scrollVar = 0.0; //used to bind to random stuff for testing
+//Coord roomBnl = Coord(halltfrF[0], 0, 3*hallBnlF[2]);
+float roomBnlF[3] = {10, 0, -6};
+float roomtfrF[3] = {20, 4, 6};
+bool useCollision = true;
+float moveSpeed = 0.5f;
+float cardDist;
+
+
+
+
+
+
+
+

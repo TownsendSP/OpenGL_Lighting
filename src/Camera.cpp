@@ -17,6 +17,8 @@
 #include <iostream>
 #include <string>
 
+#include "testingFunctions.h"
+
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -133,48 +135,6 @@ int Camera::loadFromFile(const std::string& filename) {
     return 0;
 }
 
-//int Camera::loadFromFile(const std::string& filename) {
-//    // Open the file using the filename
-//    std::ifstream file(filename);
-//
-//    if (!file.is_open()) {
-//        std::cout << "Error: File is not open" << std::endl;
-//        return -1;
-//    }
-//
-//    std::string line;
-//    int i = 0;
-//
-//    // for each line in the file, split on commas; the first
-//    std::vector<float> f;
-//    // load line 0 into a string and print it:
-//    std::cout << "Loading camera from file: " << filename << std::endl;
-//    std::getline(file, line);
-//
-//
-//
-//
-//
-//
-//
-//    std::cout << "First line: " << line << std::endl;
-//    while (i < 5 && std::getline(file, line)) {
-//        f = sToF(line, ',');
-//        storedStates[i] = std::make_tuple(
-//            Coord(f[0], f[1], f[2]),
-//            Coord(f[3], f[4], f[5]));
-//        std::cout << "i: " << line << " loaded as \n\t" << f[0] << ", " << f[1] << ", " << f[2] << ", " << f[3] << ", "
-//                << f[4] << ", " << f[5] << std::endl;
-//        i++;
-//    }
-//
-//    if (file.fail() && !file.eof()) {
-//        std::cerr << "Error: Failed to load camera" << std::endl;
-//        return -2;
-//    }
-//    file.close();
-//    return 0;
-//}
 
 void Camera::setPitchYaw() {
     Coord dirVec = (tgt - pos);
@@ -196,28 +156,135 @@ Coord calcTarget(Coord position, Coord pitchYaw) {
     return position + Coord(dirX, dirY, dirZ);
 }
 
-// void Camera::relTrans(Coord deltaTranslation) {
-//     //calculate the current direction vector
-//     Coord transVec = Coord(cos(ang.Y) * cos(ang.X), sin(ang.X), sin(ang.Y) * cos(ang.X)) * deltaTranslation;
-//     pos = pos + transVec;
-//     tgt = tgt + transVec;
-// }
 
-// void Camera::relTrans(Coord deltaTranslation) {
-//     float cosPitch = cos(ang.X);
-//     float sinPitch = sin(ang.X);
-//     float cosYaw = cos(ang.Y);
-//     float sinYaw = sin(ang.Y);
-//
-//     Coord transVec;
-//     transVec.X = deltaTranslation.X * cosYaw - deltaTranslation.Z * sinYaw;
-//     transVec.Y = deltaTranslation.X * sinPitch * sinYaw + deltaTranslation.Y * cosPitch + deltaTranslation.Z * sinPitch * cosYaw;
-//     transVec.Z = deltaTranslation.X * cosPitch * sinYaw - deltaTranslation.Y * sinPitch + deltaTranslation.Z * cosPitch * cosYaw;
-//
-//
-//     pos = pos + transVec;
-//     tgt = tgt + transVec;
-// }
+
+Coord roomBottomNearLeft = Coord(roomBnlF);
+Coord roomTopFarRight = Coord(roomtfrF);
+Coord hallBottomNearLeft = Coord(hallBnlF);
+Coord hallTopFarRight = Coord(halltfrF);
+//collision:
+
+//XZ Collision:
+
+
+
+
+
+int Camera::whichSpace(Coord posi) {
+    if (posi.X > roomBottomNearLeft.X+moveSpeed/2 && posi.X < roomTopFarRight.X &&
+        posi.Y > roomBottomNearLeft.Y && posi.Y < roomTopFarRight.Y &&
+        posi.Z > roomBottomNearLeft.Z && posi.Z < roomTopFarRight.Z) {
+
+        whichPlace = IN_ROOM;
+    }
+    if (posi.X > hallBottomNearLeft.X && posi.X < hallTopFarRight.X-moveSpeed/2 &&
+        posi.Y > hallBottomNearLeft.Y && posi.Y < hallTopFarRight.Y &&
+        posi.Z > hallBottomNearLeft.Z && posi.Z < hallTopFarRight.Z) {
+        whichPlace = IN_HALL;
+    }
+    std::string place = whichPlace == IN_ROOM ? "Room" : "Hall";
+    debugMap[60-21] = "Location: " + place;
+    return whichPlace;
+}
+
+int Camera::collisionYZ(Coord pos) {
+
+    float roomTfrfH[3] = {roomTopFarRight.X, roomTopFarRight.Y, roomTopFarRight.Z};
+    float roomBnlfH[3] = {roomBottomNearLeft.X, roomBottomNearLeft.Y, roomBottomNearLeft.Z};
+    float hallTfrfH[3] = {hallTopFarRight.X, hallTopFarRight.Y, hallTopFarRight.Z};
+    float hallBnlfH[3] = {hallBottomNearLeft.X, hallBottomNearLeft.Y, hallBottomNearLeft.Z};
+    //min X check for hall:
+    int coll = whichSpace(pos); //1 means in hall
+    if (pos.X < hallBottomNearLeft.X) {
+        debugMap[60-22] = "Near YZ collision";
+        // glout << "Near YZ collision" << std::endl;
+        return COLL_NEAR_YZ;
+    }
+    float  rttfr= roomTopFarRight.X;
+    double rtfrExtend = rttfr;
+    bool doorWalkthrough = pos.X >= hallTopFarRight.X-moveSpeed/2;
+    bool doorOpen = doorOpenPercent < 90;
+    bool inHall = coll == IN_HALL;
+    bool inRm = coll == IN_ROOM;
+    bool leftXRoom = pos.X < roomBottomNearLeft.X;
+    bool inHallByZ = hallTopFarRight.Z > pos.Z > hallBottomNearLeft.Z;
+
+    if ((inHall && doorWalkthrough && doorOpen) ||
+        (inRm && doorOpen && (leftXRoom && inHallByZ) )) {
+        debugMap[60-22] = "Door collision";
+
+            return COLL_DOOR;
+    }
+    bool throughFarWall = pos.X > rttfr;
+
+    if (throughFarWall) {
+
+        debugMap[60-22] = "Far YZ collision";
+        return COLL_FAR_YZ;
+    }
+
+    debugMap[60-22] = "No YZ collision";
+    return COLL_NONE_YZ;
+}
+
+int Camera::collisionYX(Coord pos) {
+    if (whichPlace == IN_HALL){
+        if(hallTopFarRight.Z < pos.Z) {
+
+            debugMap[60-23] = "Hall Right YX collision";
+            return COLL_HALL_RYX;
+        }
+        if(hallBottomNearLeft.Z > pos.Z) {
+
+            debugMap[60-23] = "Hall Left YX collision";
+            return COLL_HALL_LYX;
+        }
+    }if(whichPlace == IN_ROOM){
+
+        if(roomTopFarRight.Z < pos.Z) {
+
+            debugMap[60-23] = "Room Right YX collision";
+            return COLL_ROOM_RYX;
+        }
+        if(roomBottomNearLeft.Z > pos.Z) {
+
+            debugMap[60-23] = "Room Left YX collision";
+            return COLL_ROOM_LYX;
+        }
+    }
+    debugMap[60-23] = "No YX collision";
+    return COLL_NONE_YX;
+}
+
+int Camera::collisionXZ(Coord pos) {
+    if (pos.Y > roomTopFarRight.Y) {
+        debugMap[60-24] = "Up XZ collision";
+        return COLL_UP_XZ;
+    }
+    if (pos.Y < roomBottomNearLeft.Y) {
+        debugMap[60-24] = "Down XZ collision";
+        return COLL_DOWN_XZ;
+    }
+    debugMap[60-24] = "No XZ collision";
+    return COLL_NONE_XZ;
+}
+
+
+void Camera::getRelTrans(Coord deltaTranslation) {
+    float cosYaw = cos(ang.Y);
+    float sinYaw = sin(ang.Y);
+
+    Coord transVec;
+    transVec.X = deltaTranslation.X * cosYaw - deltaTranslation.Z * sinYaw;
+    transVec.Y = deltaTranslation.Y;
+    transVec.Z = deltaTranslation.X * sinYaw + deltaTranslation.Z * cosYaw;
+
+    pos = pos + transVec;
+    tgt = tgt + transVec;
+}
+
+
+
 
 
 void Camera::relTrans(Coord deltaTranslation) {
@@ -254,6 +321,42 @@ void Camera::relRot(Coord deltaAngle) {
     tgt = pos + dirVec;
     dirVecPublicUsage = dirVec;
 }
+
+void Camera::updateCardInfo() {
+    cardDist =pos.dist(Coord(18.6000004, 1.84333336, 0.25));
+    debugMap[60-25] = "Card Distance: " + std::to_string(cardDist);
+}
+
+void Camera::moveCamWithColl(Coord deltaTranslation) {
+    float cosYaw = cos(ang.Y);
+    float sinYaw = sin(ang.Y);
+
+    Coord transVec;
+    transVec.X = deltaTranslation.X * cosYaw - deltaTranslation.Z * sinYaw;
+    transVec.Y = deltaTranslation.Y;
+    transVec.Z = deltaTranslation.X * sinYaw + deltaTranslation.Z * cosYaw;
+    Coord a = pos + transVec;
+    if(useCollision) {
+        int cYZ = collisionYZ(a);
+        int cYX = collisionYX(a);
+        int CXZ = collisionXZ(a);
+
+        if( cYZ != COLL_NONE_YZ){
+            transVec.X = 0;
+        } if( cYX != COLL_NONE_YX){
+            transVec.Z = 0;
+        } if( CXZ != COLL_NONE_XZ){
+            transVec.Y = 0;
+        }
+    }
+    pos = pos + transVec;
+    tgt = tgt + transVec;
+    // check distance to card:
+
+    updateCardInfo();
+}
+
+
 
 void Camera::lookAt(DebugLevel dbg) {
     gluLookAt(pos.X, pos.Y, pos.Z, tgt.X, tgt.Y, tgt.Z, up.X, up.Y, up.Z);

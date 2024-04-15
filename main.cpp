@@ -55,7 +55,8 @@ float animThing = 0;
 bool useMouse = false;
 bool started = false;
 
-float speed = 0.5f, sensitivity = 0.01f; // camera movement and mouse sensitivity
+
+float sensitivity = 0.01f; // camera movement and mouse sensitivity
 float blindAnimSpeed = 0.05;
 bool showInfoViewport = true;
 bool drawDebugPoints = false;
@@ -151,10 +152,17 @@ void setupRight() {
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
+    if(cardRotState ==  CARD_ROT_REL) {
+        cardRotPercent = std::clamp((100.0f-((cardDist - 2.0f) / 8.0f * 100.0f)) * cardRotSpeed, 0.0f, 100.0f);
 
+        //cardRotPercent = std::clamp(cardRotSpeed * ((cardDist + 1.0f) / 8.0f) * 100.0f, 0.0f, 100.0f);
+
+        //rdRotPercent = (std::clamp((((cardDist+1)9)*100.0f), 0.0f, 100.0f));
+    }
     updateSpotlight();
 
     cam.lookAt();
+    drawHiddenBuffer();
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 }
 
@@ -286,6 +294,10 @@ void drawWindow() {
         }
         drawLeft();
     }
+    if(selecting) {
+        drawHiddenBuffer();
+
+    }
     setupRight();
 
     drawUnlitShapes();
@@ -300,11 +312,11 @@ void drawWindow() {
 }
 
 void setupObjects() {
-    cam = Camera(Coord(0, 10, 0), Coord(-1, 10, 0), Coord(0, 1, 0));
+    cam = Camera(Coord(1, 2, 0), Coord(2, 2, 0), Coord(0, 1, 0));
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
     windowBlinds = Blinds(1, 2, 0.1, 30);
 
-    // hallLight = Light(
+    // roomLight = Light(
 
     headLamp.enable();
 
@@ -342,6 +354,13 @@ void setupLights() {
 
 void setup() {
     winner = useTimeToSeedRandomToSetWinner();
+    roomBnlF[0] = 2 * hallBnlF[0];
+    roomBnlF[1] = hallBnlF[1];
+    roomBnlF[2] = 3.0f * hallBnlF[2];
+
+    roomtfrF[0] = 2 * halltfrF[0];
+    roomtfrF[1] = halltfrF[1];
+    roomtfrF[2] = 3 * halltfrF[2];
     // Light property vectors.
 
 
@@ -409,7 +428,6 @@ void mouse(int x, int y) {
     glutPostRedisplay();
 }
 
-
 void toggleMouse() {
     useMouse = !useMouse;
     if (useMouse) {
@@ -448,9 +466,10 @@ bool useCaps = false;
 
 void hallLightAction() {
     std::string hallLightState;
+    roomLight.lightswitch();
     hallLight.lightswitch();
-    hallLightState = hallLight.enabled ? "On" : "Off";
-    glout << "Hallway Light switched " << hallLightState << std::endl;
+    hallLightState = roomLight.enabled ? "On" : "Off";
+    glout << "Room Light switched " << hallLightState << std::endl;
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -459,26 +478,26 @@ void keyboard(unsigned char key, int x, int y) {
 
     switch (key) {
         case 'W': //CAMERA FORWARD
-            cam.relTrans(Coord(1 * speed, 0, 0));
+            cam.moveCamWithColl(Coord(1 * moveSpeed, 0, 0));
             break;
         case 'S': //CAMERA BACKWARD
-            cam.relTrans(Coord(-1 * speed, 0, 0));
+            cam.moveCamWithColl(Coord(-1 * moveSpeed, 0, 0));
             break;
         case 'A': //CAMERA LEFT
-            cam.relTrans(Coord(0, 0, -1 * speed));
+            cam.moveCamWithColl(Coord(0, 0, -1 * moveSpeed));
             break;
         case 'D': //CAMERA RIGHT
             if(modifiers&GLUT_ACTIVE_ALT){
                 hallLightAction();
             } else {
-                cam.relTrans(Coord(0, 0, 1 * speed));
+                cam.moveCamWithColl(Coord(0, 0, 1 * moveSpeed));
             }
             break;
         case 'C': //CAMERA DOWN
-            cam.relTrans(Coord(0, -1 * speed, 0));
+            cam.moveCamWithColl(Coord(0, -1 * moveSpeed, 0));
             break;
         case 'F': //CAMERA UP
-            cam.relTrans(Coord(0, 1 * speed, 0));
+            cam.moveCamWithColl(Coord(0, 1 * moveSpeed, 0));
             break;
         case 'd': //reset all but the camera
             if(modifiers&GLUT_ACTIVE_ALT) {
@@ -494,8 +513,14 @@ void keyboard(unsigned char key, int x, int y) {
 
             break;
         case ' ': //Toggle Mouse control of Camera
+            if(modifiers&GLUT_ACTIVE_SHIFT) {
+                useCollision = !useCollision;
+                glout << "Collision: " << (useCollision ? "Enabled" : "Disabled") << '\n';
+
+            } else {
             toggleMouse();
-            glout << "Mouse Control: " << (useMouse ? "Enabled" : "Disabled; Use ← →  and PG↑↓") << '\n';
+            glout << "Mouse Control: " << (useMouse ? "On" : "Off; Use <->  and PGUP/DN") << '\n';
+        }
             break;
 
         case '1':
@@ -635,7 +660,6 @@ void specialKeyboard(int key, int x, int y) {
         case GLUT_KEY_F1:
             showInfoViewport = !showInfoViewport;
             resize(totalWidth, height);
-
             break;
         case GLUT_KEY_F2:
             conHeightPercent = clmp(conHeightPercent - 0.02, 0.0, 0.52);
@@ -678,25 +702,26 @@ void specialKeyboard(int key, int x, int y) {
                 winner = useTimeToSeedRandomToSetWinner();
                 glout << "Win-Rand: " << retWinner() << "\n";;
             }
-
             break;
-        case GLUT_KEY_F8:
-            if (cardRotState == CARDROTNONE) {
-                cardRotState = CARDROTNOW;
-            } else {
-                cardRotState = CARDROTNONE;
-                cardRotPercent = 0;
-                glout << "CardReset" << std::endl;
-            }
 
+        case GLUT_KEY_F8:
+            if(modifiers & GLUT_ACTIVE_ALT) {
+                cardRotState = cardRotState== CARD_ROT_REL ? CARD_ROT_UNDO : CARD_ROT_REL;
+                glout << "Interactive Card: " << (cardRotState == CARD_ROT_REL ? "Enabled" : "Disabled") << '\n';
+            } else {
+                if (cardRotState == CARD_ROT_NONE) {
+                    cardRotState = CARD_ROT_NOW;
+                } else if (cardRotState == CARD_ROT_NOW || CARD_ROT_COMPLETE){
+                    cardRotState = CARD_ROT_UNDO;
+                    glout << "CardUndo" << std::endl;
+                }
+            }
             break;
         case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
             cam.saveToFile(cameraSaveFile);
-
             glout << "Camera states saved to " << cameraSaveFile << '\n';
             break;
-
 
         case GLUT_KEY_F12: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
@@ -742,6 +767,11 @@ void specialKeyboard(int key, int x, int y) {
 }
 #endif
 
+float cardDistFun() {
+    cardDist = cam.pos.dist(Coord(18.6000004, 1.84333336, 0.25));
+    return cardDist;
+}
+
 void doorAnimate() {
     if (animateDoor == DOOR_OPENING) {
         doorOpenPercent += 1;
@@ -759,12 +789,19 @@ void doorAnimate() {
 }
 
 void cardAnimate() {
-    if (cardRotState == CARDROTNOW) {
+    if (cardRotState == CARD_ROT_NOW) {
         // cardRotState++;
         cardRotPercent++;
         if (cardRotPercent >= 100 * cardRotSpeed) {
-            cardRotState = CARDROTCOMPLETE;
-            glout << "Card Done!" << std::endl;
+            cardRotState = CARD_ROT_COMPLETE;
+            // glout << "Card Done!" << std::endl;
+        }
+    } else if (cardRotState == CARD_ROT_UNDO) {
+        cardRotPercent--;
+        if (cardRotPercent <= 0) {
+            cardRotState = CARD_ROT_NONE;
+            winner = useTimeToSeedRandomToSetWinner();
+            // glout << "Card Done!" << std::endl;
         }
     }
 }
@@ -774,25 +811,23 @@ void animate(int value) {
     debugMap[60 - 5] = "MysteryValue: " + std::to_string(value);
 
     doorAnimate();
-    if (cardRotState == CARDROTNOW) {
+    if (cardRotState == CARD_ROT_NOW || CARD_ROT_UNDO) {
         cardAnimate();
     }
 
 
-    debugMap[60-4] = "ScrollVar: " + std::to_string(scrollVar);
+
     glutTimerFunc(5, animate, 1);
     glutPostRedisplay();
 }
 
 void mouseControl(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        xClick = x;
-        yClick = y;
+    if (state == GLUT_DOWN && button == GLUT_LEFT) {
         selecting = true;
-    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-        selecting = false;
+        xClick = x;
+        yClick = height - y; //for screen vs mouse coordinates
+        glutPostRedisplay();
     }
-    glutPostRedisplay();
 }
 
 int main(int argc, char **argv) {
@@ -819,3 +854,5 @@ int main(int argc, char **argv) {
     glutMainLoop();
     return 0;
 }
+
+

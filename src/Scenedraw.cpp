@@ -14,8 +14,8 @@
 extern std::map<int, std::string> debugMap;
 extern Camera cam;
 
-Coord hallBnl = Coord(0, 0, -2);
-Coord halltfr = Coord(10, 4, 2);
+Coord hallBnl = Coord(hallBnlF);
+Coord halltfr = Coord(halltfrF);
 
 //Coord roomBnl = Coord(halltfr.X, 0, 3*hallBnl.Z);
 Coord roomBnl = Coord(halltfr.X, hallBnl.Y, 3 * hallBnl.Z);
@@ -256,9 +256,24 @@ void drawWinnerAndRotate() {
 }
 
 void drawHall() {
-    hallLight.setup();
+
+    ColorData lightOG[3] = {
+        hallLight.lightAmb,
+        hallLight.lightDiff,
+        hallLight.lightSpec
+    };
     glEnable(GL_LIGHTING);
-    hallLight.disable();
+    hallLight.lightAmb = roomLight.lightAmb * doorOpenPercent / 110;
+    hallLight.lightDiff = roomLight.lightDiff * doorOpenPercent / 110;
+    hallLight.lightSpec = roomLight.lightSpec * doorOpenPercent / 110;
+    hallLight.setup();
+    hallLight.enable();
+    hallLight.lightAmb = lightOG[0];
+    hallLight.lightDiff = lightOG[1];
+    hallLight.lightSpec = lightOG[2];
+
+
+
     headLamp.enable();
 
     //get rid of this later:
@@ -266,7 +281,7 @@ void drawHall() {
     // glTranslatefv(lampPos);
     // drawLamp();
     // glPopMatrix();
-    // hallLight.enable();
+    // roomLight.enable();
     int siding = OUTSIDEOUT;
 
     wallMat.apply();
@@ -293,12 +308,13 @@ void drawHall() {
 
 #ifndef FOLDING_REGION_ROOM
 
-
+    hallLight.disable();
     glPushMatrix();
     glTranslatefv(lampPos);
     drawLamp();
     glPopMatrix();
-    hallLight.enable();
+    roomLight.setup();
+    roomLight.enable();
 
     wallMat.apply();
     cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, INSIDEOUT, FRONT_FACE | BACK_FACE);
@@ -347,10 +363,18 @@ void drawHall() {
     glPushMatrix();
     glTranslatef(0.1 + tableBnl.X, tableTfr.Y, -0.25 );
     drawContainer(Coord(0,0,0), Coord(0.5,0.51,0.5));
-
     glPopMatrix();
 
-    // glDisable(GL_LIGHTING);
+    float teapotSize = 0.3;
+    matteConcrete.apply();
+    glPushMatrix();
+    //draw teapot on table:
+    glTranslatef(0.1 + tableBnl.X+0.25, tableTfr.Y+0.5*teapotSize, 0.7 );
+    glRotatef(115, 0, 1, 0);
+    glutSolidTeapot(teapotSize);
+    glPopMatrix();
+
+
 
     glPushMatrix();
     glTranslatef(0.4 + tableBnl.X, tableTfr.Y, 0 );
@@ -396,5 +420,51 @@ void drawHall() {
             // glEnable(GL_LIGHTING);
 
 
-    hallLight.disable();
+    roomLight.disable();
+}
+
+void lastHiddenCubeMirrored() {
+    glColor3f(0,1,0);
+    glPushMatrix();
+    glTranslatef(15,-5.5 , 2);
+    cubeOfPlanes(Coord(), Coord(1, -3, 1), 20, 1, ALL_FACE);
+    glPopMatrix();
+}
+void drawHiddenBuffer() {
+    // Create a framebuffer
+    GLuint framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // Create a texture to store the color data
+    GLuint textureColorbuffer;
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    //blue 1x1 cube @ 10, 1, 2
+    //red 1x1 cube @ 19, 2, 0
+    //green 2h1w cube at -6, 15, 2
+
+
+
+    //blue cube:
+    glColor3f(0, 0, 1);
+    glPushMatrix();
+    glTranslatef(9, 1, 1);
+    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, 1, ALL_FACE);
+    glPopMatrix();
+
+    glColor3f(1, 0, 0);
+    glPushMatrix();
+    glTranslatef(17.6, 1, -0.5f);
+    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, 1, ALL_FACE);
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(2,2,-1);
+    lastHiddenCubeMirrored();
+    glPopMatrix();
+    lastHiddenCubeMirrored();
+
+
+
 }

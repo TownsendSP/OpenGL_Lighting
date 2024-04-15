@@ -4,6 +4,11 @@
 
 #ifndef TESTINGFUNCTIONS_H
 #define TESTINGFUNCTIONS_H
+#include "Coord.h"
+#include "Camera.h"
+#include "ColorData.h"
+#include "globals.h"
+
 
 
 

@@ -26,6 +26,7 @@ public:
     float transSpeed;
     float rotSens;
     Coord dirVecPublicUsage;
+    int whichPlace;
 
     // constructor:
 
@@ -57,10 +58,24 @@ public:
 
     Camera() = default;
 
+    int whichSpace(Coord posi);
+
+    int collisionYZ(Coord pos);
+
+    int collisionYX(Coord pos);
+
+    int collisionXZ(Coord pos);
+
+    void getRelTrans(Coord deltaTranslation);
+
+    void moveCamWithColl(Coord deltaTranslation);
+
     // calculating movement
     void relTrans(Coord deltaTranslation);
 
     void relRot(Coord deltaAngle);
+
+    void updateCardInfo();
 
     void lookAt(DebugLevel dbg = NONE);
 

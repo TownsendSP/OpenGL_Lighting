@@ -7,6 +7,7 @@
 #include "lighting.h"
 
 void drawHall();
+void drawHiddenBuffer();
 
 
 #endif //SCENEDRAW_H
