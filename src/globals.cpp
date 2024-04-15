@@ -380,9 +380,9 @@ void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
             glDisable(GL_LIGHTING);
             break;
         case 4: //just get rid of any values above 0
-            normToColors[0] = whyAreMyNormalsBroken[0] < 0 ? 1 : 0;
-            normToColors[1] = whyAreMyNormalsBroken[1] < 0 ? 1 : 0;
-            normToColors[2] = whyAreMyNormalsBroken[2] < 0 ? 1 : 0;
+            normToColors[0] = whyAreMyNormalsBroken[0] < 0 ? -1*whyAreMyNormalsBroken[0] : 0;
+            normToColors[1] = whyAreMyNormalsBroken[1] < 0 ? -1*whyAreMyNormalsBroken[1] : 0;
+            normToColors[2] = whyAreMyNormalsBroken[2] < 0 ? -1*whyAreMyNormalsBroken[2] : 0;
             glDisable(GL_LIGHTING);
             break;
         default:
@@ -393,3 +393,6 @@ void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
         glColor3fv(normToColors);
     }
 }
+
+
+float scrollVar = 0.0; //used to bind to random stuff for testing

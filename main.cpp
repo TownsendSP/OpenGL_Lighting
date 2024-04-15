@@ -550,7 +550,6 @@ void keyboard(unsigned char key, int x, int y) {
             break;
 
         case 27: //Escape Key: Exit
-            exit(0);
         default:
             break;
     }
@@ -749,8 +748,20 @@ void animate(int value) {
         cardAnimate();
     }
 
-    glutTimerFunc(5, animate, 1);
 
+    debugMap[60-4] = "ScrollVar: " + std::to_string(scrollVar);
+    glutTimerFunc(5, animate, 1);
+    glutPostRedisplay();
+}
+
+void mouseControl(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        xClick = x;
+        yClick = y;
+        selecting = true;
+    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+        selecting = false;
+    }
     glutPostRedisplay();
 }
 
@@ -767,7 +778,7 @@ int main(int argc, char **argv) {
     glutKeyboardFunc(keyboard);
     glutPassiveMotionFunc(NULL);
     glutSpecialFunc(specialKeyboard);
-    // glutMouseFunc(mouseControl);
+    glutMouseFunc(mouseControl);
 
     glutTimerFunc(5, animate, 1);
 

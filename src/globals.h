@@ -88,6 +88,9 @@ std::string xs64(int_fast64_t value);
 #define DOOR_OPENED_STOPPED 2
 #define DOOR_CLOSED_STOPPED 3
 
+#define INSIDEOUT -1
+#define OUTSIDEOUT 1
+
 
 #define UNAMEWIN 1;
 #define UNAMELOSE 0;
@@ -235,4 +238,5 @@ int nextDbgState();
 extern std::map<int, std::string> dbgNormMap;
 
 void glNormal3fvd(float whyAreMyNormalsBroken[3]);
+extern float scrollVar;
 #endif //GLOBALS_H

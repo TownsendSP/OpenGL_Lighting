@@ -285,8 +285,9 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
 
         glPushMatrix();
         glNormal3fvd(normalVec);
-        glTranslatefv(c1);
-        drawFlatPlaneXZ(Coord(), c2 - c1, numSubDivisions);
+        // glTranslatefv(c1);
+        // drawFlatPlaneXZ(Coord(), c2 - c1, numSubDivisions);
+        drawFlatPlaneXZ(c1, c2, numSubDivisions);
         glPopMatrix();
     }
 
@@ -295,9 +296,9 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
         //here originally
         glPushMatrix();
         glNormal3fvd(normalVec);
-        glTranslatefv(c1);
-        glRotatef(90, -1.0, 0.0, 0.0);
-        drawFlatPlaneXZ(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
+        // glTranslatefv(c1);
+        // drawFlatPlaneXY(Coord(), c2 - c1, numSubDivisions);
+        drawFlatPlaneXY(c1, c2, numSubDivisions);
         glPopMatrix();
     }
 
@@ -305,10 +306,9 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     if (abs(c1.X - c2.X) <= 0.001) {
         //here originally
         glPushMatrix();
-        glTranslatefv(c1);
-        glRotatef(90, 0.0, 0.0, 1.0);
+        // glTranslatefv(c1);
         glNormal3fvd(normalVec);
-        drawFlatPlaneXZ(Coord(), Coord((c2-c1).Y, 0, (c2-c1).Z), numSubDivisions);
+        drawFlatPlaneYZ(c1, c2, numSubDivisions);
         glPopMatrix();
     }
     if(dbgNormals!=0) {

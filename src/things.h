@@ -12,6 +12,7 @@
 # include "globals.h"
 
 
+
 // class things {
 //
 // };
@@ -28,7 +29,7 @@ public:
 
     explicit Debug3Dx(Coord position, float size = 1.0, float weight = 1.0);
 
-    Debug3Dx::Debug3Dx(float inStuff[5]);
+   Debug3Dx(float inStuff[5]);
 
     // Debug3Dx(float size = 1.0, float weight = 1.0, Coord position);
 

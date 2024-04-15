@@ -191,8 +191,9 @@ Material tableMat = Material(
 
 Material superShinySteel = Material(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f),
+    // ColorData(scrollVar, scrollVar, scrollvar, 1.0f),
     ColorData(0.1f, 0.1f, 0.1f, 1.0f),
-    ColorData(0.8f, 0.8f, 0.8f, 1.0f),
+    ColorData(scrollVar, scrollVar, scrollVar, 1.0f),
     1000.0f);
 
 Material matteConcrete = Material(

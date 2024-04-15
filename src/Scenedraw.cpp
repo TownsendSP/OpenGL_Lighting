@@ -9,6 +9,7 @@
 #include "things.h"
 #include "lighting.h"
 #include "camera.h"
+
 extern std::map<int, std::string> debugMap;
 extern Camera cam;
 
@@ -151,9 +152,11 @@ void drawTable(Coord bnl, Coord tfr, float lInset = 0.2, float tThick = 0.1, flo
 
 void drawContainer(Coord bnl, Coord tfr) {
     //simple cube, no top
+    //drawing it twice to get the inside and outside
     glPushMatrix();
     shinyRed.apply();
-    cubeOfPlanes(bnl, tfr, 20, 1, ALL_FACE ^ TOP_FACE);
+    cubeOfPlanes(bnl, tfr, 20, OUTSIDEOUT, ALL_FACE ^ TOP_FACE);
+    cubeOfPlanes(bnl+0.005, tfr-0.005, 20, INSIDEOUT, ALL_FACE ^ TOP_FACE);
     glPopMatrix();
 }
 
@@ -164,27 +167,22 @@ void drawContainer(Coord bnl, Coord tfr) {
     glPushMatrix();
     glTranslatef(0, 0, animPercent);
     cubeOfPlanes(Coord(halltfr.X - 0.4, hallBnl.Y, hallBnl.Z),
-                 Coord(halltfr.X - 0.1, hallBnl.Y + doorwayHeight, 0), 20, 1, ALL_FACE);
+                 Coord(halltfr.X - 0.1, hallBnl.Y + doorwayHeight, 0), 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
 }
 
 void rDoorExist() {
     //just reflect it over the Z, the normals will be "good enough"
     superShinySteel.apply();
-
-glPushMatrix();
-    glScalef(1, 1, -1);
+    glPushMatrix();
+    glScalef(1, 1, -1); //reflect over Z
     lDoorExist();
     glPopMatrix();
-
-    //draw container
-
-
 }
 
 
 void drawLampCage() {
-    //enable smooth lines
+    //enable smooth lines, hopefully I'll be able to get the look I'm going for
     glEnable(GL_LINE_SMOOTH);
     glPushMatrix();
     glRotatef(90, 1, 0, 0);
@@ -251,28 +249,28 @@ void drawHall() {
     // drawLamp();
     // glPopMatrix();
     // hallLight.enable();
+    int siding = OUTSIDEOUT;
 
     wallMat.apply();
     //doorframe, but only the back face:
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, hallBnl.Z),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, 1, BACK_FACE);
-
-    //top of doorframe
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, OUTSIDEOUT, BACK_FACE);
+        //top of doorframe
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
-        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, 1, BACK_FACE);
+        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
 
     //Left side of doorframe
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, halltfr.Z - doorwayWidth/2),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, 1, BACK_FACE);
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
 
 
-
-    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, 1, BACK_FACE);
-    cubeOfPlanes(hallBnl, halltfr, 40, 1, LEFT_FACE | RIGHT_FACE);
+    //
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, INSIDEOUT, BACK_FACE);
+    cubeOfPlanes(hallBnl, halltfr, 40, INSIDEOUT, LEFT_FACE | RIGHT_FACE);
     floorMat.apply();
-    cubeOfPlanes(hallBnl, halltfr, 40, 1, BOTTOM_FACE);
+    cubeOfPlanes(hallBnl, halltfr, 40, INSIDEOUT, BOTTOM_FACE);
     ceilingMat.apply();
-    cubeOfPlanes(hallBnl, halltfr, 40, 1, TOP_FACE);
+    cubeOfPlanes(hallBnl, halltfr, 40, INSIDEOUT, TOP_FACE);
 
 
 #ifndef FOLDING_REGION_ROOM
@@ -285,16 +283,16 @@ void drawHall() {
     hallLight.enable();
 
     wallMat.apply();
-    cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, 1, FRONT_FACE | BACK_FACE);
+    cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, INSIDEOUT, FRONT_FACE | BACK_FACE);
     matteConcrete.apply();
-    cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, 1, FRONT_FACE | BACK_FACE);
+    cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, INSIDEOUT, FRONT_FACE | BACK_FACE);
 
     wallMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, 1, LEFT_FACE | RIGHT_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, INSIDEOUT, LEFT_FACE | RIGHT_FACE);
     floorMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, 1, BOTTOM_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, INSIDEOUT, BOTTOM_FACE);
     ceilingMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, 1, TOP_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, INSIDEOUT, TOP_FACE);
 
 
     //doorframe, but not the back face:
@@ -304,21 +302,21 @@ void drawHall() {
 
     //top of doorframe
     cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
-                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, 1, ALL_FACE ^ BACK_FACE);
+                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, OUTSIDEOUT, ALL_FACE ^ BACK_FACE);
 
     //Left side of doorframe
     cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, halltfr.Z - doorwayWidth / 2),
-                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, 1, ALL_FACE ^ BACK_FACE);
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, OUTSIDEOUT, ALL_FACE ^ BACK_FACE);
 
 
     //this one does the gap in the back of the room,
     wallMat.apply();
-    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, 1, FRONT_FACE);
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, INSIDEOUT, FRONT_FACE);
 
 
     //small box for testing, use the shiny textures
     cardMat.apply();
-    cubeOfPlanes(troubleshootingBnl, troubleshootingtfr, 10, 1, ALL_FACE);
+    cubeOfPlanes(troubleshootingBnl, troubleshootingtfr, 10, OUTSIDEOUT, ALL_FACE);
 
     //doors:
     lDoorExist();
@@ -337,7 +335,7 @@ void drawHall() {
     // glDisable(GL_LIGHTING);
 
     glPushMatrix();
-    glTranslatef(0.2 + tableBnl.X, tableTfr.Y, 0 );
+    glTranslatef(0.4 + tableBnl.X, tableTfr.Y, 0 );
     glScalef(0.25, 0.25, 0.25);
     drawWinnerAndRotate();
     glPopMatrix();
