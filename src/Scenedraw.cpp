@@ -125,7 +125,7 @@ void drawLeg(Coord legLocBottom, float legInfo[3]) {
 void drawTable(Coord bnl, Coord tfr, float lInset = 0.2, float tThick = 0.1, float legRad = 0.1) {
     //table top
     tableMat.apply();
-    cubeOfPlanes(Coord(bnl.X, tfr.Y - tThick, bnl.Z), tfr, 40, -1, ALL_FACE);
+    cubeOfPlanes(Coord(bnl.X, tfr.Y - tThick, bnl.Z), tfr, 40, 1, ALL_FACE);
 
 
 
@@ -153,7 +153,7 @@ void drawContainer(Coord bnl, Coord tfr) {
     //simple cube, no top
     glPushMatrix();
     shinyRed.apply();
-    cubeOfPlanes(bnl, tfr, 20, -1, ALL_FACE ^ TOP_FACE);
+    cubeOfPlanes(bnl, tfr, 20, 1, ALL_FACE ^ TOP_FACE);
     glPopMatrix();
 }
 
@@ -228,8 +228,10 @@ void drawWinnerAndRotate() {
     float dumb = cardRotPercent;
     float cardRot = dumb/(cardRotSpeed*100);
     Coord currentRot = finalRot * cardRot;
+
     glPushMatrix();
-    glTranslatef(0, 1*cardRot, 0);
+    glScalef(0.9f*cardRot+0.1f, 0.9f*cardRot+0.1f, 0.9f*cardRot+0.1f);
+    glTranslatef(0, 3*cardRot, 0);
     glRotatef(currentRot.X, 1, 0, 0);
     glRotatef(currentRot.Y, 0, 1, 0);
     glRotatef(currentRot.Z, 0, 0, 1);
@@ -244,33 +246,33 @@ void drawHall() {
     headLamp.enable();
 
     //get rid of this later:
-    glPushMatrix();
-    glTranslatefv(lampPos);
-    drawLamp();
-    glPopMatrix();
-    hallLight.enable();
+    // glPushMatrix();
+    // glTranslatefv(lampPos);
+    // drawLamp();
+    // glPopMatrix();
+    // hallLight.enable();
 
     wallMat.apply();
     //doorframe, but only the back face:
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, hallBnl.Z),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, -1, BACK_FACE);
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, 1, BACK_FACE);
 
     //top of doorframe
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
-        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, -1, BACK_FACE);
+        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, 1, BACK_FACE);
 
     //Left side of doorframe
     cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, halltfr.Z - doorwayWidth/2),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, -1, BACK_FACE);
+        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, 1, BACK_FACE);
 
 
 
-    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, -1, BACK_FACE);
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, 1, BACK_FACE);
     cubeOfPlanes(hallBnl, halltfr, 40, 1, LEFT_FACE | RIGHT_FACE);
     floorMat.apply();
     cubeOfPlanes(hallBnl, halltfr, 40, 1, BOTTOM_FACE);
     ceilingMat.apply();
-    cubeOfPlanes(hallBnl, halltfr, 40, -1, TOP_FACE);
+    cubeOfPlanes(hallBnl, halltfr, 40, 1, TOP_FACE);
 
 
 #ifndef FOLDING_REGION_ROOM
@@ -283,35 +285,35 @@ void drawHall() {
     hallLight.enable();
 
     wallMat.apply();
-    cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, -1, FRONT_FACE | BACK_FACE);
+    cubeOfPlanes(roomBnl, Coord(roomtfr.X, roomtfr.Y, hallBnl.Z), 40, 1, FRONT_FACE | BACK_FACE);
     matteConcrete.apply();
-    cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, -1, FRONT_FACE | BACK_FACE);
+    cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, 1, FRONT_FACE | BACK_FACE);
 
     wallMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, -1, LEFT_FACE | RIGHT_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, 1, LEFT_FACE | RIGHT_FACE);
     floorMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, -1, BOTTOM_FACE);
+    cubeOfPlanes(roomBnl, roomtfr, 40, 1, BOTTOM_FACE);
     ceilingMat.apply();
     cubeOfPlanes(roomBnl, roomtfr, 40, 1, TOP_FACE);
 
 
     //doorframe, but not the back face:
     cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, hallBnl.Z),
-                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth / 2), 20, -1,
-                 ALL_FACE ^ BACK_FACE);
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth / 2),
+                 20, 1,ALL_FACE ^ BACK_FACE);
 
     //top of doorframe
     cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
-                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, -1, ALL_FACE ^ BACK_FACE);
+                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, 1, ALL_FACE ^ BACK_FACE);
 
     //Left side of doorframe
     cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, halltfr.Z - doorwayWidth / 2),
-                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, -1, ALL_FACE ^ BACK_FACE);
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, 1, ALL_FACE ^ BACK_FACE);
 
 
     //this one does the gap in the back of the room,
     wallMat.apply();
-    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, -1, FRONT_FACE);
+    cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, 1, FRONT_FACE);
 
 
     //small box for testing, use the shiny textures
@@ -339,7 +341,42 @@ void drawHall() {
     glScalef(0.25, 0.25, 0.25);
     drawWinnerAndRotate();
     glPopMatrix();
-    
+
+
+
+    glPushMatrix();
+    glTranslatef(10, 10, 10);
+    shinyRed.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, FRONT_FACE);
+    shinyGreen.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, TOP_FACE);
+    shinyBlue.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, RIGHT_FACE);
+    shinyRed.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, BACK_FACE);
+    shinyGreen.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, BOTTOM_FACE);
+    shinyBlue.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, LEFT_FACE);
+
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(7, 10, 10);
+    shinyRed.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, FRONT_FACE);
+    shinyGreen.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, TOP_FACE);
+    shinyBlue.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, RIGHT_FACE);
+    shinyRed.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, BACK_FACE);
+    shinyGreen.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, BOTTOM_FACE);
+    shinyBlue.apply();
+    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, LEFT_FACE);
+
+    glPopMatrix();
             // glEnable(GL_LIGHTING);
 
 

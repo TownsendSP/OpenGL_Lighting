@@ -88,6 +88,20 @@ std::string xs64(int_fast64_t value);
 #define DOOR_OPENED_STOPPED 2
 #define DOOR_CLOSED_STOPPED 3
 
+
+#define UNAMEWIN 1;
+#define UNAMELOSE 0;
+
+#define CARDROTCOMPLETE 2
+#define CARDROTNOW 1
+#define CARDROTNONE 0
+
+#define DBG_NORM_OFF 0
+#define ABS_NORM 1
+#define RAW_NORM 2
+#define POS_NORM 3
+#define NEG_NORM 4
+
 #endif
 
 
@@ -206,13 +220,6 @@ int getNextPoint(int current);
 extern int8_t doorOpenPercent;
 extern int8_t animateDoor;
 
-#define UNAMEWIN 1;
-#define UNAMELOSE 0;
-
-#define CARDROTCOMPLETE 2
-#define CARDROTNOW 1
-#define CARDROTNONE 0
-
 extern int winner;
 int useTimeToSeedRandomToSetWinner();
 std::string getDayOfWeek();
@@ -222,6 +229,10 @@ std::string retWinner();
 extern int cardRotState;
 extern int cardRotPercent;
 extern int cardRotSpeed;
+extern int dbgNormals;
+extern uint8_t enabledFaces;
+int nextDbgState();
+extern std::map<int, std::string> dbgNormMap;
 
-
+void glNormal3fvd(float whyAreMyNormalsBroken[3]);
 #endif //GLOBALS_H

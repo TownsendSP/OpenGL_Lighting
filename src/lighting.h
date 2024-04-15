@@ -109,6 +109,8 @@ extern Material tableMat;
 extern Material superShinySteel;
 extern Material matteConcrete;
 extern Material shinyRed;
+extern Material shinyGreen;
+extern Material shinyBlue;
 
 
 //light Library:

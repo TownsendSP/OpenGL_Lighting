@@ -101,6 +101,10 @@ public:
         return {X - other.X, Y - other.Y, Z - other.Z};
     }
 
+    // Coord operator*(const int lhs, const Coord & rhs) {
+    //     return {rhs.X * lhs, lhs * rhs.Y, lhs * rhs.Z};
+    // }
+
     Coord operator-(const float other) const {
         return {X - other, Y - other, Z - other};
     }

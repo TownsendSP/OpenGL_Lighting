@@ -132,11 +132,11 @@ Material::Material(ColorData spec, ColorData amb, ColorData diff, float shine) {
 }
 
 void Material::apply() {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpec);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmb);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, matEmission);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiff);
-    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, matShine);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpec); //GL_FRONT_AND_BACK, GL_SPECULAR, matSpec);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmb); //GL_FRONT_AND_BACK, GL_AMBIENT, matAmb);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, matEmission); //GL_FRONT_AND_BACK, GL_EMISSION, matEmission);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiff); //GL_FRONT_AND_BACK, GL_DIFFUSE, matDiff);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, matShine); //GL_FRONT_AND_BACK, GL_SHININESS, matShine);
 }
 
 //Material Library:
@@ -205,6 +205,18 @@ Material shinyRed = Material(
     ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
     ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
     ColorData(1.0f, 0.0f, 0.0f, 1.0f), //diffuse
+    1000000.0f); //shininess
+
+Material shinyGreen = Material(
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
+    ColorData(0.0f, 1.0f, 0.0f, 1.0f), //diffuse
+    1000000.0f); //shininess
+
+Material shinyBlue = Material(
+    ColorData(1.0f, 1.0f, 1.0f, 1.0f), //specular
+    ColorData(0.2f, 0.2f, 0.2f, 1.0f), //ambient
+    ColorData(0.0f, 0.0f, 1.0f, 1.0f), //diffuse
     1000000.0f); //shininess
 
 

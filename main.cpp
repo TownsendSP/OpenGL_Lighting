@@ -134,9 +134,8 @@ Coord normalize(Coord vec) {
 
 void updateSpotlight() {
     headLamp.setup();
-    headLamp.lightPos = ColorData(0,0,0, 1.0f);
-    headLamp.spotDir =  Coord(0, 0,-1);
-
+    headLamp.lightPos = ColorData(0, 0, 0, 1.0f);
+    headLamp.spotDir = Coord(0, 0, -1);
 }
 
 void setupRight() {
@@ -165,11 +164,12 @@ void setupRight() {
 
 //update spotlight position and direction to match the camera
 void backToBasicsCalculateTheDirVec(Coord directionVector) {
-
 }
 
 void drawLitShapes() {
     glEnable(GL_LIGHTING);
+    sunLight.enable();
+
 
     headLamp.enable();
 
@@ -181,9 +181,6 @@ void drawLitShapes() {
     glDisable(GL_LIGHT0);
 
     drawHall();
-
-
-
 
 
     headLamp.enable();
@@ -206,7 +203,6 @@ void drawLitShapes() {
 
     glDisable(GL_LIGHTING);
     glDisable(headLamp);
-
 }
 
 void drawUnlitShapes() {
@@ -223,17 +219,17 @@ void drawUnlitShapes() {
         glPopMatrix();
     }
 
-    if(drawAllPoints) {
+    if (drawAllPoints) {
         std::vector<thingHolder> debugPoints = getDbgPts();
-        for (float* point: debugPoints) {
+        for (float *point: debugPoints) {
             Debug3Dx(point).draw();
         }
     }
 
-    if(drawDebugPoints) {
-        float* dbg_pts = getDbgPts(currPointDraw);
+    if (drawDebugPoints) {
+        float *dbg_pts = getDbgPts(currPointDraw);
         Debug3Dx(dbg_pts).draw();
-        if(focusPoint) {
+        if (focusPoint) {
             cam.tgt = Coord(dbg_pts[0], dbg_pts[1], dbg_pts[2]);
         }
     }
@@ -257,7 +253,6 @@ void drawUnlitShapes() {
 
     windowTest();
     glEnable(GL_LIGHTING);
-
 }
 
 
@@ -310,7 +305,6 @@ void drawWindow() {
     drawLitShapes();
 
 
-
     glutSwapBuffers();
 }
 
@@ -333,11 +327,11 @@ void setupObjects() {
 }
 
 void setupLights() {
-
     float lightAmb[] = {0.8, 0.7, 0.2, 1.0}; // Warm ambient light
     float lightDifAndSpec[] = {0.8, 0.7, 0.2, 1.0}; // Warm diffuse and specular light
     float lightPos[] = {0.0, 7.0, 0.0, 0.0}; // Position remains the same
     float globAmb[] = {0.3, 0.3, 0.3, 1.0}; // Cool global ambient light
+
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmb);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDifAndSpec);
     glLightfv(GL_LIGHT0, GL_SPECULAR, lightDifAndSpec);
@@ -347,14 +341,12 @@ void setupLights() {
     //                                ColorData(1.0, 1.0, 1.0, 1.0), cam.tgt, 30.0, 1.0);
 
     //enabling global ambient light:
+    //
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb); // Global ambient light.
+    //setup the sun using a positional light:
+    sunLight.setup();
 
     headLamp.enable();
-    glEnable(GL_LIGHT4);
-    glEnable(GL_LIGHT5);
-    glEnable(GL_LIGHT6);
-
-
 }
 
 void setup() {
@@ -406,7 +398,8 @@ void resize(int w, int h) {
 //control
 #ifndef FOLDING_REGION_Control
 
-    static bool firstMouse = true;
+static bool firstMouse = true;
+
 void mouse(int x, int y) {
     static int lastX = 0, lastY = 0;
 
@@ -435,7 +428,9 @@ void toggleMouse() {
         glutPassiveMotionFunc(NULL);
     }
 }
+
 bool useCaps = false;
+
 void keyboard(unsigned char key, int x, int y) {
     modifiers = glutGetModifiers();
 
@@ -454,10 +449,10 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 'c': //CAMERA DOWN
             cam.relTrans(Coord(0, -1 * speed, 0));
-        break;
+            break;
         case 'f': //CAMERA UP
             cam.relTrans(Coord(0, 1 * speed, 0));
-        break;
+            break;
         case 'r': //reset all but the camera
             glout << MAX;
             break;
@@ -471,26 +466,61 @@ void keyboard(unsigned char key, int x, int y) {
             glout << "Mouse Control: " << (useMouse ? "Enabled" : "Disabled; Use ← →  and PG↑↓") << '\n';
             break;
 
-        case '1': cam.restoreState(0);
-            glout << "Camera State 1 Restored" << '\n';
-            glout << "Pos: " << cam.pos.toString(0) << "Tgt: " << cam.tgt.toString(0) << '\n';
+        case '1':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ FRONT_FACE;
+                glout << "FRONT_FACE: " << (enabledFaces & FRONT_FACE ? "Enabled" : "Disabled") << '\n';
+            } else {
+                cam.restoreState(0);
+                glout << "Camera State 1 Restored" << '\n';
+                glout << "Pos: " << cam.pos.toString(0) << "Tgt: " << cam.tgt.toString(0) << '\n';
+            }
             break;
-        case '2': cam.restoreState(1);
-            glout << "Camera State "<<key<<" Restored" << '\n';
-            glout << "Pos: " << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+        case '2':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ TOP_FACE;
+                glout << "TOP_FACE: " << (enabledFaces & TOP_FACE ? "Enabled" : "Disabled") << '\n';
+            } else {
+                cam.restoreState(1);
+                glout << "Camera State " << key << " Restored" << '\n';
+                glout << "Pos: " << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+            }
             break;
-        case '3': cam.restoreState(2);
-        glout << "Camera State "<<key<<" Restored" << '\n';
-        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+        case '3':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ RIGHT_FACE;
+                glout << "RIGHT_FACE: " << (enabledFaces & RIGHT_FACE ? "Enabled" : "Disabled") << std::endl;
+            } else {
+                cam.restoreState(2);
+                glout << "Camera State " << key << " Restored" << '\n';
+                glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+            }
             break;
-        case '4': cam.restoreState(3);
-        glout << "Camera State "<<key<<" Restored" << '\n';
-        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+        case '4':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ BACK_FACE;
+                glout << "BACK_FACE : " << (enabledFaces & BACK_FACE ? "Enabled" : "Disabled") << std::endl;
+            } else {
+                cam.restoreState(3);
+                glout << "Camera State " << key << " Restored" << '\n';
+                glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+            }
             break;
-        case '5': cam.restoreState(4);
-        glout << "Camera State "<<key<<" Restored" << '\n';
-        glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+        case '5':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ BOTTOM_FACE;
+                glout << "BOTTOM_FACE : " << (enabledFaces & BOTTOM_FACE ? "Enabled" : "Disabled") << std::endl;
+            } else {
+                cam.restoreState(4);
+                glout << "Camera State " << key << " Restored" << '\n';
+                glout << "Pos:" << cam.pos.toString(0) << " Cam Tgt: " << cam.tgt.toString(0) << '\n';
+            }
             break;
+        case '6':
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces ^ LEFT_FACE;
+                glout << "LEFT_FACE Face: " << (enabledFaces & LEFT_FACE ? "Enabled" : "Disabled") << std::endl;
+            }
         case '!': cam.storeState(0);
             glout << "State1:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
             break;
@@ -505,6 +535,15 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case '%': cam.storeState(4);
             glout << "State5:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
+            break;
+        case '`':
+            if(modifiers & GLUT_ACTIVE_ALT) {
+                enabledFaces = enabledFaces | ALL_FACE;
+                glout << "All Faces Enabled" << '\n';
+            } else {
+                dbgNormals = nextDbgState();
+                glout << "NormalColorization: " << dbgNormMap[dbgNormals] << '\n';
+            }
             break;
         case '?': //print keybinds:
             showKeybindings();
@@ -523,20 +562,19 @@ int counter = 0;
 void testCharacterPrinting() {
     for (unsigned int i = counter * 5; i <= 255; i++) {
         glout << std::hex << std::setw(2) << std::setfill('0') << i << ": ";
-        glout << (char)i << " ";
+        glout << (char) i << " ";
         if (i % 5 == 4) {
             glout << '\n';
             counter++;
             break;
         }
-        if(counter >= 0xFE || i >= 0xFE)
+        if (counter >= 0xFE || i >= 0xFE)
             counter = 0;
     }
 }
 
 
 Coord angle = Coord(0, 0.0872665, 0); //5 degrees
-
 
 
 void specialKeyboard(int key, int x, int y) {
@@ -554,17 +592,50 @@ void specialKeyboard(int key, int x, int y) {
         case GLUT_KEY_F2:
             conHeightPercent = clmp(conHeightPercent - 0.02, 0.0, 0.52);
             glout << "Shrank console to " << conHeightPercent << '\n';
-        break;
+            break;
 
         case GLUT_KEY_F3:
             conHeightPercent = clmp(conHeightPercent + 0.02, 0.0, 0.52);
             glout << "Grew console to " << conHeightPercent << '\n';
-        break;
+            break;
         case GLUT_KEY_F4:
             headLamp.lightswitch();
             glout << "Headlamp switched " << headLamp.enabled ? "On\n" : "Off\n";
             debugMap[60 - 20] = "Headlamp: " + headLamp.enabled ? "On" : "Off";
 
+            break;
+        case GLUT_KEY_F5:
+            cam.loadFromFile(cameraSaveFile);
+
+            glout << "Camera Profiles loaded from " << cameraSaveFile << '\n';
+            glout << "Available States: " << '\n';
+            for (int i = 0; i < 5; i++) {
+                glout << i + 1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) <<
+                        " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
+            }
+            break;
+
+        case GLUT_KEY_F6:
+            switch (animateDoor) {
+                case DOOR_CLOSED_STOPPED:
+                    glout << "Door Opening" << '\n';
+                    animateDoor = DOOR_OPENING;
+                    break;
+                case DOOR_OPENED_STOPPED:
+                    glout << "Door Closing" << '\n';
+                    animateDoor = DOOR_CLOSING;
+                    break;
+                case DOOR_OPENING:
+                    animateDoor = DOOR_OPENED_STOPPED;
+                    glout << "Door Opened" << '\n';
+                    break;
+                case DOOR_CLOSING:
+                    glout << "Door Closed" << '\n';
+                    animateDoor = DOOR_CLOSED_STOPPED;
+                    break;
+                default:
+                    break;
+            }
             break;
         case GLUT_KEY_F7:
             //if shift
@@ -580,64 +651,30 @@ void specialKeyboard(int key, int x, int y) {
             }
 
             break;
-
-        case GLUT_KEY_F6:
-            switch (animateDoor){
-                case DOOR_CLOSED_STOPPED:
-                    glout << "Door Opening" << '\n';
-                    animateDoor = DOOR_OPENING;
-                break;
-                case DOOR_OPENED_STOPPED:
-                    glout << "Door Closing" << '\n';
-                    animateDoor = DOOR_CLOSING;
-                break;
-                case DOOR_OPENING:
-                    animateDoor = DOOR_OPENED_STOPPED;
-                    glout << "Door Opened" << '\n';
-                break;
-                case DOOR_CLOSING:
-                    glout << "Door Closed" << '\n';
-                    animateDoor = DOOR_CLOSED_STOPPED;
-                break;
-                default:
-                    break;
-        }
-        case GLUT_KEY_F8 :
-            if(cardRotState == CARDROTNONE) {
+        case GLUT_KEY_F8:
+            if (cardRotState == CARDROTNONE) {
                 cardRotState = CARDROTNOW;
-            }else {
+            } else {
                 cardRotState = CARDROTNONE;
                 cardRotPercent = 0;
                 glout << "CardReset" << std::endl;
             }
 
-        break;
+            break;
         case GLUT_KEY_F9: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
-                cam.saveToFile(cameraSaveFile);
+            cam.saveToFile(cameraSaveFile);
 
-                glout << "Camera states saved to " << cameraSaveFile << '\n';
-        break;
+            glout << "Camera states saved to " << cameraSaveFile << '\n';
+            break;
+
 
         case GLUT_KEY_F12: //call Camera::saveToFile(std::ofstream& file)
             //open file pointer for writing:
-                glout << CONTROLOFF;
-                testCharacterPrinting();
-                glout << CONTROLON;
-        break;
-
-        case GLUT_KEY_F5:
-            cam.loadFromFile(cameraSaveFile);
-
-            glout << "Camera Profiles loaded from " << cameraSaveFile << '\n';
-            glout << "Available States: " << '\n';
-            for (int i = 0; i < 5; i++) {
-                glout << i+1 << ": " << "Pos:" << std::get<0>(cam.storedStates[i]).toString(0) << " Tgt:" << std::get<1>(cam.storedStates[i]).toString(0) << '\n';
-            }
-        break;
-
-
-
+            glout << CONTROLOFF;
+            testCharacterPrinting();
+            glout << CONTROLON;
+            break;
         case GLUT_KEY_UP: // up arrow does windowBlind.open()
             windowBlinds.open(blindAnimSpeed);
             glout << "Blinds Opened" << '\n';
@@ -677,14 +714,14 @@ void specialKeyboard(int key, int x, int y) {
 #endif
 
 void doorAnimate() {
-    if(animateDoor == DOOR_OPENING) {
-        doorOpenPercent +=1;
+    if (animateDoor == DOOR_OPENING) {
+        doorOpenPercent += 1;
         if (doorOpenPercent >= 100) {
             animateDoor = DOOR_OPENED_STOPPED;
             doorOpenPercent = 100;
         }
     } else if (animateDoor == DOOR_CLOSING) {
-        doorOpenPercent -=1;
+        doorOpenPercent -= 1;
         if (doorOpenPercent <= 0) {
             animateDoor = DOOR_CLOSED_STOPPED;
             doorOpenPercent = 0;
@@ -693,10 +730,10 @@ void doorAnimate() {
 }
 
 void cardAnimate() {
-    if(cardRotState == CARDROTNOW) {
+    if (cardRotState == CARDROTNOW) {
         // cardRotState++;
-        cardRotPercent ++;
-        if(cardRotPercent>=100*cardRotSpeed) {
+        cardRotPercent++;
+        if (cardRotPercent >= 100 * cardRotSpeed) {
             cardRotState = CARDROTCOMPLETE;
             glout << "Card Done!" << std::endl;
         }
@@ -704,12 +741,11 @@ void cardAnimate() {
 }
 
 void animate(int value) {
-
     // add value to the debugMap
     debugMap[60 - 5] = "MysteryValue: " + std::to_string(value);
 
     doorAnimate();
-    if(cardRotState == CARDROTNOW) {
+    if (cardRotState == CARDROTNOW) {
         cardAnimate();
     }
 

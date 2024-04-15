@@ -227,12 +227,39 @@ void drawBMPStr(std::string str, void *font) {
     }
 }
 
-void drawFlatPlane(Coord corner1, Coord corner2, int numSubDivisions) {
-    // corner1 = corner1 - Coord(1, 1, 1);
-    // corner2 = corner2 - Coord(1, 1, 1);
-    // Calculate the size of each subdivision
+void drawFlatPlaneYZ(Coord corner1, Coord corner2, int numSubDivisions) { //plane in the YZ plane
+    float yStep = (corner2.Y - corner1.Y) / numSubDivisions; // NOLINT(*-narrowing-conversions)
+    float zStep = (corner2.Z - corner1.Z) / numSubDivisions; // NOLINT(*-narrowing-conversions)
+
+    // Draw the grid of triangle strips
+    for (int i = 0; i < numSubDivisions; ++i) {
+        glBegin(GL_TRIANGLE_STRIP);
+        for (int j = 0; j <= numSubDivisions; ++j) {
+            glVertex3f(corner1.X, corner1.Y + i * yStep, corner1.Z + j * zStep);
+            glVertex3f(corner1.X, corner1.Y + (i + 1) * yStep, corner1.Z + j * zStep);
+        }
+        glEnd();
+    }
+}
+
+void drawFlatPlaneXY(Coord corner1, Coord corner2, int numSubDivisions) { //plane in the XY plane
     float xStep = (corner2.X - corner1.X) / numSubDivisions; // NOLINT(*-narrowing-conversions)
-    float zStep = (corner2.Z - corner1.Z) / numSubDivisions;
+    float yStep = (corner2.Y - corner1.Y) / numSubDivisions; // NOLINT(*-narrowing-conversions)
+
+    // Draw the grid of triangle strips
+    for (int i = 0; i < numSubDivisions; ++i) {
+        glBegin(GL_TRIANGLE_STRIP);
+        for (int j = 0; j <= numSubDivisions; ++j) {
+            glVertex3f(corner1.X + i * xStep, corner1.Y + j * yStep, corner1.Z);
+            glVertex3f(corner1.X + (i + 1) * xStep, corner1.Y + j * yStep, corner1.Z);
+        }
+        glEnd();
+    }
+}
+
+void drawFlatPlaneXZ(Coord corner1, Coord corner2, int numSubDivisions) { //plane in the XZ plane
+    float xStep = (corner2.X - corner1.X) / numSubDivisions; // NOLINT(*-narrowing-conversions)
+    float zStep = (corner2.Z - corner1.Z) / numSubDivisions; // NOLINT(*-narrowing-conversions)
 
     // Draw the grid of triangle strips
     for (int i = 0; i < numSubDivisions; ++i) {
@@ -249,35 +276,43 @@ void drawPlane(Coord c1, Coord c2, Coord normalVec, int numSubDivisions) {
     //draw the flat plane with the correct dimensions and location
 
     //figure out how the final plane will need to be rotated based on the corners;
-
+    float debuga[3] =  {c1.X, c1.Y, c1.Z};
+    float debugb[3] = {c2.X, c2.Y, c2.Z};
+    float dbgn[3] = {normalVec.X, normalVec.Y, normalVec.Z};
 
     // XZ plane: CORRECT!
-    if (c1.Y - c2.Y <= 0.001) {
+    if (abs(c1.Y - c2.Y) <= 0.001) {
+
         glPushMatrix();
-        glNormal3fv(normalVec);
+        glNormal3fvd(normalVec);
         glTranslatefv(c1);
-        drawFlatPlane(Coord(), c2 - c1, numSubDivisions);
+        drawFlatPlaneXZ(Coord(), c2 - c1, numSubDivisions);
         glPopMatrix();
     }
 
     // XY plane:x
     if (abs(c1.Z - c2.Z) <= 0.001) {
-        glNormal3fv(normalVec);
+        //here originally
         glPushMatrix();
+        glNormal3fvd(normalVec);
         glTranslatefv(c1);
         glRotatef(90, -1.0, 0.0, 0.0);
-        drawFlatPlane(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
+        drawFlatPlaneXZ(Coord(), Coord((c2 - c1).X, 0, (c2 - c1).Y), numSubDivisions);
         glPopMatrix();
     }
 
     //YZ plane: rotate 90 degrees about the y axis
     if (abs(c1.X - c2.X) <= 0.001) {
-        glNormal3fv(normalVec);
+        //here originally
         glPushMatrix();
         glTranslatefv(c1);
         glRotatef(90, 0.0, 0.0, 1.0);
-        drawFlatPlane(Coord(), Coord((c2-c1).Y, 0, (c2-c1).Z), numSubDivisions);
+        glNormal3fvd(normalVec);
+        drawFlatPlaneXZ(Coord(), Coord((c2-c1).Y, 0, (c2-c1).Z), numSubDivisions);
         glPopMatrix();
+    }
+    if(dbgNormals!=0) {
+        glEnable(GL_LIGHTING);
     }
 }
 
@@ -293,28 +328,99 @@ else if(mode == SOLID)
     glPopMatrix();
 }
 
+
+//manually building the coordinate vectors for normalse:
+
+
+Coord farXpositive = Coord(1.0f, 0.0f, 0.0f);//Coord farXpositive = Coord(1, 0, 0);
+Coord topYpositive = Coord(0.0f, 1.0f, 0.0f);//Coord topYpositive = Coord(0, 1, 0);
+Coord rightZpositive = Coord(0.0f, 0.0f, 1.0f);//Coord rightZpositive = Coord(0, 0, 1);
+Coord nearXnegative = Coord(-1.0f, 0.0f, 0.0f);//farXpositive * -1;            //Coord(0, 0, 0);
+Coord bottomYnegative = Coord(0.0f, -1.0f, 0.0f);//topYpositive * -1;          //Coord(0, 0, 0);
+Coord leftZnegative = Coord(0.0f, 0.0f, -1.0f);//rightZpositive * -1;          //Coord(0, 0, 0);
+
+void drawInsideOutCube(Coord bnl, Coord tfr, int numSubDiv, uint8_t whichFaces) {
+    float debuga[3] =  {bnl.X, bnl.Y, bnl.Z};
+    float debugb[3] = {tfr.X, tfr.Y, tfr.Z};
+    if (whichFaces >> 5 & 1 && enabledFaces >> 5 & 1){ //far +X
+        // int a = whichFaces >> 5 & 1;
+        drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, nearXnegative, numSubDiv);
+    }
+    if (whichFaces >> 4 & 1  && enabledFaces >> 4 & 1){ //top +Y
+        drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, bottomYnegative, numSubDiv);
+    }
+    if (whichFaces >> 3 & 1 && enabledFaces >> 3 & 1){ //right +Z
+        drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, leftZnegative, numSubDiv);
+    }
+    if (whichFaces >> 2 & 1 && enabledFaces >> 2 & 1){ //near -X
+        drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), farXpositive, numSubDiv);
+    }
+    if (whichFaces >> 1 & 1 && enabledFaces >> 1 & 1){ //bottom
+        drawPlane(bnl, Coord(tfr.X, bnl.Y, tfr.Z), topYpositive, numSubDiv);
+    }
+    if (whichFaces & 1 && enabledFaces & 1){ //left
+        drawPlane(bnl, Coord(tfr.X, tfr.Y, bnl.Z), rightZpositive, numSubDiv);
+    }
+
+
+}
+
+
 void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut, uint8_t whichFaces) {
     /*draw the cube of planes with the correct dimensions and location
     whichFaces is a bitfield that determines which faces to draw; 1 is draw, 0 is don't draw
     1: front (YZ - X+), 2: top (XZ - Y+), 3: right (XY - Z+)
     4: back (YZ - X-), 5: bottom (XZ - Y-), 6: left (XY - Z-)*/
     //flat shading
+    if(insideOut == -1) {
+        drawInsideOutCube(bnl, tfr, numSubDiv, whichFaces);
+        return;
+    }
 
-    glPushMatrix();
-    if (whichFaces >> 5 & 1) //far +X
-    	drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, Coord(-insideOut, 0, 0), numSubDiv);
-    if (whichFaces >> 4 & 1) //top +Y
-        drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, Coord(0, -insideOut, 0), numSubDiv);
-    if (whichFaces >> 3 & 1) //right +Z
-    	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, Coord(0, 0, -insideOut), numSubDiv);
-    if (whichFaces >> 2 & 1) //near -X
-    	drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), Coord(-insideOut, 0, 0), numSubDiv);
-    if (whichFaces >> 1 & 1) //bottom -Y
-    	drawPlane(bnl, Coord(tfr.X, bnl.Y, tfr.Z), Coord(0, -insideOut, 0), numSubDiv);
-    if (whichFaces & 1) //left -Z
-    	drawPlane(bnl, Coord(tfr.X, tfr.Y, bnl.Z), Coord(0, 0, -insideOut), numSubDiv);
+    // glPushMatrix();
+    if (whichFaces >> 5 & 1 && enabledFaces >> 5 & 1){ //far +X
+        // int a = whichFaces >> 5 & 1;
+            glNormal3fvd(farXpositive);
+        	glPushMatrix();
+        	drawPlane(Coord(tfr.X, bnl.Y, bnl.Z), tfr, farXpositive, numSubDiv); //Coord(-insideOut, 0, 0),  * insideOut
+        	glPopMatrix();
+    }
+    if (whichFaces >> 4 & 1  && enabledFaces >> 4 & 1){ //top +Y
+            // glNormal3fvd(topYpositive);
+            glPushMatrix();
+            drawPlane(Coord(bnl.X, tfr.Y, bnl.Z), tfr, topYpositive, numSubDiv); //Coord(0, -insideOut, 0),  * insideOut
+            glPopMatrix();
+    }
+    if (whichFaces >> 3 & 1 && enabledFaces >> 3 & 1){ //right +Z
+            // glNormal3fvd(rightZpositive);
+        	glPushMatrix();
+        	drawPlane(Coord(bnl.X, bnl.Y, tfr.Z), tfr, rightZpositive, numSubDiv); //Coord(0, 0, -insideOut),  * insideOut
+        	glPopMatrix();
+    }
+    if (whichFaces >> 2 & 1 && enabledFaces >> 2 & 1){ //near -X
+            // glNormal3fvd(nearXnegative);
+        	glPushMatrix();
+        	drawPlane(bnl, Coord(bnl.X, tfr.Y, tfr.Z), nearXnegative, numSubDiv); //Coord(-insideOut, 0, 0),  * insideOut
+        	glPopMatrix();
+    }
+    if (whichFaces >> 1 & 1 && enabledFaces >> 1 & 1){ //bottom -Y
+            // glNormal3fvd(bottomYnegative);
+        	glPushMatrix();
+        	drawPlane(bnl, Coord(tfr.X, bnl.Y, tfr.Z), bottomYnegative, numSubDiv); //Coord(0, -insideOut, 0),  * insideOut
+        	glPopMatrix();
+    }
+    if (whichFaces & 1 && enabledFaces & 1){ //left -Z
+            // glNormal3fvd(leftZnegative);
+        	glPushMatrix();
+        	drawPlane(bnl, Coord(tfr.X, tfr.Y, bnl.Z), leftZnegative, numSubDiv); //Coord(0, 0, -insideOut),  * insideOut
+        	glPopMatrix();
+    }
 
-    glPopMatrix();
+    // glPopMatrix();
+    if(dbgNormals!=0) {
+        glEnable(GL_LIGHTING);
+    }
+
 }
 
 

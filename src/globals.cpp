@@ -32,17 +32,17 @@ bool GLStreamOut::parseControlChars(char in_char) {
         switch (c) {
             case 0x00:
                 control = 0;
-                // std::cout << "Control off" << std::endl;
+            // std::cout << "Control off" << std::endl;
                 return false;
             case 0xFF:
                 control = 1;
-                // std::cout << "Control on" << std::endl;
+            // std::cout << "Control on" << std::endl;
                 return false;
             case 0x03:
                 pref = 0;
-                // std::cout << "No prefix" << std::endl;
+            // std::cout << "No prefix" << std::endl;
                 return false;
-            break;
+                break;
             case 0x04: //clear buffer and console
                 // std::cout << "Clear all" << std::endl;
                 buffer.clear();
@@ -58,51 +58,51 @@ bool GLStreamOut::parseControlChars(char in_char) {
                 return false;
             case 0x06:
                 glConsoleVec.push_back(buffer);
-                // std::cout << "Linefeed" << std::endl;
+            // std::cout << "Linefeed" << std::endl;
                 buffer.clear();
                 return false;
             case 0x09:
                 glConsoleVec.push_back(buffer);
                 buffer.clear();
                 buffer += "  ";
-                // std::cout << "Carriage return" << std::endl;
+            // std::cout << "Carriage return" << std::endl;
                 return false;
             case 0x0A:
-                if(buffer.size() > 2)
+                if (buffer.size() > 2)
                     buffer.pop_back();
-                else if(glConsoleVec.size() > 1)
+                else if (glConsoleVec.size() > 1)
                     glConsoleVec.pop_back();
-                // std::cout << "Delete" << std::endl;
+            // std::cout << "Delete" << std::endl;
                 return false;
             case 0x7f:
                 conHeightPercent += 0.1;
-                if(conHeightPercent > 0.52)
+                if (conHeightPercent > 0.52)
                     conHeightPercent = 0.52;
-                // std::cout << "Grow" << std::endl;
+            // std::cout << "Grow" << std::endl;
                 return false;
             case 0x80:
                 conHeightPercent -= 0.1;
-                if(conHeightPercent < 0.0)
+                if (conHeightPercent < 0.0)
                     conHeightPercent = 0.0;
                 return false;
             case 0x81:
-                conHeightPercent =0.52;
-                // std::cout << "MAX" << std::endl;
+                conHeightPercent = 0.52;
+            // std::cout << "MAX" << std::endl;
                 return false;
             case 0x82:
                 conHeightPercent = 0.3;
-                // std::cout << "Default" << std::endl;
+            // std::cout << "Default" << std::endl;
                 return false;
             default:
                 return true;
         }
-    }else {
+    } else {
         return true;
     }
 }
 
 std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
-    if (c != EOF ) {
+    if (c != EOF) {
         // the buffer should always start with $> to look like a cli
         if (buffer.empty() && pref) {
             buffer += "$>";
@@ -120,14 +120,14 @@ std::streambuf::int_type GLStreamOut::overflow(std::streambuf::int_type c) {
 
 std::streambuf::int_type GLStreamOut::sync() {
     std::string parsedBuffer;
-    for (char c : buffer) {
+    for (char c: buffer) {
         // std::streambuf::int_type parsedChar = parseControlChars(c);
-        if(parseControlChars(reinterpret_cast<std::streambuf::int_type &>(c)))
+        if (parseControlChars(reinterpret_cast<std::streambuf::int_type &>(c)))
             parsedBuffer += c;
         // if (parsedChar != EOF) {
         //     parsedBuffer += parsedChar;
         // }
-    }//std::cout << "after parsing: " << parsedBuffer << "before: " << buffer << std::endl;
+    } //std::cout << "after parsing: " << parsedBuffer << "before: " << buffer << std::endl;
     if (!parsedBuffer.empty()) {
         //add the shell prompt to parsedBuffer
         glConsoleVec.push_back(">$" + parsedBuffer);
@@ -185,23 +185,18 @@ GLInfo glStatus;
 std::ostream glInfoOut(&glStatus);
 
 
-
-
 std::vector<thingHolder> staticPoints;
 
 void addDbgPt(int idx, float xyz[3], float size, float weight) {
-staticPoints.insert(staticPoints.begin() + idx, thingHolder(xyz[0], xyz[1], xyz[2], size, weight));
+    staticPoints.insert(staticPoints.begin() + idx, thingHolder(xyz[0], xyz[1], xyz[2], size, weight));
     // staticPoints.emplace_back(xyz[0], xyz[1], xyz[2], size, weight);
 }
 
 std::vector<thingHolder> getDbgPts() {
-
-
     return staticPoints;
 }
-float* getDbgPts(int which) {
 
-
+float *getDbgPts(int which) {
     // if which is in the range of the vector, return it, otherwise return the first element
     if (which >= 0 && which < staticPoints.size()) {
         return staticPoints[which];
@@ -211,8 +206,6 @@ float* getDbgPts(int which) {
 }
 
 int getNextPoint(int current) {
-
-
     // simply returns the index of the next point, unless the next point would be outside the bounds of the vector, in which case it returns 0
     return current + 1 < staticPoints.size() ? current + 1 : 0;
 }
@@ -222,24 +215,31 @@ int getNextPoint(int current) {
 int_fast8_t xx8(char input) {
     return static_cast<int_fast8_t>(input);
 }
+
 char xd8(int_fast8_t input) {
     return static_cast<char>(input);
 }
+
 int_fast16_t xx16(int input) {
     return static_cast<int_fast16_t>(input);
 }
+
 short xd16(int_fast16_t input) {
     return static_cast<short>(input);
 }
+
 int_fast32_t xx32(long input) {
     return static_cast<int_fast32_t>(input);
 }
+
 long xd32(int_fast32_t input) {
     return static_cast<long>(input);
 }
+
 int_fast64_t xx64(long input) {
     return static_cast<int_fast64_t>(input);
 }
+
 long xd64(int_fast64_t input) {
     return static_cast<long>(input);
 }
@@ -249,16 +249,19 @@ std::string xs8(int_fast8_t value) {
     ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(value);
     return ss.str();
 }
+
 std::string xs16(int_fast16_t value) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(4) << static_cast<int>(value);
     return ss.str();
 }
+
 std::string xs32(int_fast32_t value) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(8) << static_cast<int>(value);
     return ss.str();
 }
+
 std::string xs64(int_fast64_t value) {
     std::stringstream ss;
     ss << std::hex << std::setfill('0') << std::setw(16) << static_cast<int>(value);
@@ -275,13 +278,10 @@ int8_t doorOpenPercent = 0;
 int8_t animateDoor = 3;
 
 
-
-
-
 int winner;
 
 std::string getUName() {
-    const char* username;
+    const char *username;
 
 #ifdef _WIN32
     username = std::getenv("USERNAME");
@@ -289,7 +289,7 @@ std::string getUName() {
     username = std::getenv("USER");
 #endif
 
-    if(username != nullptr) {
+    if (username != nullptr) {
         return username;
     } else {
         return "Unable to get username.";
@@ -297,7 +297,9 @@ std::string getUName() {
 }
 
 std::string getDayOfWeek() {
-    std::vector<std::string> daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    std::vector<std::string> daysOfWeek = {
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+    };
 
     auto now = std::chrono::system_clock::now();
     auto timePoint = std::chrono::system_clock::to_time_t(now);
@@ -314,17 +316,80 @@ int useTimeToSeedRandomToSetWinner() {
 }
 
 std::string retWinner() {
-    if(winner) {
-        return(getUName());
-    }
-    else {
-        return(getDayOfWeek());
+    if (winner) {
+        return (getUName());
+    } else {
+        return (getDayOfWeek());
     }
 }
 
+#define DBG_NORM_OFF 0
+#define ABS_NORM 1
+#define RAW_NORM 2
+#define POS_NORM 3
+#define NEG_NORM 4
 
+//mapping the state to strings for printing
+
+std::map<int, std::string> dbgNormMap = {
+    {DBG_NORM_OFF, "None"},
+    {ABS_NORM, "Abs(Norm)"},
+    {RAW_NORM, "Scaled"},
+    {POS_NORM, "Positive Only"},
+    {NEG_NORM, "Negative Only"}
+};
+
+
+int nextDbgState() {
+    if (dbgNormals == NEG_NORM) {
+        return DBG_NORM_OFF;
+    } else {
+        return dbgNormals + 1;
+    }
+}
 
 int cardRotState = CARDROTNONE;
 int cardRotPercent = 0; //out of 100, but will be scaled
 int cardRotSpeed = 1;
+int dbgNormals = 0;
+uint8_t enabledFaces = 0b00111111;
 
+void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
+    GLfloat normToColors[3];
+    float debugWhyAreMyNormalsBroken[3]  = {whyAreMyNormalsBroken[0], whyAreMyNormalsBroken[1], whyAreMyNormalsBroken[2]};
+    switch (dbgNormals) {
+        case 0:
+            glNormal3fv(whyAreMyNormalsBroken);
+            break;
+        case 1:
+            normToColors[0] = abs(whyAreMyNormalsBroken[0]);
+            normToColors[1] = abs(whyAreMyNormalsBroken[1]);
+            normToColors[2] = abs(whyAreMyNormalsBroken[2]);
+            glDisable(GL_LIGHTING);
+            break;
+        case 2:
+            normToColors[0] = (whyAreMyNormalsBroken[0] + 1) / 2;
+            normToColors[1] = (whyAreMyNormalsBroken[1] + 1) / 2;
+            normToColors[2] = (whyAreMyNormalsBroken[2] + 1) / 2;
+            glDisable(GL_LIGHTING);
+            break;
+        case 3: //just get rid of any values below 0
+            normToColors[0] = whyAreMyNormalsBroken[0] > 0 ? whyAreMyNormalsBroken[0] : 0;
+            normToColors[1] = whyAreMyNormalsBroken[1] > 0 ? whyAreMyNormalsBroken[1] : 0;
+            normToColors[2] = whyAreMyNormalsBroken[2] > 0 ? whyAreMyNormalsBroken[2] : 0;
+            glDisable(GL_LIGHTING);
+            break;
+        case 4: //just get rid of any values above 0
+            normToColors[0] = whyAreMyNormalsBroken[0] < 0 ? 1 : 0;
+            normToColors[1] = whyAreMyNormalsBroken[1] < 0 ? 1 : 0;
+            normToColors[2] = whyAreMyNormalsBroken[2] < 0 ? 1 : 0;
+            glDisable(GL_LIGHTING);
+            break;
+        default:
+            glNormal3fv(whyAreMyNormalsBroken);
+            break;
+    }
+    if (dbgNormals != 0) {
+        glColor3fv(normToColors);
+    }
+}

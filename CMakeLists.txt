@@ -6,12 +6,15 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_PREFIX_PATH "C:/Program/NVIDIA Corporation/Cg")
 endif()
 
+set(MAIN_BINARY_NAME "OpenGLWindow")
+set(TESTING_BINARY_NAME "testing")
+
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 include_directories(${OPENGL_INCLUDE_DIR}   ${GLUT_INCLUDE_DIRS})
 
-add_executable(tgsouthaHW4 main.cpp
+add_executable(${MAIN_BINARY_NAME} main.cpp
         src/Camera.cpp
         src/Camera.h
         src/Coord.cpp
@@ -30,10 +33,10 @@ add_executable(tgsouthaHW4 main.cpp
         src/testingFunctions.cpp
         src/testingFunctions.h
 )
-target_link_libraries (tgsouthaHW4 ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries (${MAIN_BINARY_NAME}  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
-add_executable(testing mainForTesting.cpp
+add_executable(${TESTING_BINARY_NAME} mainForTesting.cpp
         src/Coord.cpp
         src/Coord.h
 #
@@ -56,7 +59,7 @@ add_executable(testing mainForTesting.cpp
 
 )
 
-target_link_libraries (testing ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+target_link_libraries (${TESTING_BINARY_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
 set(CMAKE_CURRENT_SOURCE_DIR "C:/Users/tgsp/AppData/Roaming/JetBrains/CLion2024.1/scratches")
