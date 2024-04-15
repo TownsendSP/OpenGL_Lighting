@@ -39,6 +39,8 @@ target_link_libraries (${MAIN_BINARY_NAME}  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES
 add_executable(${TESTING_BINARY_NAME} mainForTesting.cpp
         src/Coord.cpp
         src/Coord.h
+        src/globals.h
+        src/globals.cpp
 #
 #        src/Camera.cpp
 #        src/Camera.h

@@ -411,6 +411,15 @@ bool useCollision = true;
 float moveSpeed = 0.5f;
 float cardDist;
 
+bool bufferPeeking = false;
+bool windowFocused = false;
+bool selectLock = false;
+bool selectLockingEnabled = false;
+
+
+
+int animatingBlinds = 3;
+int blindsProgress = 0;
 
 
 

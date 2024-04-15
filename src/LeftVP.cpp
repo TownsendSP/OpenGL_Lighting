@@ -36,6 +36,7 @@ extern int height;
 
 int mNum = 0;
 float rposX = 3;
+
 void processConsoleMsgs() {
     for (int i = glConsole.size() - 1; i >= 0; --i) {
         int messageHeight = 3 + (glConsole.size() - i) * 15;
@@ -44,8 +45,7 @@ void processConsoleMsgs() {
             glConsole.rm(i);
             // std::cout << "Removed message " << i << "because messageHeight " << messageHeight << " > maxHeight " <<
             //         static_cast<int>(conHeightPercent * height) << std::endl;
-        }
-        else {
+        } else {
             glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
             glRasterPos3f(rposX, messageHeight, -1.0);
 
@@ -61,6 +61,7 @@ void processConsoleMsgs() {
 
 void drawLeft() {
     glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
+
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     glPushMatrix();

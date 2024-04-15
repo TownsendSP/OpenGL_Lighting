@@ -11,9 +11,6 @@
 #include <iomanip>
 #include <sstream>
 
-
-
-
 float srnd(float min, float max);
 
 
@@ -27,7 +24,6 @@ inline float clscl(float val, float min, float max) {
 }
 
 float srndi(float min, float max);
-
 
 class Coord {
 
@@ -57,7 +53,6 @@ public:
         Y = 0;
         Z = 0;
     }
-
 
     //mathy stuff
 #ifndef FOLDING_COORDMATH
@@ -223,5 +218,3 @@ std::vector<Coord> genRandNonCoLinearCord(int numCoords, float permissibleClosen
 Coord genRandNonCoLinearCord(std::vector<Coord> coords, float permissibleCloseness, Coord min, Coord max);
 bool isColorCloseEnough(Coord color1, Coord color2, float closeness);
 #endif //COORD_H
-
-

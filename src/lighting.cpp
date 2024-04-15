@@ -245,9 +245,7 @@ Light hallLight = Light(
     ColorData(1.0f, 0.9f, 0.85f, 1.0f), //diff
     ColorData(1.0f, 1.0f, 1.0f, 1.0f) //spec
 );
-    // ColorData(0.2f, 0.2f, 0.2f, 1),
-    // ColorData(1.0f, 1.0f, 1.0f, 1.0f),
-    // ColorData(1.0f, 1.0f, 1.0f, 1.0f));
+
 
 Light brightWhite = Light(
     Light::LIGHT3,
@@ -306,10 +304,10 @@ Spotlight headLamp = Spotlight(
 
 
 
-
+float sunScale = 0.5;
 Light sunLight = Light( //directional sunlight, high in the sky
     Light::LIGHT2,
     ColorData(1.0f, 1.0f, 1.0f, 0.0f),
     ColorData(0.2f, 0.2f, 0.2f, 1),
-    ColorData(1.0f, 1.0f, 1.0f, 1.0f),
-    ColorData(1.0f, 1.0f, 1.0f, 1.0f));
+    ColorData(sunScale, sunScale, sunScale, 1.0f),
+    ColorData(sunScale, sunScale, sunScale, 1.0f));

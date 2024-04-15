@@ -142,12 +142,36 @@ void Camera::setPitchYaw() {
     ang = Coord(atan2(dirVec.X, dirVec.Z), asin(dirVec.Y), 0);
 }
 
+// Coord calcPitchYaw(Coord position, Coord target) {
+//     Coord targetI = target + Coord(0.001, 0.001, 0.001);
+//     Coord dirVec = (targetI - position);
+//     dirVec = dirVec / sqrt(dirVec.pow(2).sum());
+//     Coord rv = Coord(atan2(dirVec.X, dirVec.Z), asin(dirVec.Y), 0);
+//     return rv;
+// }
+
+// Coord calcPitchYaw(Coord position, Coord target) {
+//     Coord dirVec = (target - position);
+//     dirVec = dirVec / sqrt(dirVec.pow(2).sum());
+//
+//     float pitch = atan2(dirVec.Y, sqrt(dirVec.X * dirVec.X + dirVec.Z * dirVec.Z));
+//     float yaw = atan2(dirVec.X, dirVec.Z);
+//
+//     return Coord(pitch, yaw, 0);
+// }
+
+
 Coord calcPitchYaw(Coord position, Coord target) {
-    Coord dirVec = (target - position);
+    Coord targetI = target + Coord(0.001, 0.001, 0.001);
+    Coord dirVec = (targetI - position);
     dirVec = dirVec / sqrt(dirVec.pow(2).sum());
     Coord rv = Coord(atan2(dirVec.X, dirVec.Z), asin(dirVec.Y), 0);
-    return rv;
+    dirVec = Coord(0, 0, 0);
+    return Coord(0.0001, 0.0001, 0);
+    // return rv;
 }
+
+
 
 Coord calcTarget(Coord position, Coord pitchYaw) {
     float dirX = cos(pitchYaw.X) * cos(pitchYaw.Y);

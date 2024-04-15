@@ -12,6 +12,7 @@
 # include <GL/glut.h>
 
 #endif
+#include <chrono>
 #include <cstdint>
 #include <streambuf>
 #include <string>
@@ -292,7 +293,14 @@ extern bool useCollision;
 extern float moveSpeed;
 extern float cardDist;
 
+extern bool bufferPeeking;
+extern bool windowFocused;
+extern bool selectLock;
+extern bool selectLockingEnabled;
 
+
+extern int animatingBlinds;
+extern int blindsProgress;
 
 
 

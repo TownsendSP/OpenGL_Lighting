@@ -1,6 +1,6 @@
-//
-// Created by tgsp on 4/9/2024.
-//
+
+
+
 
 #include "Scenedraw.h"
 #include "Coord.h"
@@ -13,6 +13,7 @@
 
 extern std::map<int, std::string> debugMap;
 extern Camera cam;
+extern Blinds windowBlinds;
 
 Coord hallBnl = Coord(hallBnlF);
 Coord halltfr = Coord(halltfrF);
@@ -85,6 +86,16 @@ float legRadB = 0.1;
 float doorwayHeight = 3;
 float doorwayWidth = 2;
 
+Coord blindsBnl = Coord((roomtfr.X-roomBnl.X)/2+roomBnl.X, 1, roomBnl.Z);
+Coord blindsTfr = Coord((roomtfr.X-roomBnl.X)/2+roomBnl.X, roomtfr.Y-1, roomBnl.Z);
+
+void drawBlinds(Coord bnl, Coord tfr) {
+    glPushMatrix();
+    glTranslatef(bnl.X, bnl.Y, bnl.Z);
+    glRotatef(-90, 0, 1, 0);
+    windowBlinds.draw(ALL);
+    glPopMatrix();
+}
 
 
 void drawCardWinner1(int winnernum = 0) {
@@ -120,7 +131,6 @@ void drawCardWinner1(int winnernum = 0) {
     }
     glPopMatrix();
 }
-
 
 
 void makeLeg(float *legInfo) {
@@ -198,7 +208,6 @@ void rDoorExist() {
     glPopMatrix();
 }
 
-
 void drawLampCage() {
     //enable smooth lines, hopefully I'll be able to get the look I'm going for
     glEnable(GL_LINE_SMOOTH);
@@ -256,7 +265,7 @@ void drawWinnerAndRotate() {
 }
 
 void drawHall() {
-
+    sunLight.disable();
     ColorData lightOG[3] = {
         hallLight.lightAmb,
         hallLight.lightDiff,
@@ -283,18 +292,19 @@ void drawHall() {
     // glPopMatrix();
     // roomLight.enable();
     int siding = OUTSIDEOUT;
+#ifndef FOLDING_REGION_HALLWAY
 
     wallMat.apply();
     //doorframe, but only the back face:
-    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, hallBnl.Z),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth/2), 20, OUTSIDEOUT, BACK_FACE);
-        //top of doorframe
-    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
-        Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, hallBnl.Z),
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, hallBnl.Z + doorwayWidth / 2), 20, OUTSIDEOUT, BACK_FACE);
+    //top of doorframe
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y + doorwayHeight, hallBnl.Z),
+                 Coord(halltfr.X, halltfr.Y, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
 
     //Left side of doorframe
-    cubeOfPlanes(Coord(halltfr.X-0.5, hallBnl.Y, halltfr.Z - doorwayWidth/2),
-        Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
+    cubeOfPlanes(Coord(halltfr.X - 0.5, hallBnl.Y, halltfr.Z - doorwayWidth / 2),
+                 Coord(halltfr.X, hallBnl.Y + doorwayHeight, halltfr.Z), 20, OUTSIDEOUT, BACK_FACE);
 
 
     //
@@ -304,6 +314,7 @@ void drawHall() {
     cubeOfPlanes(hallBnl, halltfr, 40, INSIDEOUT, BOTTOM_FACE);
     ceilingMat.apply();
     cubeOfPlanes(hallBnl, halltfr, 40, INSIDEOUT, TOP_FACE);
+#endif
 
 
 #ifndef FOLDING_REGION_ROOM
@@ -321,8 +332,29 @@ void drawHall() {
     matteConcrete.apply();
     cubeOfPlanes(Coord(halltfr.X, roomBnl.Y, halltfr.Z), roomtfr, 40, INSIDEOUT, FRONT_FACE | BACK_FACE);
 
+
+    drawBlinds(blindsBnl, blindsTfr);
+    glPushMatrix();
+    glScalef(1, 1, -1);
+    drawBlinds(blindsBnl, blindsTfr);
+    glPopMatrix();
+    Coord bl1 = blindsBnl-Coord(1, 0, 0);
+    Coord bl2 = {bl1.X, blindsTfr.Y, bl1.Z};
+    Coord bl3 = blindsTfr;
+    Coord bl4 = (bl1&0b011)|Coord(blindsTfr.X+1, 0, 0);
+
+    Coord br1 = Coord(bl1.X, bl1.Y, -bl1.Z);
+    Coord br2 = Coord(bl2.X, bl2.Y, -bl2.Z);
+    Coord br3 = Coord(bl3.X, bl3.Y, -bl3.Z);
+    Coord br4 = Coord(bl4.X, bl4.Y, -bl4.Z);
+
+
     wallMat.apply();
-    cubeOfPlanes(roomBnl, roomtfr, 40, INSIDEOUT, LEFT_FACE | RIGHT_FACE);
+    cubeOfPlanes(roomBnl, br4, 20, INSIDEOUT, LEFT_FACE|RIGHT_FACE);
+    cubeOfPlanes(Coord(roomBnl.X, bl1.Y, bl1.Z), {br1.X, roomtfr.Y, roomtfr.Z}, 20, INSIDEOUT, LEFT_FACE|RIGHT_FACE);
+    cubeOfPlanes(bl2, roomtfr, 20, INSIDEOUT, LEFT_FACE|RIGHT_FACE);
+    cubeOfPlanes(bl4-Coord(0, 1, 0), (roomtfr&101)|br3, 20, INSIDEOUT, LEFT_FACE|RIGHT_FACE);
+
     floorMat.apply();
     cubeOfPlanes(roomBnl, roomtfr, 40, INSIDEOUT, BOTTOM_FACE);
     ceilingMat.apply();
@@ -359,7 +391,6 @@ void drawHall() {
     //drawing the table
     drawTable(tableBnl, tableTfr);
 #endif
-
     glPushMatrix();
     glTranslatef(0.1 + tableBnl.X, tableTfr.Y, -0.25 );
     drawContainer(Coord(0,0,0), Coord(0.5,0.51,0.5));
@@ -374,8 +405,6 @@ void drawHall() {
     glutSolidTeapot(teapotSize);
     glPopMatrix();
 
-
-
     glPushMatrix();
     glTranslatef(0.4 + tableBnl.X, tableTfr.Y, 0 );
     glScalef(0.25, 0.25, 0.25);
@@ -383,88 +412,82 @@ void drawHall() {
     glPopMatrix();
 
 
+#ifndef FOLDING_REGION_DEBUGCUBES
+
 
     glPushMatrix();
     glTranslatef(10, 10, 10);
     shinyRed.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, FRONT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, FRONT_FACE);
     shinyGreen.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, TOP_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, TOP_FACE);
     shinyBlue.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, RIGHT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, RIGHT_FACE);
     shinyRed.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, BACK_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, BACK_FACE);
     shinyGreen.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, BOTTOM_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, BOTTOM_FACE);
     shinyBlue.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, 1, LEFT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, 1, LEFT_FACE);
 
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(7, 10, 10);
     shinyRed.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, FRONT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, FRONT_FACE);
     shinyGreen.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, TOP_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, TOP_FACE);
     shinyBlue.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, RIGHT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, RIGHT_FACE);
     shinyRed.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, BACK_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, BACK_FACE);
     shinyGreen.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, BOTTOM_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, BOTTOM_FACE);
     shinyBlue.apply();
-    cubeOfPlanes(Coord(), Coord()+2.0f, 100, -1, LEFT_FACE);
+    cubeOfPlanes(Coord(), Coord() + 2.0f, 100, -1, LEFT_FACE);
+#endif
+
 
     glPopMatrix();
             // glEnable(GL_LIGHTING);
 
 
     roomLight.disable();
+    sunLight.enable();
 }
 
 void lastHiddenCubeMirrored() {
     glColor3f(0,1,0);
     glPushMatrix();
     glTranslatef(15,-5.5 , 2);
-    cubeOfPlanes(Coord(), Coord(1, -3, 1), 20, 1, ALL_FACE);
+    cubeOfPlanes(Coord(), Coord(1, -3, 1), 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
 }
 void drawHiddenBuffer() {
-    // Create a framebuffer
-    GLuint framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    // Create a texture to store the color data
-    GLuint textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    //blue 1x1 cube @ 10, 1, 2
-    //red 1x1 cube @ 19, 2, 0
-    //green 2h1w cube at -6, 15, 2
-
-
+    glDisable(GL_LIGHTING);
 
     //blue cube:
-    glColor3f(0, 0, 1);
+    glColor3f(0, 0, 255);
     glPushMatrix();
     glTranslatef(9, 1, 1);
-    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, 1, ALL_FACE);
+    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
 
-    glColor3f(1, 0, 0);
+    //red; red box
+    glColor3f(255, 0, 0);
     glPushMatrix();
     glTranslatef(17.6, 1, -0.5f);
-    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, 1, ALL_FACE);
+    cubeOfPlanes(Coord(), Coord(1, 1, 1), 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
 
+    //green cube:
+    glColor3f(0, 255, 0);
     glPushMatrix();
-    glScalef(2,2,-1);
-    lastHiddenCubeMirrored();
+    cubeOfPlanes(blindsBnl-Coord(1,0,0), {blindsTfr.X+1, blindsTfr.Y, blindsBnl.Z+0.1f}, 20, OUTSIDEOUT, ALL_FACE);
+    cubeOfPlanes(blindsBnl+Coord(-1,0,11.9), {blindsTfr.X+1, blindsTfr.Y, 12}, 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
-    lastHiddenCubeMirrored();
-
+    glEnable(GL_LIGHTING);
 
 
 }

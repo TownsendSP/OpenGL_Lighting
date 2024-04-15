@@ -1,5 +1,3 @@
-//Library_Imports
-
 #ifdef __APPLE__
 # include <GLUT/glut.h>
 #else
@@ -34,7 +32,6 @@
 int totalWidth = 1900;
 int lVportW = 300;
 int rVportW = 1600;
-
 int height = 900;
 
 
@@ -54,6 +51,7 @@ float animThing = 0;
 //Global Variables
 bool useMouse = false;
 bool started = false;
+bool starteda = false;
 
 
 float sensitivity = 0.01f; // camera movement and mouse sensitivity
@@ -101,8 +99,6 @@ ColorData solarizedText = ColorData(0.71373, 0.58039, 0.58824, 1.0);
 DebugLevel defaultDebug = WEAK;
 bool detachSpotlight = false;
 //variables for FPS Counter:
-int frame = 0;
-auto prevTime = std::chrono::high_resolution_clock::now();
 
 
 #endif
@@ -113,10 +109,23 @@ auto prevTime = std::chrono::high_resolution_clock::now();
 // Spotlight headlamp;
 Light fakeSun;
 
+int frame = 0;
+auto prevTime = std::chrono::high_resolution_clock::now();
+
+void calculateFPS() {
+    frame++;
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(currentTime - prevTime);
+    if (duration.count() >= 1) {
+        debugMap[60 - 3] = " FPS: " + std::to_string(frame);
+        frame = 0;
+        prevTime = currentTime;
+    }
+}
 #endif
 
-
 #ifndef FOLDING_REGION_Draw
+
 
 Coord rotToVec(float rotRadX, float rotRadY) {
     return Coord(cos(rotRadX) * sin(rotRadY), sin(rotRadX), cos(rotRadX) * cos(rotRadY));
@@ -128,7 +137,6 @@ Coord normalize(Coord vec) {
     return Coord(vec.X * invSqr, vec.Y * invSqr, vec.Z * invSqr);
 }
 
-
 void updateSpotlight() {
     headLamp.setup();
     headLamp.lightPos = ColorData(0, 0, 0, 1.0f);
@@ -136,15 +144,20 @@ void updateSpotlight() {
 }
 
 void setupRight() {
+    int effectiveWidth = showInfoViewport ? totalWidth - lVportW : totalWidth;
+
     if (showInfoViewport) {
-        glViewport(lVportW, 0, rVportW, height);
+        // glViewport(lVportW, 0, rVportW, height);
+        glViewport(lVportW, 0, effectiveWidth, height);
     } else {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, totalWidth, height);
     }
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(fov, totalWidth / height, 0.0001, 500.0);
+
+    gluPerspective(fov, static_cast<float>(effectiveWidth) / height, 0.0001, 500.0);
+
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -152,17 +165,20 @@ void setupRight() {
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // Enable local viewpoint.
     glEnable(GL_LINE_SMOOTH);
     glShadeModel(GL_SMOOTH);
-    if(cardRotState ==  CARD_ROT_REL) {
-        cardRotPercent = std::clamp((100.0f-((cardDist - 2.0f) / 8.0f * 100.0f)) * cardRotSpeed, 0.0f, 100.0f);
+
+    if (cardRotState == CARD_ROT_REL) {
+        cardRotPercent = std::clamp((100.0f - ((cardDist - 2.0f) / 8.0f * 100.0f)) * cardRotSpeed, 0.0f, 100.0f);
 
         //cardRotPercent = std::clamp(cardRotSpeed * ((cardDist + 1.0f) / 8.0f) * 100.0f, 0.0f, 100.0f);
 
         //rdRotPercent = (std::clamp((((cardDist+1)9)*100.0f), 0.0f, 100.0f));
     }
     updateSpotlight();
+    headLamp.setup();
 
     cam.lookAt();
-    drawHiddenBuffer();
+    //enable global ambient and set it to  globAmb:
+
     // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
 }
 
@@ -170,34 +186,35 @@ void setupRight() {
 void backToBasicsCalculateTheDirVec(Coord directionVector) {
 }
 
-void drawLitShapes() {
-    glEnable(GL_LIGHTING);
-    // sunLight.enable();
-    headLamp.enable();
+int modifier;
 
-    glEnable(GL_LIGHT0);
-    glPushMatrix();
-    glTranslatef(-2, 0, -2);
-    windowBlinds.draw(ALL);
-    glPopMatrix();
-    glDisable(GL_LIGHT0);
+void drawLitShapes() {
+
+    glEnable(GL_LIGHTING);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globAmb);
+    sunLight.setup();
+    headLamp.enable();
 
     drawHall();
 
+    sunLight.enable();
 
-    headLamp.enable();
 
-    ceilingMat.apply();
+
+
+    shinyRed.apply();
     glPushMatrix();
     glTranslatef(0, 10, 0);
     glRotatef(90, 1, 0, 0);
     glutSolidTorus(25, 50, 150, 100);
     glPopMatrix();
+    shinyGreen.apply();
     glPushMatrix();
     glTranslatef(0, 10, 0);
     glRotatef(90, 0, 1, 0);
     glutSolidTorus(25, 50, 250, 100);
     glPopMatrix();
+    shinyBlue.apply();
     glPushMatrix();
     glTranslatef(0, 10, 0);
     glutSolidTorus(25, 50, 250, 100);
@@ -221,6 +238,10 @@ void drawUnlitShapes() {
         glPopMatrix();
     }
 
+    if (bufferPeeking) {
+        drawHiddenBuffer();
+    }
+
     if (drawAllPoints) {
         std::vector<thingHolder> debugPoints = getDbgPts();
         for (float *point: debugPoints) {
@@ -236,6 +257,7 @@ void drawUnlitShapes() {
         }
     }
 
+
     // testConeArot();
 
 
@@ -244,9 +266,7 @@ void drawUnlitShapes() {
     glutSolidCone(1, 1, 20, 20);
     glPopMatrix();
 
-
     // testCamBindings();
-
 
     // testInRightPlace(cam);
 
@@ -257,23 +277,106 @@ void drawUnlitShapes() {
     glEnable(GL_LIGHTING);
 }
 
-
-#endif
-
-bool shownKeybinds = false;
-
-// fps function
-void calculateFPS() {
-    frame++;
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>(currentTime - prevTime);
-    if (duration.count() >= 1) {
-        debugMap[60 - 3] = " FPS: " + std::to_string(frame);
-        debugMap[30] = " FOV: " + std::to_string(fov);
-        frame = 0;
-        prevTime = currentTime;
+int stateSwitch(int animState) {
+    switch (animState) {
+        case DOOR_CLOSED_STOPPED:
+            return DOOR_OPENING;
+            break;
+        case DOOR_OPENED_STOPPED:
+            return DOOR_CLOSING;
+            break;
+        case DOOR_OPENING:
+            return DOOR_OPENED_STOPPED;
+            break;
+        case DOOR_CLOSING:
+            return DOOR_CLOSED_STOPPED;
+            break;
+        default:
+            break;
     }
 }
+
+void activateDoor() {
+    animateDoor = stateSwitch(animateDoor);
+}
+
+void activateWindow() {
+    animatingBlinds = stateSwitch(animatingBlinds);
+}
+
+void hallLightAction() {
+    std::string hallLightState;
+    roomLight.lightswitch();
+    hallLight.lightswitch();
+    hallLightState = roomLight.enabled ? "On" : "Off";
+    glout << "Room Light switched " << hallLightState << std::endl;
+}
+
+void getID(int x, int y) {
+    unsigned char pixel[3];
+    glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, pixel);
+    //printed only for demonstration
+    // glout << "Pixel at (" << x << ", " << y << "): R: "
+    //         << (int) pixel[0] << " G: " << (int) pixel[1] << " B: " << (int) pixel[2] << std::endl;
+    //
+    int pixeli[3] = {(int) pixel[0], (int) pixel[1], (int) pixel[2]};
+    int pixela = pixeli[0] << 16 | pixeli[1] << 8 | pixeli[2];
+    switch (pixela) {
+        case (255 << 16) | (0 << 8) | 0:
+            if (cardRotState == CARD_ROT_COMPLETE) {
+                cardRotState = CARD_ROT_UNDO;
+            } else {
+                cardRotState = CARD_ROT_NOW;
+            }
+            break;
+        case(0 << 16) | (255 << 8) | 0:
+            activateWindow();
+            break;
+        case (0 << 16) | (0 << 8) | 255:
+            activateDoor();
+            break;
+        default:
+            return;
+    }
+}
+
+void drawWindow() {
+    if (showInfoViewport) {
+        setupLeft();
+        calculateFPS();
+        drawLeft();
+    }
+    setupRight();
+    if (selecting) {
+        //
+        drawHiddenBuffer();
+        if (selecting != selectLock) {
+            getID(xClick, yClick);
+        }
+        selecting = false;
+        glutSwapBuffers();
+        if (selectLock) {
+            selecting = true;
+            return;
+        }
+    }
+    drawUnlitShapes();
+
+    // drawMoreShapes();
+
+    headLamp.enable();
+
+    drawLitShapes();
+
+
+    glutSwapBuffers();
+}
+#endif
+
+#ifndef FOLDING_REGION_UTILITY_AND_SETUP
+
+bool shownKeybinds = false;
+// fps function
 
 void showKeybindings() {
     glout << NOPREFIX;
@@ -284,39 +387,27 @@ void showKeybindings() {
     }
 }
 
-void drawWindow() {
-    if (showInfoViewport) {
-        setupLeft();
-        calculateFPS();
-        if (!shownKeybinds) {
-            showKeybindings();
-            shownKeybinds = true;
-        }
-        drawLeft();
-    }
-    if(selecting) {
-        drawHiddenBuffer();
-
-    }
-    setupRight();
-
-    drawUnlitShapes();
-    // drawMoreShapes();
-
-    headLamp.enable();
-
-    drawLitShapes();
-
-
-    glutSwapBuffers();
+void myPause(int pauseLength = 100) {
+    int tStart = clock();
+    while (clock() - tStart < pauseLength) { ; }
 }
 
 void setupObjects() {
-    cam = Camera(Coord(1, 2, 0), Coord(2, 2, 0), Coord(0, 1, 0));
+    Coord camIniPos(1, 2, 0);
+    Coord camIniTgt(2, 2, 0);
+    cam = Camera(camIniPos,camIniTgt, Coord(0, 1, 0));
+    cam.relRot({1, 1,0});
+    cam.relRot({-1, -1,0});//prevents the camera from jumping at the start
+    // cam.relRot(Coord(0, 90, 0));
+    // Coord pitchYaw= calcPitchYaw(camIniPos, camIniTgt);
+    // cam.setPitchYaw();
+    // cam.tgt = camIniTgt;
     debugXes.emplace_back(Coord(0, 0, 0), 100, 2);
-    windowBlinds = Blinds(1, 2, 0.1, 30);
 
-    // roomLight = Light(
+    windowBlinds = Blinds(2, 2, 0.1, 30);
+
+
+    // roomLight = Light(x
 
     headLamp.enable();
 
@@ -403,9 +494,31 @@ void resize(int w, int h) {
     gluPerspective(fov, (float) w / (float) h, 1.0, 500.0);
     glMatrixMode(GL_MODELVIEW);
 }
+#endif
 
-//control
 #ifndef FOLDING_REGION_Control
+
+void mouseControl(int button, int state, int x, int y) {
+    //check to see if the window is focused
+    if (state == GLUT_DOWN && button == GLUT_LEFT) {
+        selecting = true;
+        selectLock = selectLockingEnabled;
+        // if selectLock, set
+        glutSetCursor(selectLock ? GLUT_CURSOR_LEFT_ARROW : GLUT_CURSOR_FULL_CROSSHAIR);
+        if (!selectLock) {
+            xClick = x;
+            yClick = height - y;
+        } //for screen vs mouse coordinates}}
+        glutPostRedisplay();
+    }
+    if (state == GLUT_UP && button == GLUT_LEFT) {
+        selectLock = false;
+        //reset cursor to default:
+        glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+        xClick = x;
+        yClick = height - y;
+    }
+}
 
 static bool firstMouse = true;
 
@@ -437,39 +550,10 @@ void toggleMouse() {
     }
 }
 
-
-void activateDoor() {
-    switch (animateDoor) {
-        case DOOR_CLOSED_STOPPED:
-            glout << "Door Opening" << '\n';
-        animateDoor = DOOR_OPENING;
-        break;
-        case DOOR_OPENED_STOPPED:
-            glout << "Door Closing" << '\n';
-        animateDoor = DOOR_CLOSING;
-        break;
-        case DOOR_OPENING:
-            animateDoor = DOOR_OPENED_STOPPED;
-        glout << "Door Opened" << '\n';
-        break;
-        case DOOR_CLOSING:
-            glout << "Door Closed" << '\n';
-        animateDoor = DOOR_CLOSED_STOPPED;
-        break;
-        default:
-            break;
-    }
-}
-
-bool useCaps = false;
-
-
-void hallLightAction() {
-    std::string hallLightState;
-    roomLight.lightswitch();
-    hallLight.lightswitch();
-    hallLightState = roomLight.enabled ? "On" : "Off";
-    glout << "Room Light switched " << hallLightState << std::endl;
+void modGlobAmb(int modifier) {
+    globAmb[0] = clmp(globAmb[0] + modifier, 0.0, 1.0);
+    globAmb[1] = clmp(globAmb[1] + modifier, 0.0, 1.0);
+    globAmb[2] = clmp(globAmb[2] + modifier, 0.0, 1.0);
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -487,7 +571,7 @@ void keyboard(unsigned char key, int x, int y) {
             cam.moveCamWithColl(Coord(0, 0, -1 * moveSpeed));
             break;
         case 'D': //CAMERA RIGHT
-            if(modifiers&GLUT_ACTIVE_ALT){
+            if (modifiers & GLUT_ACTIVE_ALT) {
                 hallLightAction();
             } else {
                 cam.moveCamWithColl(Coord(0, 0, 1 * moveSpeed));
@@ -500,9 +584,9 @@ void keyboard(unsigned char key, int x, int y) {
             cam.moveCamWithColl(Coord(0, 1 * moveSpeed, 0));
             break;
         case 'd': //reset all but the camera
-            if(modifiers&GLUT_ACTIVE_ALT) {
+            if (modifiers & GLUT_ACTIVE_ALT) {
                 activateDoor();
-            } else{
+            } else {
                 hallLightAction();
                 activateDoor();
             }
@@ -513,14 +597,13 @@ void keyboard(unsigned char key, int x, int y) {
 
             break;
         case ' ': //Toggle Mouse control of Camera
-            if(modifiers&GLUT_ACTIVE_SHIFT) {
+            if (modifiers & GLUT_ACTIVE_SHIFT) {
                 useCollision = !useCollision;
                 glout << "Collision: " << (useCollision ? "Enabled" : "Disabled") << '\n';
-
             } else {
-            toggleMouse();
-            glout << "Mouse Control: " << (useMouse ? "On" : "Off; Use <->  and PGUP/DN") << '\n';
-        }
+                toggleMouse();
+                glout << "Mouse Control: " << (useMouse ? "On" : "Off; Use <->  and PGUP/DN") << '\n';
+            }
             break;
 
         case '1':
@@ -594,7 +677,7 @@ void keyboard(unsigned char key, int x, int y) {
             glout << "State5:" << "Pos:" << cam.pos.toString(0) << " Cam Tgt " << cam.tgt.toString(0) << '\n';
             break;
         case '`':
-            if(modifiers & GLUT_ACTIVE_ALT) {
+            if (modifiers & GLUT_ACTIVE_ALT) {
                 enabledFaces = enabledFaces | ALL_FACE;
                 glout << "All Faces Enabled" << '\n';
             } else {
@@ -603,19 +686,18 @@ void keyboard(unsigned char key, int x, int y) {
             }
             break;
         case 'G':
-            globAmb[0] = clmp(globAmb[0] + 0.01, 0.0, 1.0);
-            globAmb[1] = clmp(globAmb[1] + 0.01, 0.0, 1.0);
-            globAmb[2] = clmp(globAmb[2] + 0.01, 0.0, 1.0);
-        glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
-        break;
+
+            modGlobAmb(0.01);
+            glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
+            break;
         case 'g':
-            globAmb[0] = clmp(globAmb[0] -0.01, 0.0, 1.0);
-            globAmb[1] = clmp(globAmb[1] -0.01, 0.0, 1.0);
-            globAmb[2] = clmp(globAmb[2] -0.01, 0.0, 1.0);
-        glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
+            modGlobAmb(-0.01);
+            glout << "Global Ambient Light: " << globAmb[0] << ", " << globAmb[1] << ", " << globAmb[2] << '\n';
 
 
-
+            break;
+        case 'h':
+            headLamp.lightswitch();
             break;
         case '?': //print keybinds:
             showKeybindings();
@@ -648,8 +730,6 @@ void testCharacterPrinting() {
 Coord angle = Coord(0, 0.0872665, 0); //5 degrees
 
 
-
-
 void specialKeyboard(int key, int x, int y) {
     //modifiers:
     modifiers = glutGetModifiers();
@@ -672,7 +752,6 @@ void specialKeyboard(int key, int x, int y) {
             break;
         case GLUT_KEY_F4:
             headLamp.lightswitch();
-            glout << "Headlamp switched " << headLamp.enabled ? "On\n" : "Off\n";
             debugMap[60 - 20] = "Headlamp: " + headLamp.enabled ? "On" : "Off";
 
             break;
@@ -705,13 +784,13 @@ void specialKeyboard(int key, int x, int y) {
             break;
 
         case GLUT_KEY_F8:
-            if(modifiers & GLUT_ACTIVE_ALT) {
-                cardRotState = cardRotState== CARD_ROT_REL ? CARD_ROT_UNDO : CARD_ROT_REL;
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                cardRotState = cardRotState == CARD_ROT_REL ? CARD_ROT_UNDO : CARD_ROT_REL;
                 glout << "Interactive Card: " << (cardRotState == CARD_ROT_REL ? "Enabled" : "Disabled") << '\n';
             } else {
                 if (cardRotState == CARD_ROT_NONE) {
                     cardRotState = CARD_ROT_NOW;
-                } else if (cardRotState == CARD_ROT_NOW || CARD_ROT_COMPLETE){
+                } else if (cardRotState == CARD_ROT_NOW || CARD_ROT_COMPLETE) {
                     cardRotState = CARD_ROT_UNDO;
                     glout << "CardUndo" << std::endl;
                 }
@@ -730,18 +809,12 @@ void specialKeyboard(int key, int x, int y) {
             glout << CONTROLON;
             break;
         case GLUT_KEY_UP: // up arrow does windowBlind.open()
-            windowBlinds.open(blindAnimSpeed);
-            glout << "Blinds Opened" << '\n';
+            cam.moveCamWithColl(Coord(1 * moveSpeed, 0, 0));
             break;
-        case // up arrow does windowBlind.open()
-        GLUT_KEY_DOWN:
-            windowBlinds.close(blindAnimSpeed);
-            glout << "Blinds Closed" << '\n';
+        case GLUT_KEY_DOWN:
+            cam.moveCamWithColl(Coord(-1 * moveSpeed, 0, 0));
             break;
         case GLUT_KEY_RIGHT:
-            // Coord angle = Coord(0, 0.0349066, 0); //2 degrees
-            // Coord angle = Coord(0, 0.0872665, 0); //5 degrees
-            // Coord radianAngle = angle.degToRad()
             cam.relRot(angle);
             break;
         case GLUT_KEY_LEFT:
@@ -755,11 +828,20 @@ void specialKeyboard(int key, int x, int y) {
             break;
         case GLUT_KEY_HOME:
             fov += 5;
+            glout << "FOV increased to: " << fov << '\n';
             break;
         case GLUT_KEY_END:
             fov -= 5;
+            glout << "FOV decreased to: " << fov << '\n';
             break;
-
+        case GLUT_KEY_F11:
+            if (modifiers & GLUT_ACTIVE_ALT) {
+                selectLockingEnabled = !selectLockingEnabled;
+                glout << "Select Locking: " << (selectLockingEnabled ? "Enabled" : "Disabled") << '\n';
+            } else {
+                bufferPeeking = true;
+            }
+            break;
         default:
             break;
     }
@@ -767,6 +849,7 @@ void specialKeyboard(int key, int x, int y) {
 }
 #endif
 
+#ifndef FOLDING_REGION_ANIMATION
 float cardDistFun() {
     cardDist = cam.pos.dist(Coord(18.6000004, 1.84333336, 0.25));
     return cardDist;
@@ -806,6 +889,80 @@ void cardAnimate() {
     }
 }
 
+void animBlinds() {
+    if (animatingBlinds == DOOR_OPENING) {
+        windowBlinds.open(0.01);
+        if (windowBlinds.closedFactor <= 0.00001) {
+            animatingBlinds = DOOR_OPENED_STOPPED;
+            windowBlinds.closedFactor = 0;
+        }
+    } else if (animatingBlinds == DOOR_CLOSING) {
+        windowBlinds.close(0.01);
+        if (windowBlinds.closedFactor >= 1) {
+            animatingBlinds = DOOR_CLOSED_STOPPED;
+            windowBlinds.closedFactor = 1;
+        }
+    }
+}
+
+
+int peek = 0;
+int numPeeks = 1000;
+
+void peekHiddenBuffer() {
+    //peek the hidden buffer for numPeeks iterations of the animation function:
+    if (peek < numPeeks) {
+        bufferPeeking = true;
+        peek++;
+        debugMap[27] = "Peeking Buffer; " + std::to_string(peek) + "/" + std::to_string(numPeeks);
+    } else {
+        bufferPeeking = false;
+        peek = 0;
+        debugMap[27] = "";
+    }
+}
+
+//right-click menu:
+void menu(int id) {
+    switch (id) {
+        case 2: winner = 1;
+            glout << "Winner is now " << retWinner() << '\n';
+            break;
+        case 3: winner = 0;
+            glout << "Winner is now " << retWinner() << '\n';
+            break;
+        case 4: winner = useTimeToSeedRandomToSetWinner();
+            glout << "Winner is now " << retWinner() << '\n';
+            break;
+    }
+}
+
+void quitMenu(int id) {
+    switch (id) {
+        case 1: exit(0);
+            break;
+    }
+}
+
+void top_menu(int id) {
+    if (id == 1) exit(0);
+}
+
+
+void makeMenu(void) {
+    int menui = glutCreateMenu(menu);
+    glutAddMenuEntry("Set Winner to Username", 2);
+    glutAddMenuEntry("Set Winner to Day of Week", 3);
+    glutAddMenuEntry("Set Winner to Random", 4);
+
+
+    glutCreateMenu(top_menu);
+    glutAddSubMenu("Winner Menu", menui);
+
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
 void animate(int value) {
     // add value to the debugMap
     debugMap[60 - 5] = "MysteryValue: " + std::to_string(value);
@@ -815,20 +972,18 @@ void animate(int value) {
         cardAnimate();
     }
 
-
+    if (animatingBlinds == DOOR_OPENING || animatingBlinds == DOOR_CLOSING) {
+        animBlinds();
+    }
+    if (bufferPeeking) {
+        peekHiddenBuffer();
+    }
 
     glutTimerFunc(5, animate, 1);
     glutPostRedisplay();
 }
+#endif
 
-void mouseControl(int button, int state, int x, int y) {
-    if (state == GLUT_DOWN && button == GLUT_LEFT) {
-        selecting = true;
-        xClick = x;
-        yClick = height - y; //for screen vs mouse coordinates
-        glutPostRedisplay();
-    }
-}
 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
@@ -844,6 +999,7 @@ int main(int argc, char **argv) {
     glutPassiveMotionFunc(NULL);
     glutSpecialFunc(specialKeyboard);
     glutMouseFunc(mouseControl);
+    makeMenu();
 
     glutTimerFunc(5, animate, 1);
 
@@ -854,5 +1010,3 @@ int main(int argc, char **argv) {
     glutMainLoop();
     return 0;
 }
-
-
