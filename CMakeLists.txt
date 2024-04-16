@@ -30,8 +30,8 @@ add_executable(${MAIN_BINARY_NAME} main.cpp
         src/globals.h
         src/globals.cpp
         src/Scenedraw.cpp
-        src/testingFunctions.cpp
-        src/testingFunctions.h
+
+
 )
 target_link_libraries (${MAIN_BINARY_NAME}  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
@@ -56,8 +56,7 @@ add_executable(${TESTING_BINARY_NAME} mainForTesting.cpp
 #        src/globals.h
 #        src/globals.cpp
 #        src/Scenedraw.cpp
-#        src/testingFunctions.cpp
-#        src/testingFunctions.h
+
 
 )
 

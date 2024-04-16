@@ -177,9 +177,9 @@ Material buttonMat = Material( //emissive bluish color
 
 Material cardMat = Material(
        ColorData(0.3f,0.3f,0.3f, 1.0f),
-        ColorData(0.05f, 0.05f, 0.1f, 1.0f), // Lower ambient for better shine
-        ColorData(0.15f, 0.25f, 0.8f, 1.0f), // Slightly lighter blue (optional)
-        10.0f); // Very high shininess for sharp highlight
+        ColorData(0.05f, 0.05f, 0.1f, 1.0f),
+        ColorData(0.15f, 0.25f, 0.8f, 1.0f),
+        10.0f);
 
 Material castIronMat = Material( // nearly black, metallic
     ColorData(1.0f, 1.0f, 1.0f, 1.0f),
@@ -260,22 +260,6 @@ Light brightRed = Light(
     ColorData(0.2f, 0.05f, 0.05f, 1),
     ColorData(1.0f, 0.2f, 0.2f, 1.0f),
     ColorData(1.0f, 0.2f, 0.2f, 1.0f));
-//
-// Light brightGreen = Light(
-//     Light::LIGHT5,
-//     ColorData(Coord(0, 10, 0), 1.0),
-// ColorData(0.05f, 0.2f, 0.05f, 1),
-// ColorData(0.2f, 1.0f, 0.2f, 1.0f),
-// ColorData(0.2f, 1.0f, 0.2f, 1.0f));
-//
-// Light brightBlue = Light(
-//     Light::LIGHT6,
-//     ColorData(Coord(0, 10, 0), 1.0),
-//     ColorData(0.05f, 0.05f, 0.2f, 1),
-//     ColorData(0.2f, 0.2f, 1.0f, 1.0f),
-//     ColorData(0.2f, 0.2f, 1.0f, 1.0f));
-
-
 
 Spotlight headLamp = Spotlight(
     brightWhite,

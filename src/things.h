@@ -1,16 +1,20 @@
-//
-// Created by tgsp on 4/3/2024.
-//
+//                  __      __  __    _                    __
+//    ______________\ \    / /_/ /_  (_)___  ____ ______  / /_
+//   / ___/ ___/ ___/\ \  / __/ __ \/ / __ \/ __ `/ ___/ / __ \
+//  (__  ) /  / /__   \ \/ /_/ / / / / / / / /_/ (__  ) / / / /
+// /____/_/   \___/    \_\__/_/ /_/_/_/ /_/\__, /____(_)_/ /_/
+//                                        /____/
 
 #ifndef TGSOUTHAHW4_THINGS_H
 #define TGSOUTHAHW4_THINGS_H
 
 #include <map>
 
-# include "ColorData.h"
-# include "Coord.h"
-# include "globals.h"
-
+#include "Camera.h"
+#include "ColorData.h"
+#include "Coord.h"
+#include "globals.h"
+#include "things.h"
 
 
 // class things {
@@ -85,5 +89,21 @@ void cubeOfPlanes(Coord bnl, Coord tfr, int numSubDiv, int insideOut = 1, uint8_
 void cubeGLfrom2Points(Coord bnl, Coord tfr, uint8_t mode = SOLID);
 
 
+inline uint8_t animInfo = 0b000;
+inline Coord coneRotAnim = Coord(0, 0, 0);
+inline float coneHeight = 3;
+inline float coneRotSpeed = 5;
+extern std::map<int, std::string> debugMap;
+
+
+void testConeArot(Coord angle = coneRotAnim);
+void testConeA(float height, ColorData colorThing = ColorData(1.0f, 0.0f, 1.0f, 1.0f));
+void testConeCrot(Coord angle, ColorData coloraaaa) ;
+void testInRightPlace(Camera cam);
+
+void testInRightPlace();
+void testDrawingPlanes();
+void testDrawingCubes();
+void windowTest();
 
 #endif //TGSOUTHAHW4_THINGS_H

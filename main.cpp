@@ -22,7 +22,7 @@
 #include "src/ColorData.h"
 
 #include "src/lighting.h"
-#include "src/testingFunctions.h"
+
 #include "src/LeftVP.h"
 #include "src/Scenedraw.h"
 
@@ -94,7 +94,6 @@ float rVPColor[] = {0.2, 0.2, 0.2, 1.0};
 ColorData rVPColorData = ColorData(0.2, 0.2, 0.2, 1.0);
 ColorData solarizedBG = ColorData(0.02745, 0.21176, 0.25882, 1.0);
 ColorData solarizedText = ColorData(0.71373, 0.58039, 0.58824, 1.0);
-
 
 DebugLevel defaultDebug = WEAK;
 bool detachSpotlight = false;
@@ -196,11 +195,9 @@ void drawLitShapes() {
     headLamp.enable();
 
     drawHall();
+    drawClickableObjects();
 
     sunLight.enable();
-
-
-
 
     shinyRed.apply();
     glPushMatrix();
@@ -304,7 +301,7 @@ void activateWindow() {
     animatingBlinds = stateSwitch(animatingBlinds);
 }
 
-void hallLightAction() {
+void mainLightAction() {
     std::string hallLightState;
     roomLight.lightswitch();
     hallLight.lightswitch();
@@ -335,6 +332,9 @@ void getID(int x, int y) {
         case (0 << 16) | (0 << 8) | 255:
             activateDoor();
             break;
+        case (255 << 16) | (0 << 8) | 255:
+            mainLightAction();
+        break;
         default:
             return;
     }
@@ -561,40 +561,35 @@ void keyboard(unsigned char key, int x, int y) {
     std::string hallLightState;
 
     switch (key) {
-        case 'W': //CAMERA FORWARD
+        case 'i': //CAMERA FORWARD
             cam.moveCamWithColl(Coord(1 * moveSpeed, 0, 0));
             break;
-        case 'S': //CAMERA BACKWARD
+        case 'k': //CAMERA BACKWARD
             cam.moveCamWithColl(Coord(-1 * moveSpeed, 0, 0));
             break;
-        case 'A': //CAMERA LEFT
+        case 'j': //CAMERA LEFT
             cam.moveCamWithColl(Coord(0, 0, -1 * moveSpeed));
             break;
-        case 'D': //CAMERA RIGHT
-            if (modifiers & GLUT_ACTIVE_ALT) {
-                hallLightAction();
-            } else {
-                cam.moveCamWithColl(Coord(0, 0, 1 * moveSpeed));
-            }
+        case 'l': //CAMERA RIGHT
+            cam.moveCamWithColl(Coord(0, 0, 1 * moveSpeed));
             break;
-        case 'C': //CAMERA DOWN
+
+        case 'D':
+                mainLightAction();
+            break;
+        case ';': //CAMERA DOWN
             cam.moveCamWithColl(Coord(0, -1 * moveSpeed, 0));
             break;
-        case 'F': //CAMERA UP
+        case '.': //CAMERA UP
             cam.moveCamWithColl(Coord(0, 1 * moveSpeed, 0));
             break;
-        case 'd': //reset all but the camera
+        case 'd':
             if (modifiers & GLUT_ACTIVE_ALT) {
                 activateDoor();
             } else {
-                hallLightAction();
+                mainLightAction();
                 activateDoor();
             }
-            break;
-        case 'R': //reset all
-            glout << DEFAULT;
-        // glClearColor(rVPColorData.R, rVPColorData.G, rVPColorData.B, rVPColorData.A);
-
             break;
         case ' ': //Toggle Mouse control of Camera
             if (modifiers & GLUT_ACTIVE_SHIFT) {
@@ -605,7 +600,9 @@ void keyboard(unsigned char key, int x, int y) {
                 glout << "Mouse Control: " << (useMouse ? "On" : "Off; Use <->  and PGUP/DN") << '\n';
             }
             break;
-
+        case 'w':
+            activateWindow();
+            break;
         case '1':
             if (modifiers & GLUT_ACTIVE_ALT) {
                 enabledFaces = enabledFaces ^ FRONT_FACE;

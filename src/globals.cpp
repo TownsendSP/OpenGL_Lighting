@@ -192,7 +192,6 @@ void addDbgPt(int idx, float xyz[3], float size, float weight) {
     //This is the only thing i can think of that's actually creating data every frame,
     //I was careful to destroy or overwrite all other data logging
     staticPoints.insert(staticPoints.begin() + idx, thingHolder(xyz[0], xyz[1], xyz[2], size, weight));
-
 }
 
 std::vector<thingHolder> getDbgPts() {
@@ -295,7 +294,7 @@ std::string getUName() {
     if (username != nullptr) {
         return username;
     } else {
-        return "Unable to get username.";
+        return "Incognito";
     }
 }
 
@@ -327,7 +326,6 @@ std::string retWinner() {
 }
 
 
-
 //mapping the state to strings for printing
 
 std::map<int, std::string> dbgNormMap = {
@@ -356,7 +354,9 @@ uint8_t enabledFaces = 0b00111111;
 // this is what enables the normals visualization
 void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
     GLfloat normToColors[3];
-    float debugWhyAreMyNormalsBroken[3]  = {whyAreMyNormalsBroken[0], whyAreMyNormalsBroken[1], whyAreMyNormalsBroken[2]};
+    float debugWhyAreMyNormalsBroken[3] = {
+        whyAreMyNormalsBroken[0], whyAreMyNormalsBroken[1], whyAreMyNormalsBroken[2]
+    };
     switch (dbgNormals) {
         case 0:
             glNormal3fv(whyAreMyNormalsBroken);
@@ -380,9 +380,9 @@ void glNormal3fvd(float whyAreMyNormalsBroken[3]) {
             glDisable(GL_LIGHTING);
             break;
         case 4: //just get rid of any values above 0
-            normToColors[0] = whyAreMyNormalsBroken[0] < 0 ? -1*whyAreMyNormalsBroken[0] : 0;
-            normToColors[1] = whyAreMyNormalsBroken[1] < 0 ? -1*whyAreMyNormalsBroken[1] : 0;
-            normToColors[2] = whyAreMyNormalsBroken[2] < 0 ? -1*whyAreMyNormalsBroken[2] : 0;
+            normToColors[0] = whyAreMyNormalsBroken[0] < 0 ? -1 * whyAreMyNormalsBroken[0] : 0;
+            normToColors[1] = whyAreMyNormalsBroken[1] < 0 ? -1 * whyAreMyNormalsBroken[1] : 0;
+            normToColors[2] = whyAreMyNormalsBroken[2] < 0 ? -1 * whyAreMyNormalsBroken[2] : 0;
             glDisable(GL_LIGHTING);
             break;
         default:
@@ -417,13 +417,5 @@ bool selectLock = false;
 bool selectLockingEnabled = false;
 
 
-
 int animatingBlinds = 3;
 int blindsProgress = 0;
-
-
-
-
-
-
-

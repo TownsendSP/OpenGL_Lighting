@@ -1,6 +1,11 @@
 
 
-
+//                  __       _____                          __
+//    ______________\ \     / ___/________  ____  ___  ____/ /________ __      __ _________  ____
+//   / ___/ ___/ ___/\ \    \__ \/ ___/ _ \/ __ \/ _ \/ __  / ___/ __ `/ | /| / // ___/ __ \/ __ \
+//  (__  ) /  / /__   \ \  ___/ / /__/  __/ / / /  __/ /_/ / /  / /_/ /| |/ |/ // /__/ /_/ / /_/ /
+// /____/_/   \___/    \_\/____/\___/\___/_/ /_/\___/\__,_/_/   \__,_/ |__/|__(_)___/ .___/ .___/
+//                                                                                 /_/   /_/
 
 #include "Scenedraw.h"
 #include "Coord.h"
@@ -36,7 +41,7 @@ bool hallCollides(Coord loc) {
 }
 
 
-
+y = 1.15^(-1.3*(x-12))+1
 
 
 Coord troubleshootingBnl = halltfr * 0.45;
@@ -100,7 +105,7 @@ void drawBlinds(Coord bnl, Coord tfr) {
 
 void drawCardWinner1(int winnernum = 0) {
     // Set the color to yellow
-
+    glShadeModel(GL_FLAT);
     cardMat.apply();
     glColor3f(0, 1.0f, 1.0f);
     // Draw the flattened dodecahedron
@@ -108,7 +113,7 @@ void drawCardWinner1(int winnernum = 0) {
     glScalef(1.0f, 1.0f, 0.01f); // Scale in Y dimension to flatten
     glutSolidDodecahedron();
     glPopMatrix();
-
+    glShadeModel(GL_SMOOTH);
     // Set the normal in the Y dimension
     // glNormal3f(0.0f, 1.0f, 0.0f);
 
@@ -380,10 +385,6 @@ void drawHall() {
     cubeOfPlanes(hallBnl, Coord(roomtfr.X, halltfr.Y, halltfr.Z), 40, INSIDEOUT, FRONT_FACE);
 
 
-    //small box for testing, use the shiny textures
-    cardMat.apply();
-    cubeOfPlanes(troubleshootingBnl, troubleshootingtfr, 10, OUTSIDEOUT, ALL_FACE);
-
     //doors:
     lDoorExist();
     rDoorExist();
@@ -487,7 +488,42 @@ void drawHiddenBuffer() {
     cubeOfPlanes(blindsBnl-Coord(1,0,0), {blindsTfr.X+1, blindsTfr.Y, blindsBnl.Z+0.1f}, 20, OUTSIDEOUT, ALL_FACE);
     cubeOfPlanes(blindsBnl+Coord(-1,0,11.9), {blindsTfr.X+1, blindsTfr.Y, 12}, 20, OUTSIDEOUT, ALL_FACE);
     glPopMatrix();
-    glEnable(GL_LIGHTING);
 
+    //magenta cube:
+    glColor3f(255, 0, 255);
+    glPushMatrix();
+    // cubeOfPlanes(hallBnl + Coord(-1.25, 1.5f, 3.5f),hallBnl + Coord(-0.25, 2.5f, 4.5f), 10, OUTSIDEOUT, ALL_FACE);
+    glTranslatef(10, 2, -3);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    glEnable(GL_LIGHTING);
+}
+void drawClickableObjects() {
+    //doorSwitch:
+    castIronMat.apply();
+    glPushMatrix();
+    glTranslatef(9.5, 1.5, 1.5);
+
+    glScalef(0.5, 0.3, 0.3);
+    glutSolidIcosahedron();
+    glPopMatrix();
+
+    //lightSwitch:
+
+    glPushMatrix();
+    glScalef(0.25, 0.25, 0.25);
+    glTranslatefv(hallBnl + Coord(-1.25, 1.5f, 3.5f)+ 0.5);
+    testConeA(1, ColorData(0.1f, 0.1f, 0.1f, 1.0f));
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(10, 2, -3);
+    glScalef(-1, -1, -1);
+    testConeCrot(Coord(D(cam.ang.X), D(cam.ang.Y-PI/2), 0),
+        ColorData(0.0f, 1.0f, 0.0f, 0.3f));
+    glPopMatrix();
 
 }
+
+

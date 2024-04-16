@@ -18,22 +18,6 @@ extern std::map<int, std::string> debugMap;
 extern int lVportW;
 extern int height;
 
-
-// void processConsoleMsgs() {
-//     numConsoleLines = conHeightPercent * height / 15;
-//     for(int i = 0; i < (consoleMsgs.size()<(numConsoleLines-1))?consoleMsgs.size():(numConsoleLines-1); i++) {
-//         glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
-//         glRasterPos3f(3.0, 0.3 * height - i * 15, -1.0);
-//         std::for_each(consoleMsgs[i].msg.begin(), consoleMsgs[i].msg.end(),
-//                       [](int8_t c) { glutBitmapCharacter(GLUT_BITMAP_8_BY_13, c); });
-//
-//         consoleMsgs[i].time -= timeElapsedMillis;
-//         if(consoleMsgs[i].time <= 0) {
-//             consoleMsgs.erase(consoleMsgs.begin() + i);
-//         }
-//     }
-// }
-
 int mNum = 0;
 float rposX = 3;
 
@@ -43,8 +27,6 @@ void processConsoleMsgs() {
 
         if (messageHeight > conHeightPercent * height) {
             glConsole.rm(i);
-            // std::cout << "Removed message " << i << "because messageHeight " << messageHeight << " > maxHeight " <<
-            //         static_cast<int>(conHeightPercent * height) << std::endl;
         } else {
             glColor4f(solarizedText.R, solarizedText.G, solarizedText.B, solarizedText.A);
             glRasterPos3f(rposX, messageHeight, -1.0);
@@ -118,6 +100,4 @@ void setupLeft() {
     glOrtho(0, lVportW, 0, height, -10, 10.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    //add message to
 }
