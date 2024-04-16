@@ -121,11 +121,6 @@ extern Light roomLight;
 extern Light hallLight;
 extern Light sunLight;
 extern Spotlight headLamp;
-// extern Spotlight redLight;
-// extern Spotlight blueLight;
-// extern Spotlight greenLight;
-
-
 
 
 

@@ -1,3 +1,10 @@
+//                     _
+//    ____ ___  ____ _(_)___   _________  ____
+//   / __ `__ \/ __ `/ / __ \ / ___/ __ \/ __ \
+//  / / / / / / /_/ / / / / // /__/ /_/ / /_/ /
+// /_/ /_/ /_/\__,_/_/_/ /_(_)___/ .___/ .___/
+//                              /_/   /_/
+
 #ifdef __APPLE__
 # include <GLUT/glut.h>
 #else
@@ -12,8 +19,6 @@
 #include <string>
 #include <functional>
 #include <map>
-
-//My Imports and Defines
 #include <fstream>
 
 #include "src/Coord.h"

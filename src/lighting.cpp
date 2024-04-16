@@ -1,6 +1,10 @@
-//
-// Created by tgsp on 4/4/2024.
-//
+//                  __        ___       __    __  _
+//    ______________\ \      / (_)___ _/ /_  / /_(_)___  ____ _ _________  ____
+//   / ___/ ___/ ___/\ \    / / / __ `/ __ \/ __/ / __ \/ __ `// ___/ __ \/ __ \
+//  (__  ) /  / /__   \ \  / / / /_/ / / / / /_/ / / / / /_/ // /__/ /_/ / /_/ /
+// /____/_/   \___/    \_\/_/_/\__, /_/ /_/\__/_/_/ /_/\__, (_)___/ .___/ .___/
+//                            /____/                  /____/     /_/   /_/
+
 
 #include "lighting.h"
 
@@ -266,25 +270,6 @@ Spotlight headLamp = Spotlight(
     Coord(1, 0, 0),
     15.0f,
     10.0f);
-
-// Spotlight redLight = Spotlight(
-//     brightRed,
-//     Coord(1, 0, 0),
-//     30.0f,
-//     10.0f);
-//
-// Spotlight greenLight = Spotlight(
-//     brightGreen,
-//     Coord(1, 0, 0),
-//     30.0f,
-//     10.0f);
-//
-// Spotlight blueLight = Spotlight(
-//     brightBlue,
-//     Coord(1, 0, 0),
-//     30.0f,
-//     10.0f);
-
 
 
 

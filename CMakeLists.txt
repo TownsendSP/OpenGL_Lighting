@@ -36,37 +36,6 @@ add_executable(${MAIN_BINARY_NAME} main.cpp
 target_link_libraries (${MAIN_BINARY_NAME}  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
-add_executable(${TESTING_BINARY_NAME} mainForTesting.cpp
-        src/Coord.cpp
-        src/Coord.h
-        src/globals.h
-        src/globals.cpp
-#
-#        src/Camera.cpp
-#        src/Camera.h
-#
-#        src/LeftVP.cpp
-#        src/LeftVP.h
-#        src/things.cpp
-#        src/things.h
-#        src/ColorData.cpp
-#        src/ColorData.h
-#        src/lighting.cpp
-#        src/lighting.h
-#        src/globals.h
-#        src/globals.cpp
-#        src/Scenedraw.cpp
+add_executable(new_target allcombined.cpp allcombined.h)
 
-
-)
-
-target_link_libraries (${TESTING_BINARY_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
-
-
-set(CMAKE_CURRENT_SOURCE_DIR "C:/Users/tgsp/AppData/Roaming/JetBrains/CLion2024.1/scratches")
-file(GLOB SCRATCH_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-foreach(SCRATCH_SOURCE ${SCRATCH_SOURCES})
-    get_filename_component(SCRATCH_NAME ${SCRATCH_SOURCE} NAME_WE)
-    add_executable(${SCRATCH_NAME} ${SCRATCH_SOURCE})
-    target_link_libraries(${SCRATCH_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
-endforeach()
+target_link_libraries (new_target  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
