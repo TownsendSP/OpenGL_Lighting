@@ -41,7 +41,7 @@ bool hallCollides(Coord loc) {
 }
 
 
-y = 1.15^(-1.3*(x-12))+1
+//y = 1.15^(-1.3*(x-12))+1
 
 
 Coord troubleshootingBnl = halltfr * 0.45;

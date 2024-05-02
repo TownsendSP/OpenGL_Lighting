@@ -2659,7 +2659,7 @@ void drawClickableObjects() {
 # include <GL/glut.h>
 #endif
 
-#include "src/globals.h"
+
 #include <iostream>
 #include <chrono>
 #include <cmath>
@@ -2669,15 +2669,15 @@ void drawClickableObjects() {
 #include <map>
 #include <fstream>
 
-#include "src/Coord.h"
-#include "src/Camera.h"
-#include "src/things.h"
-#include "src/ColorData.h"
 
-#include "src/lighting.h"
 
-#include "src/LeftVP.h"
-#include "src/Scenedraw.h"
+
+
+
+
+
+
+
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 

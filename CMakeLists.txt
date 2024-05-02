@@ -36,6 +36,6 @@ add_executable(${MAIN_BINARY_NAME} main.cpp
 target_link_libraries (${MAIN_BINARY_NAME}  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
-add_executable(new_target allcombined.cpp allcombined.h)
+add_executable(new_target tgsouthaHW4.cpp tgsouthaHW4.cpp)
 
 target_link_libraries (new_target  ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})

@@ -1,0 +1,327 @@
+@startuml
+hide empty circle
+hide empty members
+left to right direction
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+
+component GLStreamOut as " GLStreamOut" {
+component GLStreamOut_parseControlChars as "  parseControlChars"
+component GLStreamOut_overflow as "  overflow"
+component GLStreamOut_sync as "  sync"
+component GLStreamOut_getConsole as "  getConsole"
+component GLStreamOut_rm as "  rm"
+}
+
+component GLInfo as " GLInfo" {
+component GLInfo_overflow as "  overflow"
+component GLInfo_sync as "  sync"
+component GLInfo_getInfo as "  getInfo"
+}
+
+component Coord as " Coord" {
+component Coord_Coord as "  Coord"
+component Coord_toHexString as "  toHexString"
+component Coord_wrap as "  wrap"
+component Coord_wrap as "  wrap"
+component Coord_radiansToDegrees as "  radiansToDegrees"
+component Coord_degToRad as "  degToRad"
+component Coord_dirVecToRad as "  dirVecToRad"
+component Coord_radiansToDirVec as "  radiansToDirVec"
+component Coord_toStrings as "  toStrings"
+component Coord_toStrings as "  toStrings"
+component Coord_debug as "  debug"
+component Coord_toString as "  toString"
+}
+
+component Light as " Light" {
+component Light_Light as "  Light"
+component Light_Light as "  Light"
+component Light_setup as "  setup"
+component Light_enable as "  enable"
+component Light_disable as "  disable"
+component Light_lightswitch as "  lightswitch"
+component Light_lightswitch as "  lightswitch"
+component Light_lightNum as "  lightNum"
+}
+
+component Spotlight as " Spotlight" {
+component Spotlight_Spotlight as "  Spotlight"
+component Spotlight_Spotlight as "  Spotlight"
+component Spotlight_Spotlight as "  Spotlight"
+component Spotlight_setup as "  setup"
+component Spotlight_drawVis as "  drawVis"
+}
+
+component Material as " Material" {
+component Material_Material as "  Material"
+component Material_Material as "  Material"
+component Material_apply as "  apply"
+}
+
+component Blinds as " Blinds" {
+component Blinds_Blinds as "  Blinds"
+component Blinds_drawBlade as "  drawBlade"
+component Blinds_drawDbgPoints as "  drawDbgPoints"
+component Blinds_draw as "  draw"
+component Blinds_open as "  open"
+component Blinds_close as "  close"
+component Blinds_animate as "  animate"
+}
+
+component Debug3Dx as " Debug3Dx" {
+component Debug3Dx_Debug3Dx as "  Debug3Dx"
+component Debug3Dx_Debug3Dx as "  Debug3Dx"
+component Debug3Dx_Debug3Dx as "  Debug3Dx"
+component Debug3Dx_draw as "  draw"
+component Debug3Dx_draw as "  draw"
+}
+
+component Camera as " Camera" {
+component Camera_Camera as "  Camera"
+component Camera_Camera as "  Camera"
+component Camera_Camera as "  Camera"
+component Camera_normDirVec as "  normDirVec"
+component Camera_saveToFile as "  saveToFile"
+component Camera_loadFromFile as "  loadFromFile"
+component Camera_setPitchYaw as "  setPitchYaw"
+component Camera_whichSpace as "  whichSpace"
+component Camera_collisionYZ as "  collisionYZ"
+component Camera_collisionYX as "  collisionYX"
+component Camera_collisionXZ as "  collisionXZ"
+component Camera_getRelTrans as "  getRelTrans"
+component Camera_relTrans as "  relTrans"
+component Camera_relRot as "  relRot"
+component Camera_updateCardInfo as "  updateCardInfo"
+component Camera_moveCamWithColl as "  moveCamWithColl"
+component Camera_lookAt as "  lookAt"
+component Camera_useDebugStringAdd as "  useDebugStringAdd"
+component Camera_toString as "  toString"
+}
+
+component _addDbgPt as "  addDbgPt"
+component _getDbgPts as "  getDbgPts"
+component _getNextPoint as "  getNextPoint"
+component _xx8 as "  xx8"
+component _xd8 as "  xd8"
+component _xx16 as "  xx16"
+component _xd16 as "  xd16"
+component _xx32 as "  xx32"
+component _xd32 as "  xd32"
+component _xx64 as "  xx64"
+component _xd64 as "  xd64"
+component _xs8 as "  xs8"
+component _xs16 as "  xs16"
+component _xs32 as "  xs32"
+component _xs64 as "  xs64"
+component _getUName as "  getUName"
+component _getDayOfWeek as "  getDayOfWeek"
+component _useTimeToSeedRandomToSetWinner as "  useTimeToSeedRandomToSetWinner"
+component _retWinner as "  retWinner"
+component _nextDbgState as "  nextDbgState"
+component _glNormal3fvd as "  glNormal3fvd"
+component _mapInsert as "  mapInsert"
+component _trunc as "  trunc"
+component _dist as "  dist"
+component _srnd as "  srnd"
+component _srndi as "  srndi"
+component _randomNaiveNotSeeded as "  randomNaiveNotSeeded"
+component _genRandNonCoLinearCord as "  genRandNonCoLinearCord"
+component _isColorCloseEnough as "  isColorCloseEnough"
+component _processConsoleMsgs as "  processConsoleMsgs"
+component _drawLeft as "  drawLeft"
+component _setupLeft as "  setupLeft"
+component _drawBlinds as "  drawBlinds"
+component _drawXZxGridlines as "  drawXZxGridlines"
+component _drawBMPStr as "  drawBMPStr"
+component _drawFlatPlaneYZ as "  drawFlatPlaneYZ"
+component _drawFlatPlaneXY as "  drawFlatPlaneXY"
+component _drawFlatPlaneXZ as "  drawFlatPlaneXZ"
+component _drawPlane as "  drawPlane"
+component _cubeGLfrom2Points as "  cubeGLfrom2Points"
+component _drawInsideOutCube as "  drawInsideOutCube"
+component _cubeOfPlanes as "  cubeOfPlanes"
+component _testConeA as "  testConeA"
+component _testConeCrot as "  testConeCrot"
+component _testInRightPlace as "  testInRightPlace"
+component _testDrawingCubes as "  testDrawingCubes"
+component _windowTest as "  windowTest"
+component _sToF as "  sToF"
+component _readFileLines as "  readFileLines"
+component _splitAndConvertToFloats as "  splitAndConvertToFloats"
+component _calcPitchYaw as "  calcPitchYaw"
+component _calcTarget as "  calcTarget"
+component _floatToHexString as "  floatToHexString"
+component _hexStringToFloat as "  hexStringToFloat"
+component _roomCollides as "  roomCollides"
+component _hallCollides as "  hallCollides"
+component _t as "  t"
+component _returnEvenlySpaced as "  returnEvenlySpaced"
+component _drawCardWinner1 as "  drawCardWinner1"
+component _makeLeg as "  makeLeg"
+component _drawLeg as "  drawLeg"
+component _drawTable as "  drawTable"
+component _drawContainer as "  drawContainer"
+component _lDoorExist as "  lDoorExist"
+component _rDoorExist as "  rDoorExist"
+component _drawLampCage as "  drawLampCage"
+component _drawLamp as "  drawLamp"
+component _lockInCardNormals as "  lockInCardNormals"
+component _drawCardFinalPos as "  drawCardFinalPos"
+component _drawWinnerAndRotate as "  drawWinnerAndRotate"
+component _drawHall as "  drawHall"
+component _lastHiddenCubeMirrored as "  lastHiddenCubeMirrored"
+component _drawHiddenBuffer as "  drawHiddenBuffer"
+component _drawClickableObjects as "  drawClickableObjects"
+component _calculateFPS as "  calculateFPS"
+component _rotToVec as "  rotToVec"
+component _normalize as "  normalize"
+component _updateSpotlight as "  updateSpotlight"
+component _setupRight as "  setupRight"
+component _backToBasicsCalculateTheDirVec as "  backToBasicsCalculateTheDirVec"
+component _drawLitShapes as "  drawLitShapes"
+component _drawUnlitShapes as "  drawUnlitShapes"
+component _stateSwitch as "  stateSwitch"
+component _activateDoor as "  activateDoor"
+component _activateWindow as "  activateWindow"
+component _mainLightAction as "  mainLightAction"
+component _getID as "  getID"
+component _drawWindow as "  drawWindow"
+component _showKeybindings as "  showKeybindings"
+component _myPause as "  myPause"
+component _setupObjects as "  setupObjects"
+component _setupLights as "  setupLights"
+component _setup as "  setup"
+component _resize as "  resize"
+component _mouseControl as "  mouseControl"
+component _mouse as "  mouse"
+component _toggleMouse as "  toggleMouse"
+component _modGlobAmb as "  modGlobAmb"
+component _keyboard as "  keyboard"
+component _testCharacterPrinting as "  testCharacterPrinting"
+component _specialKeyboard as "  specialKeyboard"
+component _cardDistFun as "  cardDistFun"
+component _doorAnimate as "  doorAnimate"
+component _cardAnimate as "  cardAnimate"
+component _animBlinds as "  animBlinds"
+component _peekHiddenBuffer as "  peekHiddenBuffer"
+component _menu as "  menu"
+component _quitMenu as "  quitMenu"
+component _top_menu as "  top_menu"
+component _makeMenu as "  makeMenu"
+component _animate as "  animate"
+component _main as "  main"
+GLStreamOut_parseControlChars --> _xx8
+GLStreamOut_sync --> GLStreamOut_parseControlChars
+_retWinner --> _getUName
+_retWinner --> _getDayOfWeek
+_srndi --> _srnd
+Coord_toStrings --> _trunc
+Coord_debug --> _addDbgPt
+Coord_toString --> Coord_toStrings
+Spotlight_setup --> Light_setup
+_drawLeft --> _processConsoleMsgs
+Blinds_draw --> Blinds_drawBlade
+Blinds_draw --> Blinds_drawDbgPoints
+_drawPlane --> _glNormal3fvd
+_drawPlane --> _drawFlatPlaneXZ
+_drawPlane --> _drawFlatPlaneXY
+_drawPlane --> _drawFlatPlaneYZ
+_drawInsideOutCube --> _drawPlane
+_cubeOfPlanes --> _drawInsideOutCube
+_cubeOfPlanes --> _glNormal3fvd
+_cubeOfPlanes --> _drawPlane
+_testConeCrot --> _testConeA
+_testInRightPlace --> _testConeCrot
+_testDrawingCubes --> _cubeOfPlanes
+_windowTest --> _cubeGLfrom2Points
+Camera_Camera --> _calcPitchYaw
+Camera_loadFromFile --> _readFileLines
+Camera_loadFromFile --> _splitAndConvertToFloats
+Camera_collisionYZ --> Camera_whichSpace
+Camera_moveCamWithColl --> Camera_collisionYZ
+Camera_moveCamWithColl --> Camera_collisionYX
+Camera_moveCamWithColl --> Camera_collisionXZ
+Camera_moveCamWithColl --> Camera_updateCardInfo
+Camera_lookAt --> Camera_toString
+_drawCardWinner1 --> _retWinner
+_drawLeg --> _makeLeg
+_drawTable --> _cubeOfPlanes
+_drawTable --> _drawLeg
+_drawContainer --> _cubeOfPlanes
+_lDoorExist --> _cubeOfPlanes
+_rDoorExist --> _lDoorExist
+_drawLamp --> _t
+_drawLamp --> _drawLampCage
+_lockInCardNormals --> _drawCardWinner1
+_drawCardFinalPos --> _lockInCardNormals
+_drawWinnerAndRotate --> _drawCardFinalPos
+_drawHall --> _cubeOfPlanes
+_drawHall --> _drawLamp
+_drawHall --> _drawBlinds
+_drawHall --> _lDoorExist
+_drawHall --> _rDoorExist
+_drawHall --> _drawTable
+_drawHall --> _drawContainer
+_drawHall --> _drawWinnerAndRotate
+_lastHiddenCubeMirrored --> _cubeOfPlanes
+_drawHiddenBuffer --> _cubeOfPlanes
+_drawClickableObjects --> _testConeA
+_drawClickableObjects --> _testConeCrot
+_setupRight --> _updateSpotlight
+_drawLitShapes --> _drawHall
+_drawLitShapes --> _drawClickableObjects
+_drawUnlitShapes --> _drawXZxGridlines
+_drawUnlitShapes --> _drawHiddenBuffer
+_drawUnlitShapes --> _getDbgPts
+_drawUnlitShapes --> _testDrawingCubes
+_drawUnlitShapes --> _windowTest
+_activateDoor --> _stateSwitch
+_activateWindow --> _stateSwitch
+_getID --> _activateWindow
+_getID --> _activateDoor
+_getID --> _mainLightAction
+_drawWindow --> _setupLeft
+_drawWindow --> _calculateFPS
+_drawWindow --> _drawLeft
+_drawWindow --> _setupRight
+_drawWindow --> _drawHiddenBuffer
+_drawWindow --> _getID
+_drawWindow --> _drawUnlitShapes
+_drawWindow --> _drawLitShapes
+_setup --> _useTimeToSeedRandomToSetWinner
+_setup --> _setupObjects
+_toggleMouse --> _mouse
+_keyboard --> _mainLightAction
+_keyboard --> _activateDoor
+_keyboard --> _toggleMouse
+_keyboard --> _activateWindow
+_keyboard --> _nextDbgState
+_keyboard --> _modGlobAmb
+_keyboard --> _showKeybindings
+_specialKeyboard --> _resize
+_specialKeyboard --> _activateDoor
+_specialKeyboard --> _retWinner
+_specialKeyboard --> _useTimeToSeedRandomToSetWinner
+_specialKeyboard --> _testCharacterPrinting
+_cardAnimate --> _useTimeToSeedRandomToSetWinner
+_menu --> _retWinner
+_menu --> _useTimeToSeedRandomToSetWinner
+_makeMenu --> _menu
+_makeMenu --> _top_menu
+_animate --> _doorAnimate
+_animate --> _cardAnimate
+_animate --> _animBlinds
+_animate --> _peekHiddenBuffer
+_animate --> _animate
+_main --> _setup
+_main --> _drawWindow
+_main --> _resize
+_main --> _keyboard
+_main --> _specialKeyboard
+_main --> _mouseControl
+_main --> _makeMenu
+_main --> _animate
+
+@enduml

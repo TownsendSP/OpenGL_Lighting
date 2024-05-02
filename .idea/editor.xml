@@ -98,7 +98,6 @@
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/INDENT_SIZE/@EntryValue" value="4" type="int" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/CONTINUOUS_LINE_INDENT/@EntryValue" value="Double" type="string" />
     <option name="/Default/CodeStyle/CodeFormatting/CppFormatting/TAB_WIDTH/@EntryValue" value="4" type="int" />
-    <option name="/Default/CodeEditing/CppDocumentationComment/UseLiveTemplate/@EntryValue" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=29F05EF9E6543B4791C326992DBB487E/@KeyIndexDefined" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=29F05EF9E6543B4791C326992DBB487E/Shortcut/@EntryValue" value="gldisable" type="string" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=29F05EF9E6543B4791C326992DBB487E/Description/@EntryValue" value="disables then enables a gl THing" type="string" />
@@ -119,11 +118,11 @@
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Text/@EntryValue" value="glPushMatrix();&#10;  $SELECTION$ &#10;glPopMatrix();&#10;$END$&#10;" type="string" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/IsBlessed/@EntryValue" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Reformat/@EntryValue" value="true" type="bool" />
-    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/ShortenQualifiedReferences/@EntryValue" value="true" type="bool" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Temjellplate/=653BCF5C0EE60643845C1890F142E46A/ShortenQualifiedReferences/@EntryValue" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Applicability/=Surround/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Scope/=F6696F8185506F41B9C4252540BE9C18/@KeyIndexDefined" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Scope/=F6696F8185506F41B9C4252540BE9C18/Type/@EntryValue" value="InCppFile" type="string" />
-    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Scope/=4B847A5ED8F7574F925C66209222DF71/@KeyIndexDefined" value="true" type="bool" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Scope/=4B847A5ED8F7574F925C66209222DF71/@KeyIndexDefined" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Scope/=4B847A5ED8F7574F925C66209222DF71/Type/@EntryValue" value="AtLineStart" type="string" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Shortcut/@EntryValue" value="glpush" type="string" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=1B8A6E2A911B6547814931D2C751EFB0/@KeyIndexDefined" value="true" type="bool" />
@@ -172,10 +171,14 @@
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=D4019C6973798848842B53F3C604D9B4/Scope/=4B847A5ED8F7574F925C66209222DF71/@KeyIndexDefined" value="true" type="bool" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=D4019C6973798848842B53F3C604D9B4/Scope/=4B847A5ED8F7574F925C66209222DF71/Type/@EntryValue" value="AtLineStart" type="string" />
     <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=D4019C6973798848842B53F3C604D9B4/Shortcut/@EntryValue" value="fold" type="string" />
-    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Applicability/=Live/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Applicability/=Live/@EntryIndexedValue" value="false" type="bool" />
     <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Agl_002Eh_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FProgram_0020Files_0020_0028x86_0029_003FWindows_0020Kits_003F10_003Finclude_003F10_002E0_002E22621_002E0_003Fum_003FGL_003Fgl_002Eh/@EntryIndexedValue" value="ExplicitlyExcluded" type="string" />
     <option name="/Default/CodeEditing/CppCodeGeneration/FunctionImplementationKind/@EntryValue" value="ReturnDefaultValue" type="string" />
-    <option name="/Default/CodeEditing/CppCodeGeneration/EmptyCtorsAndDtorsBodyKind/@EntryValue" />
     <option name="/Default/CodeEditing/CppDocumentationComment/AddBriefTag/@EntryValue" value="true" type="bool" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Applicability/=Live/@EntryIndexRemoved" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=1B8A6E2A911B6547814931D2C751EFB0/Applicability/=Live/@EntryIndexedValue" value="false" type="bool" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=1B8A6E2A911B6547814931D2C751EFB0/Applicability/=Live/@EntryIndexRemoved" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=1B8A6E2A911B6547814931D2C751EFB0/Applicability/=Surround/@EntryIndexRemoved" />
+    <option name="/Default/PatternsAndTemplates/LiveTemplates/Template/=653BCF5C0EE60643845C1890F142E46A/Applicability/=Surround/@EntryIndexRemoved" />
   </component>
 </project>
